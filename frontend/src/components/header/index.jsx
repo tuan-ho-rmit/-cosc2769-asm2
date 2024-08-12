@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function Header() {
   return (
-    <div>Header</div>
+    <div style={{height:'64px', backgroundColor:"lightcoral"}}>Header</div>
   )
 }
