@@ -9,7 +9,7 @@ export default function PrivateLayout() {
             <Header />
 
             <div style={{ display: 'flex', flexDirection: 'row', width:'100%', overflow: 'hidden', minHeight: 'calc(100vh - 64px)' }}>
-                <LeftSideBar />
+                {/*<LeftSideBar />*/}
                 <div style={{ flex: 1, overflow: 'auto' }}>
                     <Outlet />
                 </div>
