@@ -1,5 +1,6 @@
 import React from "react";
 import DropDowns from "./DropDowns";
+import { Link } from 'react-router-dom';
 export default function ListOfPosts({posts, onPostEdit, onPostDelete}) {
     
     const post = posts.map((each, index) => {
@@ -14,19 +15,24 @@ export default function ListOfPosts({posts, onPostEdit, onPostDelete}) {
                     </div>
                     <div className="postInfo">
                         <div className="userName">
-                            <p>name</p>
+                            <p>{each.author}</p>
                         </div>
                         <div className="postDate">
-                            <p>date dd/mm/yyyy</p>
+                            <p>{each.date}</p>
                         </div>
                     </div>
                     <div className="dropDown">
                         <DropDowns onEdit={() => onPostEdit(index)} onDelete={() => onPostDelete(index)} />
                     </div>
                 </div>
+                <Link to={`/post/${index}`}>
                 <div className="postContent">
-                    {each}
+                    {each.content}
                 </div>
+                <div className="postContentImg">
+                    {each.images}
+                </div>
+                </Link>
                 <hr className="solid"></hr>
                 <div className="likeComment">
                     <div>
