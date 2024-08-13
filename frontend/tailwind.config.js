@@ -11,6 +11,12 @@ module.exports = {
       yellow: '#FFD369',
       white: '#EEEEEE'
     },
+    fontSize: {
+      base: '12px',
+      title: '16px',
+      subheader: '18px',
+      header: '20px',
+    },
     extend: {},
   },
   plugins: [],
