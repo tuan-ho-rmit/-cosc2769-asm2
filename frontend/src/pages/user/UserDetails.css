@@ -34,11 +34,12 @@
     display: flex;
     font-size: 24px;
     color: white;
+    position: relative;
 }
 .changeNameBtn {
     position: absolute;
-    top: 155px;
-    right: 150px;
+    bottom: 15px;
+    right: -30px;
     padding: 5px;
     cursor: pointer;
     display: flex;
@@ -78,3 +79,13 @@ hr.solid {
     margin-top:60px;
     
   }
+  .nameInput {
+    font-size: 24px;
+    padding: 5px;
+    border: 2px solid #FFD369;
+    border-radius: 5px;
+    color: #393E46;
+    background-color: #FFF;
+    width: 100%;
+    text-align: center;
+}
