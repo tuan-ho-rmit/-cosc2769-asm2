@@ -35,7 +35,7 @@
     border-radius: 25px;
     background-color: #EEEEEE;
     padding:10px;
-    width: 81%;
+    width: 90%;
   
   }
   
@@ -72,7 +72,10 @@
     margin-top: 25px;
     border-top: 1px solid #bbb;
   }
-  
+  hr.solidPost {
+    /* margin-top: 25px; */
+    border-top: 1px solid #222831;
+  }
   .btnContainer {
     display: flex;
     justify-content: space-between;
@@ -89,7 +92,9 @@
     font-size: 16px;
     width:170px;
   }
-  
+.mx-4 {
+  margin:0px;
+}
   .postListContainer {
     display: flex;
     flex-direction: column;
@@ -128,7 +133,7 @@
   }
   
   .imgContainer {
-    margin-right: 5px;
+    margin-right: 20px;
     /* width: 100px; */
   }
 
@@ -155,11 +160,12 @@
   }
   
   .postContent {
-    font-size: 23px;
+    font-size: 20px;
     line-height: 1.5;
     width: 85%;
     margin:0 auto;
-    word-wrap: break-word; 
+    word-wrap: break-word;
+    color: white;
   }
   
   .mainContent {
@@ -171,4 +177,50 @@
     margin-left: auto;
     color: black;
     
+}
+.likeComment {
+  display: flex;
+  justify-content: space-around;
+  font-size: 20px;
+  color: #FFD369;
+  /* margin-top:5px; */
+  padding:10px;
+
+}
+
+.postContentImg {
+    display: flex; /* Flexbox를 사용하여 가로로 나열 */
+    gap: 10px; /* 이미지 간의 간격 */
+    padding-top:10px;
+    margin-bottom: 20px;
+}
+
+.imageWrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.postImage {
+    width: 100%; /* 이미지의 너비를 조절하세요 */
+    height: auto;
+    border-radius: 5px;
+
+
+}
+
+.imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
 }
