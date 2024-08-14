@@ -17,7 +17,18 @@ module.exports = {
       subheader: '18px',
       header: '20px',
     },
-    extend: {},
+    borderWidth: {
+      DEFAULT: '1px',
+      '0': '0',
+      '1': '1px',
+      '2': '2px'
+    },
+    extend: {
+      borderOpacity: {
+        '10': '10%',
+        '50': '50%',
+      },
+    },
   },
   plugins: [],
 }
