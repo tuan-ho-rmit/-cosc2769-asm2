@@ -3,7 +3,7 @@ import React from 'react'
 export default function Header() {
   return (
       <>
-        <div className='bg-grey text-center h-[50px] border-1 border-white flex flex-row items-center' >
+        <div className='bg-grey text-center h-[50px] border-b-1 border-white flex flex-row items-center' >
           <div className='basis-1/3 justify-start mx-4'>
             <svg className="h-[30px] w-[30px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
