@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+// 기본 이미지 URL을 설정합니다.
+import defaultAvatar from './defaultAvatar.png'; // 이 이미지를 파일 경로에 저장해주세요.
+
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -9,7 +12,7 @@ const Register = () => {
     confirmPassword: '',
     dateOfBirth: '',
     gender: '',
-    avatar: '', // Base64 encoded string
+    avatar: defaultAvatar, // 기본 이미지를 설정합니다.
   });
 
   const handleChange = (e) => {
@@ -19,7 +22,7 @@ const Register = () => {
       reader.onloadend = () => {
         setFormData({
           ...formData,
-          avatar: reader.result,
+          avatar: reader.result, // 업로드된 이미지로 대체합니다.
         });
       };
       reader.readAsDataURL(files[0]);
@@ -61,12 +64,33 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg" style={{ marginTop: '2rem' }}>
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Register</h2>
+      <div className="w-full max-w-md p-8 bg-grey shadow-md rounded-lg" style={{ marginTop: '2rem' }}>
+        <h2 className="text-2xl font-bold mb-6 text-center text-white">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={formData.avatar}
+              alt="User Avatar"
+              className="w-24 h-24 rounded-full border-4 border-yellow-500"
+            />
+            <label
+              htmlFor="avatar"
+              className="mt-4 px-4 py-2 border border-yellow text-yellow text-sm rounded-full cursor-pointer"
+            >
+              Upload a Photo
+              <input
+                id="avatar"
+                type="file"
+                name="avatar"
+                accept="image/*"
+                onChange={handleChange}
+                className="hidden"
+              />
+            </label>
+          </div>
           <div className="flex space-x-4">
             <div className="flex-1">
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Enter Your Last Name</label>
+              <label htmlFor="lastName" className="block text-sm font-medium text-white">Enter Your Last Name</label>
               <input
                 id="lastName"
                 type="text"
@@ -79,7 +103,7 @@ const Register = () => {
               />
             </div>
             <div className="flex-1">
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Enter Your First Name</label>
+              <label htmlFor="firstName" className="block text-sm font-medium text-white">Enter Your First Name</label>
               <input
                 id="firstName"
                 type="text"
@@ -93,7 +117,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Enter Your Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-white">Enter Your Email</label>
             <input
               id="email"
               type="email"
@@ -106,7 +130,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Enter a New Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-white">Enter a New Password</label>
             <input
               id="password"
               type="password"
@@ -119,7 +143,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Re-enter the Password</label>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white">Re-enter the Password</label>
             <input
               id="confirmPassword"
               type="password"
@@ -132,7 +156,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <label htmlFor="dateOfBirth" className="block text-sm font-medium text-white">Date of Birth</label>
             <input
               id="dateOfBirth"
               type="date"
@@ -144,7 +168,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>
+            <label htmlFor="gender" className="block text-sm font-medium text-white">Gender</label>
             <select
               id="gender"
               name="gender"
@@ -160,30 +184,19 @@ const Register = () => {
             </select>
           </div>
           <div>
-            <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">Upload a Photo</label>
-            <input
-              id="avatar"
-              type="file"
-              name="avatar"
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-indigo-900 text-yellow-500 text-lg font-bold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full py-2 px-4 bg-black text-yellow text-lg font-bold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               Register
             </button>
           </div>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-white">
           Already have an account? <a href="/login" className="text-indigo-600 hover:underline">Log in</a> instead
         </p>
       </div>
     </div>
-
   );
 };
 
