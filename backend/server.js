@@ -2,15 +2,16 @@ import dotenv from "dotenv";
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from "cors";
-import authRoutes from './routes/authRoutes.js'
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
 const app = express();
+
 const corsOptions = {
     origin: true,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "skip"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // MongoDB connection
@@ -24,7 +25,7 @@ const connect = async () => {
 };
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increase the body size limit for large image uploads
 app.use(cors(corsOptions));
 
 // Routes
@@ -33,8 +34,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 
-
 app.listen(process.env.PORT || 3000, () => {
     connect();
-    console.log("Server is running on port 3000");
+    console.log(`Server is running on port ${process.env.PORT || 3000}`);
 });
