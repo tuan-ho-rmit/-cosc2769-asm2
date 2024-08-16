@@ -4,6 +4,7 @@ import Register from "./register";
 import Group from "./group";
 import PrivateLayout from "../components/private-layout";
 import PostDetail from "./post/PostDetail";
+import UserDetails from "./user/UserDetails";
 
 export const router = createBrowserRouter([
   {
@@ -14,7 +15,8 @@ export const router = createBrowserRouter([
       { path: 'groups', element: <Group /> },   
       { path: '/register', element: <Register /> }, 
       { path: '/register', element: <Register /> },
-      { path: 'post/:id', element: <PostDetail /> }, 
+      { path: 'post/:id', element: <PostDetail /> },
+      { path: '/userdetail', element: <UserDetails /> }, 
     ],
   },
 ]);
