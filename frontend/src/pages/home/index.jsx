@@ -103,7 +103,7 @@ export default function Home() {
   }
 
   return (
-    <div className="mainContent">
+    <div className="newFeedContent">
       <CreatePost text={text} onAdd={handleAddPost} onPostChange={handleInput} />
       <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} />
     </div>

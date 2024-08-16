@@ -105,6 +105,7 @@
   }
   
   .postContainer {
+
     padding-top:15px;
     color: #ccc;
     padding-bottom: 40px;
@@ -113,6 +114,8 @@
     border-radius: 10px;
     padding:20px;
   }
+
+  
   
   
   .postHeaderForInputPost {
@@ -168,7 +171,7 @@
     color: white;
   }
   
-  .mainContent {
+  .newFeedContent {
     width: 700px;
     margin: 0 auto;
     margin-top:100px;
