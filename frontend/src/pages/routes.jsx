@@ -3,6 +3,7 @@ import Home from "./home";
 import Register from "./register";
 import Group from "./group";
 import PrivateLayout from "../components/private-layout";
+import PostDetail from "./post/PostDetail";
 
 export const router = createBrowserRouter([
   {
@@ -11,7 +12,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },       
       { path: 'groups', element: <Group /> },   
-      { path: '/register', element: <Register /> }, 
+      { path: '/register', element: <Register /> },
+      { path: 'post/:id', element: <PostDetail /> }, 
     ],
   },
 ]);
