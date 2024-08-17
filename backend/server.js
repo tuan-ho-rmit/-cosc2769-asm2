@@ -6,7 +6,6 @@ import authRoutes from './routes/authRoutes.js';
 import User from './models/User.js';
 import bcrypt from 'bcrypt';
 
-
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
 const app = express();
@@ -16,7 +15,6 @@ const corsOptions = {
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 };
-
 
 // MongoDB connection
 const connect = async () => {
@@ -38,29 +36,35 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 
-// login
+//login route
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
-
+  
     try {
         const user = await User.findOne({ email });
-
+    
         if (!user) {
-            return res.status(400).json({ message: 'Email or password is incorrect' });
+          return res.status(400).json({ message: 'Email or password is incorrect' });
         }
-
+    
+        console.log("Entered password:", password); // check input pw
+        console.log("Stored hashed password:", user.password); // check saved pw
+    
         const isMatch = await bcrypt.compare(password, user.password);
-
+    
         if (!isMatch) {
-            return res.status(400).json({ message: 'Email or password is incorrect' });
+          console.log("Password does not match");
+          return res.status(400).json({ message: 'Email or password is incorrect' });
         }
-
+    
+        console.log("Password matches");
         res.status(200).json({ message: 'Successful authentication' });
-    } catch (err) {
+      } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
-    }
-});
+      }
+    });
+
 
 
 app.listen(process.env.PORT || 3000, () => {

@@ -9,6 +9,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // input data validation
+    if (!email || !password) {
+      alert("Email and password must not be empty");
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
@@ -16,6 +22,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // can be differ to CORS setting 
       });
 
       const data = await response.json();

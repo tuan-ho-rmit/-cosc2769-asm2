@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 // Handle user registration
 export const registerUser = async (req, res) => {
@@ -13,9 +13,11 @@ export const registerUser = async (req, res) => {
     }
 
     // Password hashing
+    console.log("Plain password:", password); // check origin pw
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password to be saved:", hashedPassword); // check hashed pw
 
-    // Create a new user object with the Base64 image
+    // Create a new user object
     const newUser = new User({
       firstName,
       lastName,
@@ -23,13 +25,19 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
       dateOfBirth,
       gender,
-      avatar, // Store the Base64 image string directly in MongoDB
+      avatar,
     });
 
+    // Save the user to the database
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
+    // check stored pw
+    const savedUser = await User.findOne({ email });
+    console.log("Stored hashed password:", savedUser.password);
+
+    res.status(201).json({ message: 'User registered successfully', user: savedUser });
   } catch (err) {
+    console.error("Error registering user:", err);
     res.status(500).json({ message: 'Error registering user', error: err.message });
   }
 };
