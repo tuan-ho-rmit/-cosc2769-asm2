@@ -1,6 +1,26 @@
-import React from 'react'
+// eslint-disable-next-line no-unused-vars
+import React, {useEffect, useState} from 'react'
+import axios from "axios";
 
 export default function Header() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/auth/users`)
+        .then(user => setUser(user.data))
+        .catch(error => console.log('Error fetching the user:', error));
+    }, []);
+
+  console.log(user)
+  // console.log(user.avatar);
+  // console.log(user.data.avatar);
+
+  const handleAvatarClick = () => {
+    if (user) {
+      window.location.href = '/userdetail';
+    }
+  }
+
   return (
       <>
         <div className='bg-grey text-center h-[50px] border-b-1 border-white flex flex-row items-center' >
@@ -38,8 +58,12 @@ export default function Header() {
               </svg>
             </div>
             <div className='mx-8 items-center'>
-              <img src='/Images/example2.png'
-                   className='w-8 h-8 ring-yellow ring-2 rounded-full content-center' alt='rounded-avatar'/>
+              <img
+                  src='/Images/example2.png'
+                  className='w-8 h-8 ring-yellow ring-2 rounded-full cursor-pointer'
+                  alt='User Avatar'
+                  onClick={handleAvatarClick}
+              />
             </div>
           </div>
         </div>
