@@ -7,10 +7,17 @@ import { usePopUp } from '../../components/popup/usePopUp';
 import CircularProgress from '../../components/CircularProgress';
 import Tooltip from '../../components/tooltip';
 import IcLock from './IcLock';
+import DropdownMenu from '../../components/dropdown-menu';
 
 export default function ConfigPage() {
   const popUpConfig = usePopUp();
   const popUpLockAccount = usePopUp();
+  const menuItems = [
+    { label: 'Account settings', onClick: () => console.log('Account settings') },
+    { label: 'Support', onClick: () => console.log('Support') },
+    { label: 'License', onClick: () => console.log('License') },
+    { label: 'Sign out', onClick: () => console.log('Sign out') },
+  ];
 
   return (
     <div className="mt-10 ml-10 mr-10 mb-10">
@@ -50,6 +57,13 @@ export default function ConfigPage() {
         placeholder="Error TextField"
         error="This field is required"
         style={{ maxWidth: '200px' }}
+      />
+
+      <h4 className="text-lg font-bold mt-8 mb-4">Dropdown menu</h4>
+      <DropdownMenu
+        title="Options"
+        items={menuItems}
+        position="bottom-left"
       />
 
       <h4 className="text-lg font-bold mt-8 mb-4">PopUp</h4>
