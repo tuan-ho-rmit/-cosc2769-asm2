@@ -1,110 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CreatePost from '../../components/post/CreatePost';
 import ListOfPosts from '../../components/post/ListOfPosts';
-import { useState } from 'react';
 import './Home.css';
 
 export default function Home() {
-  const initialPosts = [
-    {
-      id: 1,
-      content: "Nature is incredibly diverse and awe-inspiring. From the towering mountains to the deep oceans, every aspect of nature has something unique to offer. In this post, we'll explore some of the most beautiful natural landscapes on Earth.",
-      author: "John Doe",
-      date: "2024-08-12",
-      images: [
-        "images/example.jpg",
-        "images/example.jpg",
-        "images/example.jpg",
-        "images/example.jpg",
-        "images/example.jpg",
-        "images/example.jpg",
-      ]
-    },
-    {
-      id: 2,
-      content: "Technology is rapidly evolving, bringing about changes that were once thought to be science fiction. From AI and machine learning to quantum computing, let's discuss the future trends that will shape our world.",
-      author: "Jane Smith",
-      date: "2024-08-11",
-      images: [
-        // "images/example.jpg",
-        // "images/example.jpg",
-        // "images/example.jpg",
-      ]
-    },
-    {
-      id: 3,
-      content: "Eating healthy doesn't have to be boring or difficult. In this post, we'll share some delicious and easy-to-make recipes that are both nutritious and tasty. Plus, we'll provide tips on how to maintain a balanced diet.",
-      author: "Emily Brown",
-      date: "2024-08-10",
-      images: [
-        // "images/example.jpg",
-        // "images/example.jpg",
-        // "images/example.jpg",
-      ]
-    },
-    {
-      id: 4,
-      content: "Exercise is crucial for maintaining good health. Whether you prefer running, lifting weights, or practicing yoga, regular physical activity can help you feel better, sleep better, and reduce the risk of many chronic diseases.",
-      author: "Michael Johnson",
-      date: "2024-08-09",
-      images: [
-        // "images/example.jpg",
-        // "images/example.jpg",
-        // "images/example.jpg",
-      ]
-    },
-    {
-      id: 5,
-      content: "Traveling opens your mind to new cultures, foods, and experiences. In this post, we'll explore some of the top travel destinations around the world that should be on every traveler's bucket list.",
-      author: "Sarah Wilson",
-      date: "2024-08-08",
-      images: [
-        // "images/example.jpg",
-        // "images/example.jpg",
-        // "images/example.jpg",
-      ]
-    },
-  ];
+  const [posts, setPostList] = useState([]);
+  const [content, setContent] = useState("");  // 변경된 변수명
+  const [images, setImages] = useState([]);
 
-  const [posts, setPostList] = useState(initialPosts);
-  const [text, setText] = useState("");
+  // 모든 게시글 불러오기
+  useEffect(() => {
+    fetch('http://localhost:3000/api/posts')
+      .then(response => response.json())
+      .then(data => setPostList(data))
+      .catch(error => console.error('Error fetching posts:', error));
+  }, []);
 
+  // 게시글 추가하기
   function handleAddPost() {
-    const newPost = {
-      id: posts.length + 1,
-      content: text,
-      author: "Current User",  // 현재 사용자의 이름을 설정합니다.
-      date: new Date().toISOString().split('T')[0],
-      images: [],  // 이미지는 나중에 추가하거나 비워둘 수 있습니다.
+    const newPostData = {
+      userProfile: "/Images/example.jpg", // 기본 프로필 이미지
+      content: content,  // 변경된 변수명 사용
+      images: images,
     };
-    setPostList([newPost, ...posts]);
-    setText("");
+
+    fetch('http://localhost:3000/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newPostData),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setPostList([data, ...posts]);  // 서버에서 반환된 새로운 Post를 추가
+        setContent("");  // 입력값 초기화
+        setImages([]);  // 이미지 목록 초기화
+      })
+      .catch(error => console.error('Error creating post:', error));
   }
 
   function handleInput(newPost) {
-    setText(newPost);
+    setContent(newPost);  // 변경된 변수명 사용
   }
 
-  function handleEditPost(index) {
-    const updatedContent = prompt("Edit your post:", posts[index].content);
+  function handleEditPost(id) {
+    const updatedContent = prompt("Edit your post:");
     if (updatedContent !== null) {
-      const updatedPosts = posts.map((post, i) =>
-        i === index ? { ...post, content: updatedContent } : post
-      );
-      setPostList(updatedPosts);
+        fetch(`http://localhost:3000/api/posts/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: updatedContent, images: [] }),  // 필요한 데이터를 함께 전송
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(updatedPost => {
+            setPostList(posts.map(post => post._id === id ? updatedPost : post));
+        })
+        .catch(error => console.error('Error updating post:', error));
     }
-  }
+}
 
-  function handleDeletePost(index) {
+  function handleDeletePost(id) {
+    console.log(id); // 삭제할 포스트의 id를 출력하여 확인
+
     if (window.confirm("Are you sure you want to delete this post?")) {
-      const updatedPosts = posts.filter((_, i) => i !== index);
-      setPostList(updatedPosts);
+        fetch(`http://localhost:3000/api/posts/${id}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setPostList(posts.filter(post => post._id !== id));
+        })
+        .catch(error => console.error('Error deleting post:', error));
     }
-  }
+}
 
+
+  
+  
   return (
     <div className="newFeedContent">
-      <CreatePost text={text} onAdd={handleAddPost} onPostChange={handleInput} />
+      <CreatePost text={content} onAdd={handleAddPost} onPostChange={handleInput} />
       <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} />
     </div>
   );
