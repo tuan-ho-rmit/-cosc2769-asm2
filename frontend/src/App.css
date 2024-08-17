@@ -1,3 +1,9 @@
+@import url('https://fonts.cdnfonts.com/css/tt-firs-neue-trl?styles=143111,143113,143105,143108,143110,143101,143099,143103,143097,143115');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: 'TT Firs Neue Trl', 'TT Firs Neue Trial Var Roman', 'TT Firs Neue Trial Var Italic', sans-serif;
+    @apply text-white;
+}
