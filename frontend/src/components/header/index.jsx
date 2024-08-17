@@ -5,6 +5,7 @@ import axios from "axios";
 export default function Header() {
   const [user, setUser] = useState(null);
 
+  // fetch user details
   useEffect(() => {
     axios.get(`http://localhost:3000/api/auth/users`)
         .then(user => setUser(user.data))
@@ -12,6 +13,8 @@ export default function Header() {
     }, []);
 
   console.log(user)
+
+  // TODO: display avatar
   // console.log(user.avatar);
   // console.log(user.data.avatar);
 
