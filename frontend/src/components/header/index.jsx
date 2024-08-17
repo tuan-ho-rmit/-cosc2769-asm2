@@ -37,8 +37,8 @@ export default function Header() {
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
             </div>
-            <div className='mx-8'>
-              <img src='https://scontent.fhan4-3.fna.fbcdn.net/v/t39.30808-6/454539036_476839358283813_2967004303045072180_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=-9m-zIRhoLYQ7kNvgF3oBm_&_nc_ht=scontent.fhan4-3.fna&oh=00_AYAcyZp-BRKgTQ_HzRZA-G0OMKGRy4C84B3jhXkfw6A58g&oe=66C0DFF9'
+            <div className='mx-8 items-center'>
+              <img src='/Images/example2.png'
                    className='w-8 h-8 ring-yellow ring-2 rounded-full content-center' alt='rounded-avatar'/>
             </div>
           </div>
