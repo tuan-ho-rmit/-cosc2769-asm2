@@ -1,0 +1,41 @@
+/* PostDetail.css */
+.postDetailContainer {
+    padding: 20px;
+    /* display: flex; */
+    /* background-color: black; */
+    background-color:#393E46 ;
+    width: 90%;
+    margin: 0 auto;
+    margin-top:30px;
+    margin-bottom:30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    height: 100%;
+
+  }
+  
+  .imageSlider img {
+    width: 33.33%;
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+  
+.imageSlider {
+    width: 100%;
+    background-color: black;
+    margin-top:20px;
+    margin-bottom: 40px;
+
+}
+.postContent {
+    /* margin-top:50px */
+}
+
+.slick-dots li button:before, .slick-dots li.slick-active button:before {
+    font-size: 50px;
+    color: #FFD369;
+}
+.solidPostForDetail {
+    margin-top:0px;
+}
