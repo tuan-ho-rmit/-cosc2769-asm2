@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-// 기본 이미지 URL을 설정합니다.
-import defaultAvatar from './defaultAvatar.png'; // 이 이미지를 파일 경로에 저장해주세요.
+// default img url
+import defaultAvatar from './defaultAvatar.png'; 
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +12,7 @@ const Register = () => {
     confirmPassword: '',
     dateOfBirth: '',
     gender: '',
-    avatar: defaultAvatar, // 기본 이미지를 설정합니다.
+    avatar: defaultAvatar, // default img.
   });
 
   const handleChange = (e) => {
@@ -22,7 +22,7 @@ const Register = () => {
       reader.onloadend = () => {
         setFormData({
           ...formData,
-          avatar: reader.result, // 업로드된 이미지로 대체합니다.
+          avatar: reader.result, // replace it to uploaded img.
         });
       };
       reader.readAsDataURL(files[0]);

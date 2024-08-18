@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       { index: true, element: <Home /> },       
-      { path: 'groups', element: <Group /> },   
+      { path: '/group', element: <Group /> },   
       { path: '/register', element: <Register /> }, 
       { path: '/login', element: <Login /> }, 
     ],

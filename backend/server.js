@@ -36,34 +36,34 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 
-//login route
-app.post('/api/auth/login', async (req, res) => {
-    const { email, password } = req.body;
+// //login route <- moved to authController
+// app.post('/api/auth/login', async (req, res) => {
+//     const { email, password } = req.body;
   
-    try {
-        const user = await User.findOne({ email });
+//     try {
+//         const user = await User.findOne({ email });
     
-        if (!user) {
-          return res.status(400).json({ message: 'Email or password is incorrect' });
-        }
+//         if (!user) {
+//           return res.status(400).json({ message: 'Email or password is incorrect' });
+//         }
     
-        console.log("Entered password:", password); // check input pw
-        console.log("Stored hashed password:", user.password); // check saved pw
+//         console.log("Entered password:", password); // check input pw
+//         console.log("Stored hashed password:", user.password); // check saved pw
     
-        const isMatch = await bcrypt.compare(password, user.password);
+//         const isMatch = await bcrypt.compare(password, user.password);
     
-        if (!isMatch) {
-          console.log("Password does not match");
-          return res.status(400).json({ message: 'Email or password is incorrect' });
-        }
+//         if (!isMatch) {
+//           console.log("Password does not match");
+//           return res.status(400).json({ message: 'Email or password is incorrect' });
+//         }
     
-        console.log("Password matches");
-        res.status(200).json({ message: 'Successful authentication' });
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
-      }
-    });
+//         console.log("Password matches");
+//         res.status(200).json({ message: 'Successful authentication' });
+//       } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: 'Server error' });
+//       }
+//     });
 
 
 
