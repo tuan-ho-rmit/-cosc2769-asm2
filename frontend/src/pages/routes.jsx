@@ -7,6 +7,7 @@ import PostDetail from "./post/PostDetail";
 import UserDetails from "./user/UserDetails";
 import ConfigPage from "./config-page";
 import CreateGroup from "./group/creategroup";
+import ManageGroup from "./managegroup";
 
 export const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },       
       { path: 'groups', element: <Group /> },   
       { path: '/creategroup', element: <CreateGroup /> }, 
-      
+      { path: '/managegroup', element: <ManageGroup /> }, 
       { path: '/register', element: <Register /> }, 
       { path: '/register', element: <Register /> },
       { path: 'post/:id', element: <PostDetail /> },
