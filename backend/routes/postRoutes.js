@@ -14,7 +14,7 @@ router.get('/posts', async (req, res) => {
     }
 });
 
-// Post 추가
+// Create Post
 router.post('/posts', async (req, res) => {
     try {
         const { content, author, images } = req.body;
@@ -33,6 +33,8 @@ router.post('/posts', async (req, res) => {
         res.status(500).json({ message: "Error creating post", error });
     }
 });
+
+// Delete Post
 router.delete('/posts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
@@ -54,6 +56,7 @@ router.delete('/posts/:id', async (req, res) => {
     }
 });
 
+// Update Post
 router.put('/posts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
