@@ -7,6 +7,8 @@ import PrivateLayout from "../components/private-layout";
 import PostDetail from "./post/PostDetail";
 import UserDetails from "./user/UserDetails";
 import ConfigPage from "./config-page";
+import CreateGroup from "./group/creategroup";
+import ManageGroup from "./managegroup";
 
 export const router = createBrowserRouter([
   {
@@ -14,7 +16,9 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       { index: true, element: <Home /> },       
-      { path: '/group', element: <Group /> },   
+      { path: 'groups', element: <Group /> },   
+      { path: '/creategroup', element: <CreateGroup /> }, 
+      { path: '/managegroup', element: <ManageGroup /> }, 
       { path: '/register', element: <Register /> }, 
       { path: '/login', element: <Login /> }, 
       { path: '/register', element: <Register /> },
