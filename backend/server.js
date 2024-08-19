@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js'
 import groupRoutes from './routes/groupRoutes.js';
 import User from './models/User.js';
 import bcrypt from 'bcrypt';
+import postRoutes from './routes/postRoutes.js'
 
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api', postRoutes);
 
 
 
