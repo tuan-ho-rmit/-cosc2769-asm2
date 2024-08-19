@@ -1,0 +1,16 @@
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+    z-index: 1;
+    transition: opacity 0.6s, transform 0.6s;
+}
+
+[data-ripple-light='true'] .ripple {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+[data-ripple-light='false'] .ripple {
+    background: rgba(0, 0, 0, 0.2);
+}
