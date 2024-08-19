@@ -14,6 +14,9 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization", "skip"],
 };
 
+app.use(express.json({ limit: '50mb' })); // 요청 크기 제한을 50MB로 설정
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // 요청 크기 제한을 50MB로 설정
+
 // MongoDB connection
 const connect = async () => {
     try {

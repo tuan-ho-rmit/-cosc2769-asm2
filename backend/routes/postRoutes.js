@@ -6,7 +6,8 @@ const router = express.Router();
 // 모든 Posts 불러오기
 router.get('/posts', async (req, res) => {
     try {
-        const posts = await Post.find();
+        // date 필드를 기준으로 내림차순 정렬하여 가장 최근의 포스트가 맨 위로 오도록 설정
+        const posts = await Post.find().sort({ date: -1 }); 
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -14,15 +15,16 @@ router.get('/posts', async (req, res) => {
     }
 });
 
+
 // Create Post
 router.post('/posts', async (req, res) => {
     try {
-        const { content, author, images } = req.body;
+        const { content, images, userProfile } = req.body;
 
         const newPost = new Post({
             content,
-            author,
-            images,
+            userProfile,
+            images,  // Base64 인코딩된 이미지 배열
             date: new Date(),
         });
 
@@ -81,6 +83,28 @@ router.put('/posts/:id', async (req, res) => {
     } catch (error) {
         console.error('Error updating post:', error);
         res.status(500).json({ message: "Error updating post", error });
+    }
+});
+
+// Read a Post
+router.get('/posts/:id', async (req, res) => {
+    try {
+        const postId = req.params.id;
+
+        // ObjectId가 유효한지 확인
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ message: "Invalid post ID" });
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.status(200).json(post);
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: "Error fetching post", error });
     }
 });
 
