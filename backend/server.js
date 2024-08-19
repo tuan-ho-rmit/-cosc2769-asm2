@@ -3,6 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from "cors";
 import authRoutes from './routes/authRoutes.js'
+import groupRoutes from './routes/groupRoutes.js';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
     res.send('Hello from Express!');
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/groups', groupRoutes);
 
 const posts = [
     {
