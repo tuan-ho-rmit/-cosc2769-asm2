@@ -4,14 +4,17 @@ import mongoose from 'mongoose';
 import cors from "cors";
 import authRoutes from './routes/authRoutes.js'
 import groupRoutes from './routes/groupRoutes.js';
+import User from './models/User.js';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
 const app = express();
+
 const corsOptions = {
     origin: true,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "skip"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // MongoDB connection
@@ -25,7 +28,7 @@ const connect = async () => {
 };
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increase the body size limit for large image uploads
 app.use(cors(corsOptions));
 
 // Routes
@@ -96,11 +99,11 @@ const posts = [
 app.get('/api/posts/:id', (req, res) => {
     const { id } = req.params;
     const post = posts.find(p => p.id === parseInt(id));
-  
+
     if (!post) {
       return res.status(404).send('Post not found');
     }
-  
+
     res.json(post);
   });
 

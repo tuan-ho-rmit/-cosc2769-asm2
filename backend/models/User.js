@@ -1,38 +1,38 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
-const userSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-    },
+const userSchema = new mongoose.Schema({
     email: {
-      type: String,
-      required: true,
-    },
-    avatar: {
-      type: String,
+        type: String,
+        required: true,
+        unique: true,
     },
     password: {
-      type: String,
-      required: true,
+        type: String,
+        required: true,
+    },
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
+    dateOfBirth: {
+        type: Date,
+        required: true,
+    },
+    gender: {
+        type: String,
+        required: true,
     },
     avatar: {
-      type: String,
+        type: String, // Base64 encoded string for avatar image
     },
-    role: {
-      type: String,
-      enum: ["admin", "user"],
-      default: "user",
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+});
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
 
+
+const User = mongoose.model('User', userSchema);
 export default User;
