@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import CreatePost from '../../components/post/CreatePost';
-import ListOfPosts from '../../components/post/ListOfPosts';
+import CreatePost from '../post/components/CreatePost';
+import ListOfPosts from '../post/components/ListOfPosts';
 import './Home.css';
 
 export default function Home() {

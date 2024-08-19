@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CreatePost from '../../components/post/CreatePost';
-import ListOfPosts from '../../components/post/ListOfPosts';
+import CreatePost from '../post/components/CreatePost';
+import ListOfPosts from '../post/components/ListOfPosts';
 import { useState } from 'react';
 import './Group.css';
 
