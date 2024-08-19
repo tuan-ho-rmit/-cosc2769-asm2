@@ -2,14 +2,18 @@ import React from 'react';
 import Header from '../header';
 import LeftSideBar from '../left-side-bar';
 import { Outlet } from 'react-router-dom';
+import RightSideBar from "../right-side-bar";
 
 export default function PrivateLayout() {
     return (
         <>
             <div className='flex flex-col bg-black h-[100vh]'>
-                <Header />
-                <div className='flex flex-row w-[100%] overflow-hidden min-h-[calc(100vh - 64px)]'>
+                <div className='h-auto'>
+                    <Header />
+                </div>
+                <div className='flex flex-row w-[100%] overflow-hidden min-h-[calc(100vh - 50px)]'>
                     <LeftSideBar />
+                    <RightSideBar />
                     <div className='flex-1 overflow-auto'>
                         <Outlet />
                     </div>

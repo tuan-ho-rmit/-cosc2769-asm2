@@ -4,6 +4,9 @@ import Register from "./register";
 import Login from "./login";
 import Group from "./group";
 import PrivateLayout from "../components/private-layout";
+import PostDetail from "./post/PostDetail";
+import UserDetails from "./user/UserDetails";
+import ConfigPage from "./config-page";
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +17,10 @@ export const router = createBrowserRouter([
       { path: '/group', element: <Group /> },   
       { path: '/register', element: <Register /> }, 
       { path: '/login', element: <Login /> }, 
+      { path: '/register', element: <Register /> },
+      { path: 'post/:id', element: <PostDetail /> },
+      { path: '/userdetail', element: <UserDetails /> },
+      {path: 'config', element: <ConfigPage/>}
     ],
   },
 ]);

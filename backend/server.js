@@ -36,38 +36,76 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 
-// //login route <- moved to authController
-// app.post('/api/auth/login', async (req, res) => {
-//     const { email, password } = req.body;
-  
-//     try {
-//         const user = await User.findOne({ email });
-    
-//         if (!user) {
-//           return res.status(400).json({ message: 'Email or password is incorrect' });
-//         }
-    
-//         console.log("Entered password:", password); // check input pw
-//         console.log("Stored hashed password:", user.password); // check saved pw
-    
-//         const isMatch = await bcrypt.compare(password, user.password);
-    
-//         if (!isMatch) {
-//           console.log("Password does not match");
-//           return res.status(400).json({ message: 'Email or password is incorrect' });
-//         }
-    
-//         console.log("Password matches");
-//         res.status(200).json({ message: 'Successful authentication' });
-//       } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Server error' });
-//       }
-//     });
+const posts = [
+    {
+      id: 1,
+      content: "Nature is incredibly diverse and awe-inspiring. From the towering mountains to the deep oceans, every aspect of nature has something unique to offer. In this post, we'll explore some of the most beautiful natural landscapes on Earth.",
+      author: "John Doe",
+      date: "2024-08-12",
+      images: [
+        "/images/example.jpg",
+        "/images/example.jpg",
+        "/images/example.jpg",
+      ]
+    },
+    {
+      id: 2,
+      content: "Technology is rapidly evolving, bringing about changes that were once thought to be science fiction. From AI and machine learning to quantum computing, let's discuss the future trends that will shape our world.",
+      author: "Jane Smith",
+      date: "2024-08-11",
+      images: [
+        "/images/example.jpg",
+        "/images/example.jpg",
+        "/images/example.jpg",
+      ]
+    },
+    {
+      id: 3,
+      content: "Eating healthy doesn't have to be boring or difficult. In this post, we'll share some delicious and easy-to-make recipes that are both nutritious and tasty. Plus, we'll provide tips on how to maintain a balanced diet.",
+      author: "Emily Brown",
+      date: "2024-08-10",
+      images: [
+        "/images/example.jpg",
+        "/images/example.jpg",
+        "/images/example.jpg",
+      ]
+    },
+    {
+      id: 4,
+      content: "Exercise is crucial for maintaining good health. Whether you prefer running, lifting weights, or practicing yoga, regular physical activity can help you feel better, sleep better, and reduce the risk of many chronic diseases.",
+      author: "Michael Johnson",
+      date: "2024-08-09",
+      images: [
+        "/images/example.jpg",
+        "/images/example.jpg",
+        "/images/example.jpg",
+      ]
+    },
+    {
+      id: 5,
+      content: "Traveling opens your mind to new cultures, foods, and experiences. In this post, we'll explore some of the top travel destinations around the world that should be on every traveler's bucket list.",
+      author: "Sarah Wilson",
+      date: "2024-08-08",
+      images: [
+        "/images/example.jpg",
+        "/images/example.jpg",
+        "/images/example.jpg",
+      ]
+    },
+  ];
 
+app.get('/api/posts/:id', (req, res) => {
+    const { id } = req.params;
+    const post = posts.find(p => p.id === parseInt(id));
 
+    if (!post) {
+      return res.status(404).send('Post not found');
+    }
+
+    res.json(post);
+  });
 
 app.listen(process.env.PORT || 3000, () => {
     connect();
-    console.log(`Server is running on port ${process.env.PORT || 3000}`);
+    console.log("Server is running on port 3000");
 });
