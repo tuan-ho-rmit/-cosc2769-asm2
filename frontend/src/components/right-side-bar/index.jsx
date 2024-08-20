@@ -1,7 +1,40 @@
-import React from 'react'
-// import { NotificationsContext } from './NotificationsContext.jsx'
+import React, {useContext} from 'react'
+import { NotificationsContext } from './NotificationsContext.jsx'
+// import useNotifications from "./useNotifications.jsx";
 
 export default function RightSideBar() {
+    // const {notifications, unreadNotifications, updateNotificationsUrl} = useNotifications();
+    const {notifications, unreadNotifications} = useContext(NotificationsContext);
+
+    return (
+        <>
+            {/*<div className='conent-end bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>*/}
+            <div className='bg-black h-[100vh] w-[250px] border-white border-l-1'>
+                <nav>
+                    <h2>Notifications</h2>
+                    <span>
+                        notifications: {notifications}
+                        number of unread noti: {unreadNotifications}
+
+                    </span>
+                    {/*<ul>*/}
+                    {/*    {context.map((notification) => (*/}
+                    {/*        <li key={notification.id}*/}
+                    {/*            className='p-2 border-b border-white bg-black text-white'>*/}
+                    {/*            {notification.content}*/}
+                    {/*        </li>*/}
+                    {/*    ))}*/}
+                    {/*</ul>*/}
+                </nav>
+            </div>
+        </>
+    )
+}
+
+
+//------------------------------------------------------
+// draft
+
     // const {notifications, markAsRead} = useContext(NotificationContext)
     //
     // const handleNotificationClick = (notification) => {
@@ -30,26 +63,26 @@ export default function RightSideBar() {
 
 
 
-    const notifications = [
-        {id: 1, type: 'friend_request', content: 'Mike sent you a friend request', read:false},
-        {id: 2, type: 'reaction', content: 'Mike reacted to your post', read:false},
-        {id: 3, type: 'group_invite', content: 'You were invited to Group "Full Stack Development Group"', read:true},
-    ]
+    // const notifications = [
+    //     {id: 1, type: 'friend_request', content: 'Mike sent you a friend request', read:false},
+    //     {id: 2, type: 'reaction', content: 'Mike reacted to your post', read:false},
+    //     {id: 3, type: 'group_invite', content: 'You were invited to Group "Full Stack Development Group"', read:true},
+    // ]
 
 
-    return (
-        <>
-            <div className=' bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>
-                <nav>
-                    <ul>
-                        {notifications.map((notification) => (
-                            <li key={notification.id} className={`p-2 border-b border-white ${notification.read ? 'bg-black text-white' : 'bg-yellow'}`}>
-                                {notification.content}
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            </div>
-        </>
-    )
-}
+    // return (
+    //     <>
+    //         <div className=' bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>
+    //             <nav>
+    //                 <ul>
+    //                     {notifications.map((notification) => (
+    //                         <li key={notification.id} className={`p-2 border-b border-white ${notification.read ? 'bg-black text-white' : 'bg-yellow'}`}>
+    //                             {notification.content}
+    //                         </li>
+    //                     ))}
+    //                 </ul>
+    //             </nav>
+    //         </div>
+    //     </>
+    // )
+
