@@ -73,29 +73,8 @@ const NotificationsProvider = ({ children }) => {
         }
     }
 
-    // const fetchSequentially = async () => {
-    //     let currentUrlIndex = 0;
-    //     while (currentUrlIndex < urlsToFetch.length) {
-    //         setUrl(urlsToFetch[currentUrlIndex])
-    //         await fetchNotification(url);
-    //         currentUrlIndex += 1;
-    //     }
-    // }
-
 
     useEffect(() => {
-        // // Initial sequential fetch
-        // fetchSequentially().then(() => {
-        //
-        //     // Start periodic fetching after initial sequence completes
-        //     const intervalId = setInterval(() => {
-        //         fetchNotification(url);
-        //     }, 60000); // Fetch every 60 seconds
-        //
-        //     return () => clearInterval(intervalId); // Cleanup on unmount
-        // });
-
-
         fetchNotification()
         const intervalId = setInterval(() => {
             fetchNotification()
@@ -104,11 +83,6 @@ const NotificationsProvider = ({ children }) => {
         return () => clearInterval(intervalId); // Cleanup on component unmount
 
     }, []); // re-fetch if url changes
-
-    // function to update the url
-    // const updateNotificationsUrl = (newUrl) => {
-    //     setUrl(newUrl);
-    // }
 
     const value = {
         notifications,
@@ -122,6 +96,7 @@ const NotificationsProvider = ({ children }) => {
         </NotificationsContext.Provider>
     )
 }
+
 
 export default NotificationsProvider;
 export { NotificationsContext };
