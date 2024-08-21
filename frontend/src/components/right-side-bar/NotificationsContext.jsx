@@ -45,8 +45,13 @@ const NotificationsProvider = ({ children }) => {
             // Apply the filter function to get pending groups
             const filteredGroup = filterPendingGroups(groupsData);
             setPendingGroups(filteredGroup)
+            console.log('filtered groups:', filteredGroup);
             console.log('pending groups:', pendingGroups);
 
+            // count pending groups
+            const countPendingGroups = filteredGroup.length
+            setUnreadNotifications(countPendingGroups);
+            console.log('countPendingGroups:', unreadNotifications);
 
 
             const response2 = await fetch('http://localhost:3000/api/posts', {
