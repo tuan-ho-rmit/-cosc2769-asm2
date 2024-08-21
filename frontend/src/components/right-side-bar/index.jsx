@@ -4,27 +4,27 @@ import { NotificationsContext } from './NotificationsContext.jsx'
 
 export default function RightSideBar() {
     // const {notifications, unreadNotifications, updateNotificationsUrl} = useNotifications();
-    const {notifications, unreadNotifications} = useContext(NotificationsContext);
+    const {notifications, unreadNotifications, pendingGroups} = useContext(NotificationsContext);
+
 
     return (
         <>
-            {/*<div className='conent-end bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>*/}
-            <div className='bg-black h-[100vh] w-[250px] border-white border-l-1'>
+            <div className='conent-end bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>
+            {/*<div className='bg-black h-[100vh] w-[250px] border-white border-l-1'>*/}
                 <nav>
-                    <h2>Notifications</h2>
-                    <span>
-                        notifications: {notifications}
-                        number of unread noti: {unreadNotifications}
-
-                    </span>
-                    {/*<ul>*/}
-                    {/*    {context.map((notification) => (*/}
-                    {/*        <li key={notification.id}*/}
-                    {/*            className='p-2 border-b border-white bg-black text-white'>*/}
-                    {/*            {notification.content}*/}
-                    {/*        </li>*/}
-                    {/*    ))}*/}
-                    {/*</ul>*/}
+                    <ul>
+                        {pendingGroups.length > 0 ? (
+                            pendingGroups.map((group) => (
+                                <li key={group.id}
+                                    className='p-2 border-b border-white bg-black text-white'>
+                                </li>
+                            ))
+                        ) : (
+                            <li>
+                                No Pending Group
+                            </li>
+                        )}
+                    </ul>
                 </nav>
             </div>
         </>
