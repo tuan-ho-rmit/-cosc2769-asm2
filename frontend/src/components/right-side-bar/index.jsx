@@ -9,7 +9,9 @@ export default function RightSideBar() {
 
     return (
         <>
-            <div className='conent-end bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>
+
+            {/*<div className='conent-end bg-black h-[100vh] w-[250px] right-0 absolute border-white border-l-1'>*/}
+            <div className='bg-black h-[100vh] w-[250px] right-0 fixed border-white border-l-1 overflow-y-auto'>
                 <nav>
                     <ul>
                         <div className='p-2 border-b border-white bg-black text-yellow'>
