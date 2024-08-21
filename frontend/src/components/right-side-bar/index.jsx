@@ -25,7 +25,7 @@ export default function RightSideBar() {
                                             Group: {group.groupName}
                                         </div>
                                         <div>
-                                            Created at: {new Date(group.createdAt).toLocaleString(undefined, { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            Created on: {new Date(group.createdAt).toLocaleString(undefined, { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             <br/>
                                             Status: {group.status}
                                         </div>
