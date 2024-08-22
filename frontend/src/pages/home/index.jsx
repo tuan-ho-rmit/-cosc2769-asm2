@@ -71,6 +71,48 @@ export default function Home() {
     setContent(newPost);
   }
 
+  function handleDeletePost(id) {
+    console.log(id); // 삭제할 포스트의 id를 출력하여 확인
+
+    if (window.confirm("Are you sure you want to delete this post?")) {
+        fetch(`http://localhost:3000/api/posts/${id}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setPostList(posts.filter(post => post._id !== id));
+        })
+        .catch(error => console.error('Error deleting post:', error));
+    }
+}
+
+
+  function handleEditPost(id) {
+    const updatedContent = prompt("Edit your post:");
+    if (updatedContent !== null) {
+        fetch(`http://localhost:3000/api/posts/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: updatedContent, images: [] }),  // 필요한 데이터를 함께 전송
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(updatedPost => {
+            setPostList(posts.map(post => post._id === id ? updatedPost : post));
+        })
+        .catch(error => console.error('Error updating post:', error));
+    }
+}
+
+
   return (
     <div className="newFeedContent">
       <CreatePost
@@ -79,7 +121,7 @@ export default function Home() {
         onPostChange={handleInput}
         onImageUpload={handleImageUpload} // 이미지 업로드 핸들러 전달
       />
-      <ListOfPosts posts={posts} />
+      <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost}/>
     </div>
   );
 }
