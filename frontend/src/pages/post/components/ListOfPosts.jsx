@@ -14,7 +14,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete }) {
                     <div className="imgContainer">
                         <div className='mx-4'>
                             <img
-                                src='https://scontent.fhan4-3.fna.fbcdn.net/v/t39.30808-6/454539036_476839358283813_2967004303045072180_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=-9m-zIRhoLYQ7kNvgF3oBm_&_nc_ht=scontent.fhan4-3.fna&oh=00_AYAcyZp-BRKgTQ_HzRZA-G0OMKGRy4C84B3jhXkfw6A58g&oe=66C0DFF9'
+                                src={each.userProfile}  // 저장된 Base64 이미지 또는 URL을 사용
                                 className='w-10 h-10 ring-yellow ring-2 rounded-full'
                                 alt='rounded-avatar'
                             />
@@ -22,11 +22,11 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete }) {
                     </div>
                     <div className="postInfo">
                         <div className="userName">
-                            <p>{each.author}</p>
-                            <p>{each._id}</p>
+                            <p>{each.author}</p>  {/* 저장된 작성자 이름 표시 */}
+                            {/* <p>{each._id}</p> */}
                         </div>
                         <div className="postDate">
-                            <p>{each.date}</p>
+                            <p>{new Date(each.date).toLocaleString()}</p>  {/* 날짜를 보기 좋게 포맷 */}
                         </div>
                     </div>
                     <div className="dropDown">

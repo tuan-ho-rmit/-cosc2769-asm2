@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import CreatePost from '../post/components/CreatePost';
 import ListOfPosts from '../post/components/ListOfPosts';
 import './Home.css';
+import axios from 'axios';
 
 export default function Home() {
   const [posts, setPostList] = useState([]);
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
+  const [user, setUser] = useState(null);
 
   // 모든 게시글 불러오기
   useEffect(() => {
@@ -14,6 +16,24 @@ export default function Home() {
       .then(response => response.json())
       .then(data => setPostList(data))
       .catch(error => console.error('Error fetching posts:', error));
+  }, []);
+
+  // 사용자 정보 불러오기
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/auth/user', { withCredentials: true });
+        if (response.data && response.data.user) {
+          setUser(response.data.user);
+        } else {
+          console.error('User data is missing from the response.');
+        }
+      } catch (error) {
+        console.error('Error fetching user information:', error);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   function handleImageUpload(event) {
@@ -35,13 +55,18 @@ export default function Home() {
 
         reader.readAsDataURL(file);
     }
-}
-
+  }
 
   // 게시글 추가하기
   function handleAddPost() {
+    if (!user) {
+      alert('You need to log in to post.');
+      return;
+    }
+
     const newPostData = {
-      userProfile: "/Images/example.jpg", // 기본 프로필 이미지
+      userProfile: user.avatar || "/Images/example.jpg", // 사용자 프로필 이미지
+      author: user.firstName + ' ' + user.lastName, // 사용자 이름
       content: content,
       images: images, // Base64 인코딩된 이미지 배열
     };
