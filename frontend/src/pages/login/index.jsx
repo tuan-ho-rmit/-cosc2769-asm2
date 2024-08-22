@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,24 +17,22 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include', // can be differ to CORS setting 
-      });
+      const response = await axios.post('http://localhost:3000/api/auth/login', 
+        { email, password },
+        { withCredentials: true });
 
-      const data = await response.json();
+      if (response.status === 200) {
+        // Fetch the user info after successful login
+        const userResponse = await axios.get('http://localhost:3000/api/auth/user', { withCredentials: true });
+        localStorage.setItem('user', JSON.stringify(userResponse.data.user)); // Save user to localStorage
+        console.log('User information fetched:', userResponse.data.user);
 
-      if (!response.ok) {
-        alert(data.message || 'Something went wrong');
-        return;
+        // Redirect to main page after setting the user
+        navigate('/');
+        window.location.reload(); // Reload to ensure that the header updates immediately
+      } else {
+        alert(response.data.message || 'Something went wrong');
       }
-
-      console.log('Successful authentication');
-      navigate('/');
     } catch (error) {
       console.error('Error logging in:', error);
       alert('Failed to log in. Please try again later.');
