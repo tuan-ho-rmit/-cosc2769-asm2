@@ -82,9 +82,30 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-// Fetch current user from session
+
+// Check if user is logged in
+export const checkAuth = (req, res) => {
+  if (req.session.user) {
+    res.status(200).json({ isLoggedIn: true });
+  } else {
+    res.status(200).json({ isLoggedIn: false });
+  }
+};
+
+
+// Logout (세션 제거)
+export const logoutUser = (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to log out' });
+    }
+    res.status(200).json({ message: 'Logged out successfully' });
+  });
+};
+
+// Get Current User Session
 export const getCurrentUser = (req, res) => {
-  if (req.session && req.session.user) {
+  if (req.session.user) {
     res.status(200).json({ user: req.session.user });
   } else {
     res.status(401).json({ message: 'Unauthorized' });

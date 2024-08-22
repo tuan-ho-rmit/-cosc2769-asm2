@@ -1,28 +1,14 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
-import axios from "axios";
 
 export default function Header() {
   const [user, setUser] = useState(null);
 
-  // Fetch user details if the user is authenticated
+  // Fetch user details from localStorage if user exists
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/auth/user', { withCredentials: true });
-        if (response.status === 200) {
-          setUser(response.data.user); // Set the user details from the session
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          console.log('User is not logged in.');
-        } else {
-          console.log('Error fetching the user:', error);
-        }
-      }
-    };
-
-    fetchUser();
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
   }, []);
 
   const handleAvatarClick = () => {
@@ -59,26 +45,19 @@ export default function Header() {
             </div>
           </form>
         </div>
-        <div className='basis-1/3 flex flex-nowrap justify-end items-center'>
-          <div className='mx-4'>
-            <svg className="h-[30px] w-[30px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-          </div>
+        <div className='basis-1/3 flex flex-nowrap justify-end'>
           {user && (
             <>
               <div className='mx-4'>
                 <img
-                  src={user.avatar || '/Images/example2.png'}  // Use session user avatar
+                  src={user.avatar || '/Images/example2.png'}  // use session user avatar
                   className='w-8 h-8 ring-yellow ring-2 rounded-full cursor-pointer'
                   alt='User Avatar'
                   onClick={handleAvatarClick}
                 />
               </div>
               <div className='text-white'>
-                {user.firstName} {user.lastName}  {/* Display session user name */}
+                {user.firstName} {user.lastName}  {/* display session user name */}
               </div>
             </>
           )}
