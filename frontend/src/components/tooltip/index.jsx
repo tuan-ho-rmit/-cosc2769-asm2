@@ -20,11 +20,11 @@ const Tooltip = ({ text, children, position = 'top' }) => {
     };
 
     return (
-        <div className="relative inline-block">
+        <div style={{ position: 'relative', display: 'inline-block', width: 'fit-content', height: 'fit-content' }}>
             <div
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                className="inline-block"
+                style={{ width: 'fit-content', height: 'fit-content', display: "flex" }}
             >
                 {children}
             </div>

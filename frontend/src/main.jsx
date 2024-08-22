@@ -4,7 +4,8 @@ import App from './App.jsx'
 import { ToastContainer } from 'react-toastify'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <>
+    {/* <StrictMode> */}
     <ToastContainer
       autoClose={3000}
       hideProgressBar
@@ -15,5 +16,6 @@ createRoot(document.getElementById('root')).render(
       style={{ fontFamily: "inherit" }}
     />
     <App />
-  </StrictMode>,
+    {/* </StrictMode> */}
+  </>
 )
