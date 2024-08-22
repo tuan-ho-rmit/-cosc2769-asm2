@@ -3,6 +3,7 @@ import Header from '../header';
 import LeftSideBar from '../left-side-bar';
 import { Outlet } from 'react-router-dom';
 import RightSideBar from "../right-side-bar";
+import NotificationsProvider from "../right-side-bar/NotificationsContext.jsx";
 
 export default function PrivateLayout() {
     return (
@@ -13,7 +14,9 @@ export default function PrivateLayout() {
                 </div>
                 <div className='flex flex-row w-[100%] overflow-hidden min-h-[calc(100vh - 50px)]'>
                     <LeftSideBar />
-                    <RightSideBar />
+                    <NotificationsProvider>
+                        <RightSideBar />
+                    </NotificationsProvider>
                     <div className='flex-1 overflow-auto'>
                         <Outlet />
                     </div>
