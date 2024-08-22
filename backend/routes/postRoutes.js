@@ -1,6 +1,7 @@
 import express from 'express';
 import Post from '../models/Post.js';
 import mongoose from 'mongoose';
+
 const router = express.Router();
 
 // 모든 Posts 불러오기
@@ -15,16 +16,16 @@ router.get('/posts', async (req, res) => {
     }
 });
 
-
 // Create Post
 router.post('/posts', async (req, res) => {
     try {
-        const { content, images, userProfile } = req.body;
+        const { content, images, userProfile, author } = req.body;
 
         const newPost = new Post({
             content,
             userProfile,
-            images,  // Base64 인코딩된 이미지 배열
+            author, // Store the author's name
+            images,  // Base64 encoded image array
             date: new Date(),
         });
 
