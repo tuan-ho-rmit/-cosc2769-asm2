@@ -26,7 +26,7 @@ export const TextField = ({
     const focusRingStyles = error ? 'ring-danger' : 'ring-primary';
 
     return (
-        <div className="mb-4">
+        <div >
             {label && <label className="block text-white mb-2">{label}</label>}
             <input
                 type={type}

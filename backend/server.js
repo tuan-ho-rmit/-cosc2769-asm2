@@ -5,7 +5,8 @@ import cors from "cors";
 import session from 'express-session';  // Added for session management
 import authRoutes from './routes/authRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
-import postRoutes from './routes/postRoutes.js';
+import postRoutes from './routes/postRoutes.js'
+import userRoutes from './routes/userRoutes.js'
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
@@ -48,6 +49,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api', postRoutes);
+app.use('/api/users', userRoutes);
+
 
 app.listen(process.env.PORT || 3000, () => {
   connect();
