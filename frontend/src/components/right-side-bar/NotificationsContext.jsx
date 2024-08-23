@@ -10,13 +10,6 @@ const NotificationsProvider = ({ children }) => {
 
     const [pendingGroups, setPendingGroups] = useState([]); // State for pending groups
 
-    // Array of URLs to fetch data from consequentially
-    // const urlsToFetch = [
-    //     'http://localhost:3000/api/groups',
-    //     'http://localhost:3000/api/users',
-    //     'http://localhost:3000/api/posts',
-    // ];
-
 
 
 
@@ -24,7 +17,8 @@ const NotificationsProvider = ({ children }) => {
     const fetchNotification = async () => {
         try {
 
-            const response1 = await fetch('http://localhost:3000/api/groups', {
+            // const response1 = await fetch('http://localhost:3000/api/groups', {
+            const response1 = await fetch('http://localhost:3000/api/notifications', {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
@@ -35,7 +29,7 @@ const NotificationsProvider = ({ children }) => {
             }
             const groupsData = await response1.json();
             console.log('Fetched result for groups: ', groupsData);
-
+            setNotifications(groupsData);
 
             // Filter function to get only groups with "pending" status
             const filterPendingGroups = (groupsData) => {
@@ -52,20 +46,6 @@ const NotificationsProvider = ({ children }) => {
             const countPendingGroups = filteredGroup.length
             setUnreadNotifications(countPendingGroups);
             console.log('countPendingGroups:', unreadNotifications);
-
-
-            const response2 = await fetch('http://localhost:3000/api/posts', {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                }
-            });
-            if (!response2.ok) {
-                throw new Error(`HTTP error! status: ${response2.status}`);
-            }
-            const postsData = await response2.json();
-            console.log('Fetched result for posts: ', postsData);
-
 
             // todo: append the new notifications to the existing state
             // setNotifications(prevNotifications => [...prevNotifications, ...result]);

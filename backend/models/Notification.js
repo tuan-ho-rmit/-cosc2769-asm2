@@ -21,7 +21,17 @@ const notificationSchema = new mongoose.Schema({
         default: "unread",
         required: true,
     },
-});
+    activityType: {
+        type: String,
+        required: true,
+    },
+    activityUrl: {
+        type: String,
+        required: true,
+    },
+
+},
+    {timestamps: true});
 
 const Notification = mongoose.model('Notification', notificationSchema);
 
