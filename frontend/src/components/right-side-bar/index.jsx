@@ -21,7 +21,7 @@ export default function RightSideBar() {
                             pendingGroups.map((group) => (
                                 <li key={group._id}
                                     className='p-2 border-b border-white bg-black text-white'>
-                                    <NavLink to='/groups'>
+                                    <NavLink to='/managegroup'>
                                         <div>
                                             Group: {group.groupName}
                                         </div>
