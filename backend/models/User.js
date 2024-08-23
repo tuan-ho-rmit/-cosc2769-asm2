@@ -30,9 +30,21 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String, // Base64 encoded string for avatar image
     },
+    role: {
+        type: String,
+        enum: ["admin", "user"],
+        default: "user",
+        required: true,
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+        required: true,
+    }
 });
 
 
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;
