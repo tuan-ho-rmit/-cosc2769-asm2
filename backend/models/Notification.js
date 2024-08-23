@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
-    groupName: {
+    notiTitle: {
         type: String,
         required: true,
     },
@@ -9,22 +9,17 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    user: {
-        type: String,
+    userIds: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
+        ref: 'User',
+        default: []
     },
     status: {
         type: String,
-        default: 'pending',
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
+        enum: ["read", "unread"],
+        default: "unread",
+        required: true,
     },
 });
 
