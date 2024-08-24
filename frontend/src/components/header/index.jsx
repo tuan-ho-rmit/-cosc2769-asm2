@@ -13,7 +13,7 @@ export default function Header() {
 
   const handleAvatarClick = () => {
     if (user) {
-      window.location.href = '/userdetail';
+      window.location.href = '/mydetail';
     }
   };
 
