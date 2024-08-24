@@ -7,10 +7,9 @@ const notificationSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
     },
     userIds: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         required: true,
         ref: 'User',
         default: []
