@@ -33,11 +33,15 @@ const connect = async () => {
 
 // Session middleware setup
 app.use(session({
-  secret: 'your-secret-key',  // Replace with your own secret key
+  secret: 'your-secret-key',  // 비밀 키
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }  // Set to true if using HTTPS
+  cookie: {
+    secure: false,  // HTTPS를 사용하는 경우 true로 설정
+    sameSite: 'lax',  // 세션 쿠키를 보호하기 위한 설정
+  }
 }));
+
 
 // Middleware
 app.use(cors(corsOptions));
