@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import CreatePost from '../post/components/CreatePost';
 import ListOfPosts from '../post/components/ListOfPosts';
 import './Home.css';
-import axios from 'axios';
 
 export default function Home() {
   const [posts, setPostList] = useState([]);
@@ -22,9 +21,13 @@ export default function Home() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/auth/user', { withCredentials: true });
-        if (response.data && response.data.user) {
-          setUser(response.data.user);
+        const response = await fetch('http://localhost:3000/api/auth/user', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const data = await response.json();
+        if (data && data.user) {
+          setUser(data.user);
         } else {
           console.error('User data is missing from the response.');
         }
@@ -42,18 +45,18 @@ export default function Home() {
     const images = [];
 
     for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
+      const file = files[i];
+      const reader = new FileReader();
 
-        reader.onload = (e) => {
-            images.push(e.target.result);
-            if (images.length === files.length) {
-                // 모든 파일이 로드된 후 상태를 업데이트
-                setImages(images);
-            }
-        };
+      reader.onload = (e) => {
+        images.push(e.target.result);
+        if (images.length === files.length) {
+          // 모든 파일이 로드된 후 상태를 업데이트
+          setImages(images);
+        }
+      };
 
-        reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     }
   }
 
@@ -63,19 +66,21 @@ export default function Home() {
       alert('You need to log in to post.');
       return;
     }
-
+  
     const newPostData = {
-      userProfile: user.avatar || "/Images/example.jpg", // 사용자 프로필 이미지
-      author: user.firstName + ' ' + user.lastName, // 사용자 이름
+      userProfile: user._id, // 사용자 프로필 ID
+      userId: user._id, // 사용자 ID
+      author: user._id, // 작성자 ID
       content: content,
       images: images, // Base64 인코딩된 이미지 배열
     };
-
+  
     fetch('http://localhost:3000/api/posts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // 세션 쿠키를 포함하여 보냅니다.
       body: JSON.stringify(newPostData),
     })
       .then(response => {
@@ -84,13 +89,22 @@ export default function Home() {
         }
         return response.json();
       })
-      .then(data => {
-        setPostList([data, ...posts]);
+      .then(newPost => {
+        // 서버에서 새로 생성된 포스트를 다시 불러와 populate를 적용
+        return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+      })
+      .then(response => response.json())
+      .then(populatedPost => {
+        setPostList([populatedPost, ...posts]); // 상태 업데이트
         setContent("");
         setImages([]); // 이미지 목록 초기화
       })
       .catch(error => console.error('Error creating post:', error));
   }
+  
 
   function handleInput(newPost) {
     setContent(newPost);
@@ -100,43 +114,43 @@ export default function Home() {
     console.log(id); // 삭제할 포스트의 id를 출력하여 확인
 
     if (window.confirm("Are you sure you want to delete this post?")) {
-        fetch(`http://localhost:3000/api/posts/${id}`, {
-            method: 'DELETE',
-        })
+      fetch(`http://localhost:3000/api/posts/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            setPostList(posts.filter(post => post._id !== id));
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          setPostList(posts.filter(post => post._id !== id));
         })
         .catch(error => console.error('Error deleting post:', error));
     }
-}
-
+  }
 
   function handleEditPost(id) {
     const updatedContent = prompt("Edit your post:");
     if (updatedContent !== null) {
-        fetch(`http://localhost:3000/api/posts/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content: updatedContent, images: [] }),  // 필요한 데이터를 함께 전송
-        })
+      fetch(`http://localhost:3000/api/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ content: updatedContent, images: [] }),  // 필요한 데이터를 함께 전송
+      })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
         })
         .then(updatedPost => {
-            setPostList(posts.map(post => post._id === id ? updatedPost : post));
+          setPostList(posts.map(post => post._id === id ? updatedPost : post));
         })
         .catch(error => console.error('Error updating post:', error));
     }
-}
-
+  }
 
   return (
     <div className="newFeedContent">
@@ -145,8 +159,16 @@ export default function Home() {
         onAdd={handleAddPost}
         onPostChange={handleInput}
         onImageUpload={handleImageUpload} // 이미지 업로드 핸들러 전달
+        user={user} // 현재 로그인된 유저 정보를 전달
       />
-      <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost}/>
+      <ListOfPosts
+        posts={posts}
+        onPostEdit={handleEditPost}
+        onPostDelete={handleDeletePost}
+        currentUserId={user ? user._id : null}
+        user={user}  // user 전체 객체를 전달
+      />
+
     </div>
   );
 }

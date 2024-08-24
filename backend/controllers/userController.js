@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-
+import mongoose from 'mongoose';
 // get List User
 export const getListUser = async (req, res) => {
     try {
@@ -99,3 +99,72 @@ export const activateUser = async (req, res) => {
         });
     }
 };
+
+export const updateUserProfile = async (req, res) => {
+    try {
+        const { id, firstName, lastName, avatar } = req.body;
+
+        // 사용자 ID로 사용자 정보 찾기 및 업데이트
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { firstName, lastName, avatar },
+            { new: true } // 업데이트된 정보를 반환하도록 설정
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // 성공적으로 업데이트된 정보를 반환
+        res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Failed to update profile', error: error.message });
+    }
+};
+
+export const getUserDetails = async (req, res) => {
+    const { userId } = req.params; // URL 파라미터에서 userId 추출
+
+    console.log('Requested userId on server:', userId); // 서버에서 요청된 userId 출력
+
+    try {
+        // ObjectId 형식이 유효한지 확인
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            console.error('Invalid user ID format');
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID format",
+            });
+        }
+
+        // userId로 사용자 찾기
+        const user = await User.findById(userId);
+
+        // 사용자가 존재하지 않을 경우
+        if (!user) {
+            console.error('User not found in database');
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // 성공적으로 사용자 정보를 가져온 경우
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched user details",
+            data: user,
+        });
+    } catch (error) {
+        // 오류 발생 시
+        console.error('Error fetching user details:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching user details",
+            error: error.message,
+        });
+    }
+};
+
+

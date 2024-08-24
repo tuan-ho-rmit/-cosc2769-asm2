@@ -26,7 +26,7 @@ export const createNoti = async (req, res) => {
 export const getAllNoti = async (req, res) => {
     try {
         console.log('testing getall noti')
-        const notifications = await Notification.find();
+        const notifications = await Notification.find().populate('userIds');
         res.status(200).json(notifications);
     } catch (err) {
         console.error(err);
