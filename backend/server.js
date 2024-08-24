@@ -8,6 +8,7 @@ import groupRoutes from './routes/groupRoutes.js';
 import postRoutes from './routes/postRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import notiRoutes from './routes/notiRoutes.js'
+import friendRequestRoutes from './routes/friendRequestRoutes.js'
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
@@ -52,6 +53,7 @@ app.use('/api/groups', groupRoutes);
 app.use('/api', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notiRoutes);
+app.use('/api/friendrequest', friendRequestRoutes);
 
 
 app.listen(process.env.PORT || 3000, () => {
