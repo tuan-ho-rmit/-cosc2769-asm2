@@ -2,8 +2,6 @@
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
 
-
-
 export const addComment = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -73,6 +71,48 @@ export const deleteComment = async (req, res) => {
 
     try {
         // 댓글이 존재하는지 확인하고 삭제
+        const deletedComment = await Comment.findByIdAndDelete(commentId);
+        if (!deletedComment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ message: 'Error deleting comment', error: error.message });
+    }
+};
+
+export const updateCommentInPostDetail = async (req, res) => {
+    const { commentId } = req.params;
+    const { content } = req.body;
+
+    try {
+        const updatedComment = await Comment.findByIdAndUpdate(
+            commentId, 
+            { content },
+            { new: true }
+        );
+
+        if (!updatedComment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        res.status(200).json(updatedComment);
+    } catch (error) {
+        console.error('Error updating comment:', error);
+        res.status(500).json({ message: "Error updating comment", error });
+    }
+};
+
+// controllers/commentController.js
+
+export const deleteCommentInPostDetail = async (req, res) => {
+    const { postId, commentId } = req.params;
+
+    try {
+        console.log(`Deleting comment for postId: ${postId} and commentId: ${commentId}`); // 로그 추가
+
         const deletedComment = await Comment.findByIdAndDelete(commentId);
         if (!deletedComment) {
             return res.status(404).json({ message: 'Comment not found' });

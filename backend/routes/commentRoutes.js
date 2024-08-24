@@ -1,6 +1,6 @@
 // routes/commentRoutes.js
 import express from 'express';
-import { addComment, getCommentsByPostId, updateComment, deleteComment } from '../controllers/commentController.js';
+import { addComment, getCommentsByPostId, updateComment, deleteComment, updateCommentInPostDetail, deleteCommentInPostDetail } from '../controllers/commentController.js';
 
 const router = express.Router();
 
@@ -15,5 +15,12 @@ router.put('/:postId/comments/:commentId', updateComment);
 
 // 댓글 삭제
 router.delete('/:postId/comments/:commentId', deleteComment);
+
+// 댓글 수정
+router.put('/posts/:postId/comments/:commentId', updateCommentInPostDetail);
+
+// 댓글 삭제
+router.delete('/:postId/comments/:commentId', deleteCommentInPostDetail);
+
 
 export default router;

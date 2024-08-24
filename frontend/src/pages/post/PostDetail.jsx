@@ -8,7 +8,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import './PostDetail.css';
 
 export default function PostDetail() {
-  const { id } = useParams(); // URL 파라미터에서 id 가져오기
+  const { id: postId } = useParams(); // URL 파라미터에서 postId 가져오기
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [user, setUser] = useState(null);
@@ -20,7 +20,7 @@ export default function PostDetail() {
     }
 
     // API 요청을 통해 포스트 데이터를 가져옵니다.
-    fetch(`http://localhost:3000/api/posts/${id}`, {
+    fetch(`http://localhost:3000/api/posts/${postId}`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -34,8 +34,8 @@ export default function PostDetail() {
       .catch(error => console.error('Error fetching the post:', error));
 
     // 댓글 데이터 가져오기
-    fetchComments(id);
-  }, [id]);
+    fetchComments(postId);
+  }, [postId]);
 
   const fetchComments = async (postId) => {
     try {
@@ -51,10 +51,10 @@ export default function PostDetail() {
   };
 
   const handleAddComment = (newCommentText) => {
-    const newComment = { content: newCommentText, id: Date.now(), author: user };
+    const newComment = { content: newCommentText, author: user };
     setComments([...comments, newComment]);
 
-    fetch(`http://localhost:3000/api/posts/${id}/comments`, {
+    fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,13 +64,13 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(id); // 댓글 목록 업데이트
+        fetchComments(postId); // 댓글 목록 업데이트
       })
       .catch(error => console.error('Error adding comment:', error));
   };
 
-  const handleEditComment = (commentId, newContent) => {
-    fetch(`http://localhost:3000/api/posts/${id}/comments/${commentId}`, {
+  const handleEditComment = (postId, commentId, newContent) => {
+    fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -80,18 +80,20 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(id); // 댓글 목록 업데이트
+        fetchComments(postId); // 댓글 목록 업데이트
       })
       .catch(error => console.error('Error editing comment:', error));
   };
 
-  const handleDeleteComment = (commentId) => {
-    fetch(`http://localhost:3000/api/posts/${id}/comments/${commentId}`, {
+  const handleDeleteComment = (postId, commentId) => {
+    console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`); // 로그 수정
+
+    fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
       method: 'DELETE',
       credentials: 'include',
     })
       .then(() => {
-        fetchComments(id); // 댓글 목록 업데이트
+        fetchComments(postId); // 댓글 목록 업데이트
       })
       .catch(error => console.error('Error deleting comment:', error));
   };
@@ -158,7 +160,7 @@ export default function PostDetail() {
       {/* 댓글 섹션 추가 */}
       <div className="commentsSection">
         <ListOfComments 
-          postId={id} 
+          postId={postId} 
           comments={comments} 
           onEditComment={handleEditComment} 
           onDeleteComment={handleDeleteComment} 
