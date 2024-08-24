@@ -4,7 +4,6 @@ import {NavLink} from "react-router-dom";
 
 export default function RightSideBar() {
     const {notifications} = useContext(NotificationsContext);
-    console.log('notifications from rightsidebar: ', notifications);
 
     return (
         <>
@@ -15,7 +14,8 @@ export default function RightSideBar() {
                             <li key={notification.id}
                                 className='p-2 border-b border-white bg-black text-white'>
                                 <NavLink to={notification.activityUrl}>
-                                    {notification.userIds.name} has {notification.notiTitle}
+                                    {/*TODO: handle activityURL and notification name*/}
+                                    {notification.userIds.name} {notification.notiTitle}
                                 </NavLink>
                             </li>
                         ))}

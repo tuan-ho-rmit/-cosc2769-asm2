@@ -12,7 +12,6 @@ const NotificationsProvider = ({ children }) => {
     const fetchNotification = async () => {
         try {
 
-            // const response1 = await fetch('http://localhost:3000/api/groups', {
             const response1 = await fetch('http://localhost:3000/api/notifications', {
                 method: 'GET',
                 headers: {
@@ -23,11 +22,15 @@ const NotificationsProvider = ({ children }) => {
                 throw new Error(`HTTP error! status: ${response1.status}`);
             }
             const notificationsData = await response1.json();
-            console.log('Fetched result for groups: ', notificationsData);
+            console.log('Fetched result for notificationsData from notificationsContext: ', notificationsData);
             setNotifications(notificationsData);
 
-            console.log('notification userids name', notificationsData.userIds.name)
-
+            // fetch name for each user
+            notificationsData.forEach(notification => {
+                notification.userIds.forEach(user => {
+                    console.log('Fetched notification user\'name from notificationsContext:', user.name);
+                })}
+            )
 
 
 
@@ -37,7 +40,8 @@ const NotificationsProvider = ({ children }) => {
             // TODO: update unread notifications count
             // setUnreadNotifications(prevUnread => prevUnread + result.filter(notifications))
 
-        } catch (error) {
+        } catch (error)
+            {
             console.error('Error fetching notifications:', error.message);
         }
     }
