@@ -5,7 +5,7 @@ export async function creatNotificationService( {
     status = 'unread',
     activityType,
     activityUrl
-            // refer to notificationDraft.jsx and mongoDB's notifications collection for filling in each the attribute.
+            // refer to notificationDraft.jsx and mongoDB's notifications collection for what to pass in each the attribute.
 }) {
     const notificationData = {
         notiTitle,
