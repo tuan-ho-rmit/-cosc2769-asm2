@@ -127,7 +127,7 @@ export default function MyDetails() {
                     onImageUpload={() => {}} // 이미지 업로드 핸들러
                     user={user} // 현재 로그인된 유저 정보를 전달
                 />
-                <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} currentUserId={userId}/>
+                <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} user={user} />
             </div>
         </div>
     );
