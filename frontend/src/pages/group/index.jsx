@@ -108,12 +108,8 @@ export default function Group() {
 
   return (
 
-    <div className="groupContainer">
-      {/* <div className="feedContent">
-        <CreatePost text={text} onAdd={handleAddPost} onPostChange={handleInput} />
-        <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} />
-      </div> */}
+<>
       <Groupnav/>
-    </div>
+</>
   );
 }

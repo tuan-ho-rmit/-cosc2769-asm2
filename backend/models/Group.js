@@ -18,13 +18,16 @@ const groupSchema = new mongoose.Schema({
     default: 'pending',
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     default: null,
   },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  members: {
+    type: Array,
+    default: null,
   },
   visibility: { 
     type: String,

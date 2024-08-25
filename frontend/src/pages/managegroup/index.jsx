@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Groupnav from '../../components/groupnav';
 
 const ManageGroup = () => {
   const [groups, setGroups] = useState([]);
@@ -40,6 +41,8 @@ const ManageGroup = () => {
   };
 
   return (
+    <>
+    <Groupnav/>
     <div style={{ padding: '2rem' }}>
       <h2 style={{ color: '#EEEEEE', marginBottom: '1rem' }}>Manage Groups</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -70,7 +73,9 @@ const ManageGroup = () => {
           </div>
         ))}
       </div>
+      
     </div>
+    </>
   );
 };
 

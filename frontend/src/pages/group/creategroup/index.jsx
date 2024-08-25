@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import defaultAvatar from './defaultAvatar.png';
+import Groupnav from '../../../components/groupnav'
 
 const CreateGroup = () => {
   const [formData, setFormData] = useState({
     groupName: '',
     description: '',
     avatar: defaultAvatar,
-    visibility: 'public', // 기본값을 public으로 설정
+    visibility: 'public',
   });
+
+  const [user, setUser] = useState(null);
+
+  // 유저 세션 정보를 로컬 스토리지에서 불러오기
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -31,10 +42,15 @@ const CreateGroup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!user) {
+      alert('You need to log in to create a group.');
+      return;
+    }
+
     const groupData = {
       ...formData,
       status: 'pending',
-      createdBy: null,
+      createdBy: user.email, // 유저 세션에서 이메일 가져오기
       createdAt: new Date().toISOString(),
     };
 
@@ -45,6 +61,7 @@ const CreateGroup = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(groupData),
+        credentials: 'include', // 세션 쿠키 포함
       });
 
       if (!response.ok) {
@@ -60,6 +77,8 @@ const CreateGroup = () => {
   };
 
   return (
+    <>
+    <Groupnav/>
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: '28rem', padding: '2rem', backgroundColor: '#393E46', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '0.5rem', marginTop: '2rem' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center', color: '#EEEEEE' }}>Create Group</h2>
@@ -135,6 +154,7 @@ const CreateGroup = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

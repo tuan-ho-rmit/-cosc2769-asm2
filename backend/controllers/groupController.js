@@ -2,6 +2,11 @@ import Group from '../models/Group.js';
 
 export const createGroup = async (req, res) => {
   try {
+    // 세션에 저장된 유저 정보 확인
+    if (!req.session.user) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
+
     const { groupName, description, avatar, visibility } = req.body;
 
     const newGroup = new Group({
@@ -9,8 +14,8 @@ export const createGroup = async (req, res) => {
       description,
       avatar,
       status: 'pending',
-      createdBy: null,
-      visibility, // visibility 필드 추가
+      createdBy: req.session.user.email, // 세션에서 이메일을 가져와서 저장
+      visibility,
     });
 
     const savedGroup = await newGroup.save();
@@ -20,6 +25,7 @@ export const createGroup = async (req, res) => {
     res.status(500).json({ message: 'Failed to create group', error: err.message });
   }
 };
+
 
 export const getGroups = async (req, res) => {
     try {
