@@ -1,5 +1,6 @@
 import Group from '../models/Group.js';
 import GroupJoinRequest from '../models/GroupJoinRequest.js';
+import User from '../models/User.js';
 
 export const createGroup = async (req, res) => {
   try {
@@ -116,15 +117,21 @@ export const getGroups = async (req, res) => {
     const { groupName, userEmail } = req.body;
   
     try {
-      // 해당 그룹을 찾고 멤버 배열에 사용자 이메일 추가
+      // 해당 그룹을 찾기
       const group = await Group.findOne({ groupName });
       if (!group) {
         return res.status(404).json({ message: 'Group not found' });
       }
   
-      // 중복되지 않게 멤버 추가
-      if (!group.members.includes(userEmail)) {
-        group.members.push(userEmail);
+      // 유저의 오브젝트 아이디를 이메일을 통해 찾기
+      const user = await User.findOne({ email: userEmail });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // 중복되지 않게 유저 오브젝트 아이디 추가
+      if (!group.members.includes(user._id)) {
+        group.members.push(user._id);
         await group.save();
       } else {
         return res.status(400).json({ message: 'User is already a member of the group' });
