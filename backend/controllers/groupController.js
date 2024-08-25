@@ -62,6 +62,12 @@ export const getGroups = async (req, res) => {
     const userEmail = req.session.user.email;
   
     try {
+      // 이미 조인 요청이 있는지 확인
+      const existingRequest = await GroupJoinRequest.findOne({ userEmail, groupName });
+      if (existingRequest) {
+        return res.status(400).json({ message: 'You have already requested to join this group.' });
+      }
+  
       const newRequest = new GroupJoinRequest({
         userEmail: userEmail,
         groupName: groupName,
@@ -74,5 +80,22 @@ export const getGroups = async (req, res) => {
     } catch (error) {
       console.error('Error creating group join request:', error);
       res.status(500).json({ message: 'Failed to create group join request', error: error.message });
+    }
+  };
+
+  export const getRequestedGroups = async (req, res) => {
+    const { email } = req.query;
+  
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+  
+    try {
+      const requests = await GroupJoinRequest.find({ userEmail: email });
+      const groupNames = requests.map(req => req.groupName);
+      res.status(200).json(groupNames);
+    } catch (error) {
+      console.error('Error fetching requested groups:', error);
+      res.status(500).json({ message: 'Failed to fetch requested groups', error: error.message });
     }
   };
