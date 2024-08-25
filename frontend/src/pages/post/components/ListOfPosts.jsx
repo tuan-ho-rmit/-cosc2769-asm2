@@ -3,6 +3,7 @@ import DropDowns from "./DropDowns";
 import { Link } from 'react-router-dom';
 import CreateComment from "../../comment/components/CreateComment";
 import ListOfComments from "../../comment/components/ListOfComments";
+import { PostWithReactions } from "./PostWithReactions";
 
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const currentUserId = user ? user.id : null; 
@@ -135,9 +136,8 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
-                        <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                    <PostWithReactions postId={each._id} />
+
                     </span>
                     <span className="commentBtn">
                         <button>Comment</button>

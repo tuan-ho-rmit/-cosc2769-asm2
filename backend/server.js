@@ -9,7 +9,8 @@ import postRoutes from './routes/postRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import notiRoutes from './routes/notiRoutes.js'
 import friendRequestRoutes from './routes/friendRequestRoutes.js'
-import commentRoutes from './routes/commentRoutes.js';
+import commentRoutes from './routes/commentRoutes.js'
+import reactionRoutes from './routes/reactionRoutes.js';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
@@ -60,6 +61,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notiRoutes);
 app.use('/api/friendrequest', friendRequestRoutes);
 app.use('/api/posts', commentRoutes);
+app.use('/api', reactionRoutes); // 리액션 라우트 추가
 
 app.listen(process.env.PORT || 3000, () => {
   connect();

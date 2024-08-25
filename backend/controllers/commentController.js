@@ -124,3 +124,98 @@ export const deleteCommentInPostDetail = async (req, res) => {
         res.status(500).json({ message: 'Error deleting comment', error: error.message });
     }
 };
+
+
+// comment reaction
+
+// 특정 댓글에 대한 사용자의 리액션 가져오기
+export const getUserReactionForComment = async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const userId = req.session.user?.id; // 세션에서 사용자 ID 가져오기
+  
+      if (!userId) {
+        return res.status(401).json({ message: 'User is not logged in' });
+      }
+  
+      // 특정 댓글에서 사용자의 리액션 찾기
+      const comment = await Comment.findById(commentId).select('reactions');
+      
+      if (!comment) {
+        return res.status(404).json({ message: 'Comment not found' });
+      }
+  
+      const userReaction = comment.reactions.find(
+        (reaction) => reaction.userId.toString() === userId
+      );
+  
+      res.status(200).json({ reaction: userReaction?.type || null });
+    } catch (error) {
+      console.error('Error fetching user reaction for comment:', error);
+      res.status(500).json({ message: 'Error fetching user reaction for comment', error: error.message });
+    }
+  };
+
+// 댓글에 리액션 추가 또는 업데이트
+export const addOrUpdateCommentReaction = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { reaction } = req.body;
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    const existingReactionIndex = comment.reactions.findIndex(
+      (r) => r.userId.toString() === userId
+    );
+
+    if (existingReactionIndex > -1) {
+      // 리액션이 이미 존재하면 업데이트
+      comment.reactions[existingReactionIndex].type = reaction;
+    } else {
+      // 리액션이 존재하지 않으면 새로 추가
+      comment.reactions.push({ userId, type: reaction });
+    }
+
+    await comment.save();
+    res.status(200).json(comment.reactions);
+  } catch (error) {
+    console.error('Error adding or updating comment reaction:', error);
+    res.status(500).json({ message: 'Error adding or updating comment reaction', error: error.message });
+  }
+};
+
+// 댓글 리액션 삭제
+export const removeCommentReaction = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // 사용자 리액션 삭제
+    comment.reactions = comment.reactions.filter(
+      (reaction) => reaction.userId.toString() !== userId
+    );
+
+    await comment.save();
+    res.status(200).json({ message: 'Reaction removed successfully' });
+  } catch (error) {
+    console.error('Error removing comment reaction:', error);
+    res.status(500).json({ message: 'Error removing comment reaction', error: error.message });
+  }
+};
