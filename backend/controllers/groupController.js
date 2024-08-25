@@ -167,4 +167,36 @@ export const getGroups = async (req, res) => {
       res.status(500).json({ message: 'Failed to reject member', error: error.message });
     }
   };
+
+  export const getGroupsForMember = async (req, res) => {
+    const { memberId } = req.query;
+  
+    try {
+      const groups = await Group.find({ members: memberId });
+      res.status(200).json(groups);
+    } catch (error) {
+      console.error('Error fetching groups for member:', error);
+      res.status(500).json({ message: 'Failed to fetch groups for member', error: error.message });
+    }
+  };
+  
+  export const removeMemberFromGroup = async (req, res) => {
+    const { groupId, userId } = req.body;
+  
+    try {
+      const group = await Group.findById(groupId);
+      if (!group) {
+        return res.status(404).json({ message: 'Group not found' });
+      }
+  
+      group.members = group.members.filter(member => member.toString() !== userId);
+      await group.save();
+  
+      res.status(200).json({ message: 'Member removed from group' });
+    } catch (error) {
+      console.error('Error removing member from group:', error);
+      res.status(500).json({ message: 'Failed to remove member from group', error: error.message });
+    }
+  };
+
   
