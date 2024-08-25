@@ -1,5 +1,7 @@
 import React from "react";
 import DropDowns from "../../post/components/DropDowns";
+import { CommentWithReactions } from "./CommentWithReactions";
+
 export default function ListOfComments({ comments, onEditComment, onDeleteComment, currentUserId }) {
     if (!comments) {
         return <div>No comments available.</div>;
@@ -46,7 +48,8 @@ export default function ListOfComments({ comments, onEditComment, onDeleteCommen
                             {comment.content}
                         </div>
                         <div className="likeComment">
-                            <button>Like</button>
+                            {/* ReactionForComment 컴포넌트 추가 */}
+                            <CommentWithReactions commentId={comment._id} />
                         </div>
                     </div>
                 ))

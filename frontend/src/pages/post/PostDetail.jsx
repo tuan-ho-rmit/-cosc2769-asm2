@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Slider from 'react-slick';
 import CreateComment from '../comment/components/CreateComment';
 import ListOfComments from '../comment/components/ListOfComments';
+import { PostWithReactions } from './components/PostWithReactions';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './PostDetail.css';
@@ -147,9 +148,7 @@ export default function PostDetail() {
       <hr className="solidPostForDetail"></hr>
       <div className="likeComment">
         <span className="likeBtn">
-          <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
+        <PostWithReactions postId={postId} />
         </span>
         <span className="commentBtn">
           <button>Comment</button>
