@@ -15,6 +15,7 @@ import AdminUsers from "./admin/components/users";
 import AdminGroups from "./admin/components/groups";
 import AdminPosts from "./admin/components/posts";
 import DiscoverGroup from "./discovergroup";
+import GroupMemberManagement from "./groupmembermanagement";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: '/creategroup', element: <CreateGroup /> },
       { path: '/managegroup', element: <ManageGroup /> },
       { path: '/discovergroup', element: <DiscoverGroup /> },
+      { path: '/groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
       { path: '/register', element: <Register /> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
