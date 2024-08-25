@@ -10,18 +10,34 @@ const Group = () => {
     // 유저 세션에서 사용자 오브젝트 아이디 가져오기
     const fetchUser = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        setUserId(storedUser._id);
-        fetchGroups(storedUser._id);
+      console.log('User session data:', storedUser); // 유저 세션 데이터 확인
+
+      if (storedUser && storedUser.id) {  // storedUser._id 대신 storedUser.id 사용
+        setUserId(storedUser.id);
+        console.log('User ID:', storedUser.id); // 유저 ID 확인
+        fetchGroups(storedUser.id);
+      } else {
+        console.error('No user data found in session or User ID is undefined.');
       }
     };
 
-    // 사용자가 가입한 그룹들을 가져오기
+    // 사용자가 가입한 그룹들만 가져오기
     const fetchGroups = async (userId) => {
       try {
-        const response = await fetch(`http://localhost:3000/api/groups?memberId=${userId}`);
+        const response = await fetch('http://localhost:3000/api/groups');
         const result = await response.json();
-        setGroups(result);
+        console.log('Fetched groups:', result); // 가져온 그룹 데이터 확인
+
+        // 내가 가입한 그룹만 필터링
+        const myGroups = result.filter(group => {
+          console.log(`Checking group "${group.groupName}" with members:`, group.members); // 각 그룹의 멤버 확인
+          const isMember = group.members.includes(userId);
+          console.log(`User ${userId} is member of "${group.groupName}":`, isMember); // 해당 그룹에 유저가 포함되어 있는지 확인
+          return isMember;
+        });
+
+        console.log('My groups:', myGroups); // 필터링된 나의 그룹들 확인
+        setGroups(myGroups);
       } catch (error) {
         console.error('Error fetching groups:', error);
       }
