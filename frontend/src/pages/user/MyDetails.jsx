@@ -40,7 +40,7 @@ export default function MyDetails() {
 
     const handleAddPost = () => {
         if (!user) return;
-
+    
         const newPostData = {
             userProfile: user._id, // 사용자 프로필 ID
             userId: user._id, // 사용자 ID
@@ -48,7 +48,7 @@ export default function MyDetails() {
             content: content,
             images: [], // 이미지 배열
         };
-
+    
         fetch('http://localhost:3000/api/posts', {
             method: 'POST',
             headers: {
@@ -57,10 +57,28 @@ export default function MyDetails() {
             credentials: 'include', // 세션 쿠키를 포함하여 보냅니다.
             body: JSON.stringify(newPostData),
         })
-        .then(response => response.json())
-        .then(post => setPosts([post, ...posts]))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error creating post');
+            }
+            return response.json();
+        })
+        .then(post => {
+            // 새로 추가된 포스트에 대해 서버로부터 데이터를 다시 받아옵니다.
+            fetch(`http://localhost:3000/api/posts/${post._id}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            .then(response => response.json())
+            .then(updatedPost => {
+                setPosts([updatedPost, ...posts]);
+                setContent(""); // 포스트 작성 후 입력 필드 초기화
+            })
+            .catch(error => console.error('Error fetching updated post:', error));
+        })
         .catch(error => console.error('Error creating post:', error));
     };
+    
 
     const handleEditPost = (id) => {
         // 포스트 편집 로직을 여기에 추가

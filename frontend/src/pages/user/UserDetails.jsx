@@ -8,6 +8,7 @@ export default function UserDetails() {
     const [user, setUser] = useState(null);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true); // 로딩 상태 추가
+    const [currentUser, setCurrentUser] = useState(null); // 현재 로그인한 사용자 상태 추가
 
     useEffect(() => {
         console.log('Requested userId:', userId); // URL에서 가져온 userId가 올바른지 확인
@@ -48,6 +49,16 @@ export default function UserDetails() {
             console.error('Error fetching user posts:', error);
             setLoading(false); // 에러 발생 시 로딩 상태 해제
         });
+
+        // 현재 로그인한 사용자 정보를 가져옵니다.
+        fetch(`http://localhost:3000/api/auth/user`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(data => setCurrentUser(data.user))
+        .catch(error => console.error('Error fetching current user:', error));
+        
     }, [userId]);
 
     if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
@@ -69,7 +80,7 @@ export default function UserDetails() {
             <hr className="solid"></hr>
 
             <div className="newFeedContent">
-                <ListOfPosts posts={posts} currentUserId={null} onPostEdit={() => {}} onPostDelete={() => {}} />
+                <ListOfPosts posts={posts} user={currentUser} onPostEdit={() => {}} onPostDelete={() => {}} />
             </div>
         </div>
     );
