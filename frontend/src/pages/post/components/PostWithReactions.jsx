@@ -16,7 +16,6 @@ export function PostWithReactions({ postId }) {
   // 현재 사용자 ID 가져오기 (예: 세션 또는 로컬 저장소에서 가져오기)
   const currentUserId = JSON.parse(localStorage.getItem('user')).id;
 
-  // 초기 로드시 서버에서 리액션 데이터를 가져옵니다.
   useEffect(() => {
     const fetchReactions = async () => {
       try {
@@ -30,14 +29,21 @@ export function PostWithReactions({ postId }) {
         }
 
         const post = await response.json();
-        
-        // 현재 사용자가 이미 리액션을 추가했는지 확인합니다.
+
+        console.log('Fetched post data:', post);
+
+        // 사용자 리액션 체크 및 설정
         const userReaction = post.reactions.find(
-          (reaction) => reaction.userId._id === currentUserId // 현재 사용자 ID와 비교
+          (reaction) => reaction.userId.toString() === currentUserId.toString()
         );
 
+        console.log('Found user reaction:', userReaction);
+
+        // 사용자 리액션이 존재하면 상태 업데이트
         if (userReaction) {
-          setSelectedPostReaction(userReaction.type); // 사용자의 리액션 타입 설정
+          setSelectedPostReaction(userReaction.type);
+        } else {
+          setSelectedPostReaction(null);
         }
       } catch (error) {
         console.error('Error fetching reactions:', error);
@@ -52,27 +58,51 @@ export function PostWithReactions({ postId }) {
   };
 
   const handlePostReaction = async (reaction) => {
-    try {
-      setSelectedPostReaction(reaction);
-      setShowPostReactionBar(false);
+    if (selectedPostReaction === reaction) {
+      // 동일한 리액션을 선택한 경우 삭제
+      try {
+        const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ userId: currentUserId }), // 사용자 ID를 보내서 리액션 삭제
+        });
 
-      const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ reaction }),
-      });
+        if (!response.ok) {
+          throw new Error('Error removing reaction');
+        }
 
-      if (!response.ok) {
-        throw new Error('Error adding reaction');
+        setSelectedPostReaction(null);
+        console.log('Reaction removed');
+      } catch (error) {
+        console.error('Error removing reaction:', error);
       }
+    } else {
+      // 새로운 리액션을 추가하거나 업데이트
+      try {
+        setSelectedPostReaction(reaction);
+        setShowPostReactionBar(false);
 
-      const data = await response.json();
-      console.log('Reaction added:', data);
-    } catch (error) {
-      console.error('Error adding reaction:', error);
+        const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ reaction }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error adding or updating reaction');
+        }
+
+        const data = await response.json();
+        console.log('Reaction added or updated:', data);
+      } catch (error) {
+        console.error('Error adding or updating reaction:', error);
+      }
     }
   };
 
