@@ -27,7 +27,7 @@ const groupSchema = new mongoose.Schema({
   },
   members: {
     type: Array,
-    default: null,
+    default: [],
   },
   visibility: { 
     type: String,

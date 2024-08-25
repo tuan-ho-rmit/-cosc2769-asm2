@@ -126,10 +126,15 @@ export const getGroups = async (req, res) => {
       if (!group.members.includes(userEmail)) {
         group.members.push(userEmail);
         await group.save();
+      } else {
+        return res.status(400).json({ message: 'User is already a member of the group' });
       }
   
       // 해당 조인 요청 삭제
-      await GroupJoinRequest.findOneAndDelete({ groupName, userEmail, status: 'pending' });
+      const request = await GroupJoinRequest.findOneAndDelete({ groupName, userEmail, status: 'pending' });
+      if (!request) {
+        return res.status(404).json({ message: 'Join request not found' });
+      }
   
       res.status(200).json({ message: 'Member accepted and added to group' });
     } catch (error) {
@@ -137,6 +142,7 @@ export const getGroups = async (req, res) => {
       res.status(500).json({ message: 'Failed to accept member', error: error.message });
     }
   };
+  
   
   export const rejectMember = async (req, res) => {
     const { requestId } = req.params;
