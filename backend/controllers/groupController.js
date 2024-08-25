@@ -1,4 +1,5 @@
 import Group from '../models/Group.js';
+import GroupJoinRequest from '../models/GroupJoinRequest.js';
 
 export const createGroup = async (req, res) => {
   try {
@@ -48,5 +49,28 @@ export const getGroups = async (req, res) => {
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Failed to delete group', error: err.message });
+    }
+  };
+
+  export const joinGroup = async (req, res) => {
+    const { groupName, userId } = req.body;
+  
+    if (!userId) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
+  
+    try {
+      const newRequest = new GroupJoinRequest({
+        userId: userId,
+        groupName: groupName,
+        requestedAt: new Date(),
+        status: 'pending',
+      });
+  
+      const savedRequest = await newRequest.save();
+      res.status(201).json({ message: 'Group join request submitted successfully', request: savedRequest });
+    } catch (error) {
+      console.error('Error creating group join request:', error);
+      res.status(500).json({ message: 'Failed to create group join request', error: error.message });
     }
   };
