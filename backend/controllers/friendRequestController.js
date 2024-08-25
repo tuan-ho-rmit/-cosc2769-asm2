@@ -30,7 +30,7 @@ export const acceptFriendRequest = async (req, res) => {
             return res.status(404).json({message: "Friend request not found"})
         }
 
-        friendRequest.sttus = 'accepted';
+        friendRequest.status = 'accepted';
         await friendRequest.save();
 
         const fromUser = await User.findByIdAndUpdate(
@@ -70,7 +70,7 @@ export const acceptFriendRequest = async (req, res) => {
 export const rejectFriendRequest = async (req, res) => {
     try {
         const {requestId} = req.params;
-        const friendRequest = await friendRequest.findOne({_id: requestId});
+        const friendRequest = await FriendRequest.findOne({_id: requestId});
         if (!friendRequest) {
             return res.status(404).json({message: "Friend rq not found"})
         }
