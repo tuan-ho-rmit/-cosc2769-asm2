@@ -39,7 +39,7 @@ const DiscoverGroup = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ groupName, userId: user.id }),
+        body: JSON.stringify({ groupName }),
         credentials: 'include', // 세션 쿠키 포함
       });
 

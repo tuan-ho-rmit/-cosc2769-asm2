@@ -53,15 +53,17 @@ export const getGroups = async (req, res) => {
   };
 
   export const joinGroup = async (req, res) => {
-    const { groupName, userId } = req.body;
+    const { groupName } = req.body;
   
-    if (!userId) {
+    if (!req.session.user) {
       return res.status(401).json({ message: 'User is not logged in' });
     }
   
+    const userEmail = req.session.user.email;
+  
     try {
       const newRequest = new GroupJoinRequest({
-        userId: userId,
+        userEmail: userEmail,
         groupName: groupName,
         requestedAt: new Date(),
         status: 'pending',
