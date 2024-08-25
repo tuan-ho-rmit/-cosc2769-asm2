@@ -6,6 +6,7 @@ const CreateGroup = () => {
     groupName: '',
     description: '',
     avatar: defaultAvatar,
+    visibility: 'public', // 기본값을 public으로 설정
   });
 
   const handleChange = (e) => {
@@ -108,6 +109,20 @@ const CreateGroup = () => {
               required
               style={{ marginTop: '0.25rem', display: 'block', width: '100%', padding: '0.75rem', border: '1px solid #C5C5C5', borderRadius: '0.375rem', boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)', outline: 'none', fontSize: '0.875rem', backgroundColor: '#FFFFFF', color: '#222831' }}
             />
+          </div>
+          <div>
+            <label htmlFor="visibility" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 'medium', color: '#EEEEEE' }}>Group Visibility</label>
+            <select
+              id="visibility"
+              name="visibility"
+              value={formData.visibility}
+              onChange={handleChange}
+              required
+              style={{ marginTop: '0.25rem', display: 'block', width: '100%', padding: '0.75rem', border: '1px solid #C5C5C5', borderRadius: '0.375rem', boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)', outline: 'none', fontSize: '0.875rem', backgroundColor: '#FFFFFF', color: '#222831' }}
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
           </div>
           <div>
             <button

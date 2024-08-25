@@ -26,6 +26,11 @@ const groupSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  visibility: { 
+    type: String,
+    enum: ['private', 'public'],
+    required: true,
+  },
 });
 
 const Group = mongoose.model('Group', groupSchema);
