@@ -6,25 +6,13 @@ const NotificationsProvider = ({ children }) => {
 
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
-    const [url, setUrl] = useState("");
-
-    const [pendingGroups, setPendingGroups] = useState([]); // State for pending groups
-
-    // Array of URLs to fetch data from consequentially
-    // const urlsToFetch = [
-    //     'http://localhost:3000/api/groups',
-    //     'http://localhost:3000/api/users',
-    //     'http://localhost:3000/api/posts',
-    // ];
-
-
 
 
     // fetch notification from backend
     const fetchNotification = async () => {
         try {
 
-            const response1 = await fetch('http://localhost:3000/api/groups', {
+            const response1 = await fetch('http://localhost:3000/api/notifications', {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
@@ -33,38 +21,17 @@ const NotificationsProvider = ({ children }) => {
             if (!response1.ok) {
                 throw new Error(`HTTP error! status: ${response1.status}`);
             }
-            const groupsData = await response1.json();
-            console.log('Fetched result for groups: ', groupsData);
+            const notificationsData = await response1.json();
+            console.log('Fetched result for notificationsData from notificationsContext: ', notificationsData);
+            setNotifications(notificationsData);
 
+            // fetch name for each user
+            notificationsData.forEach(notification => {
+                notification.userIds.forEach(user => {
+                    console.log('Fetched notification user\'name from notificationsContext:', user.name);
+                })}
+            )
 
-            // Filter function to get only groups with "pending" status
-            const filterPendingGroups = (groupsData) => {
-                return groupsData.filter(data => data.status === "pending");
-            };
-
-            // Apply the filter function to get pending groups
-            const filteredGroup = filterPendingGroups(groupsData);
-            setPendingGroups(filteredGroup)
-            console.log('filtered groups:', filteredGroup);
-            console.log('pending groups:', pendingGroups);
-
-            // count pending groups
-            const countPendingGroups = filteredGroup.length
-            setUnreadNotifications(countPendingGroups);
-            console.log('countPendingGroups:', unreadNotifications);
-
-
-            const response2 = await fetch('http://localhost:3000/api/posts', {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                }
-            });
-            if (!response2.ok) {
-                throw new Error(`HTTP error! status: ${response2.status}`);
-            }
-            const postsData = await response2.json();
-            console.log('Fetched result for posts: ', postsData);
 
 
             // todo: append the new notifications to the existing state
@@ -73,7 +40,8 @@ const NotificationsProvider = ({ children }) => {
             // TODO: update unread notifications count
             // setUnreadNotifications(prevUnread => prevUnread + result.filter(notifications))
 
-        } catch (error) {
+        } catch (error)
+            {
             console.error('Error fetching notifications:', error.message);
         }
     }
@@ -91,8 +59,7 @@ const NotificationsProvider = ({ children }) => {
 
     const value = {
         notifications,
-        unreadNotifications,
-        pendingGroups
+        unreadNotifications
     }
 
     return (
@@ -110,6 +77,24 @@ export { NotificationsContext };
 
 // ----------------------------------------------
 // draft
+
+// const [pendingGroups, setPendingGroups] = useState([]); // State for pending groups
+//
+// // Filter function to get only groups with "pending" status
+// const filterPendingGroups = (groupsData) => {
+//     return groupsData.filter(data => data.status === "pending");
+// };
+//
+// // Apply the filter function to get pending groups
+// const filteredGroup = filterPendingGroups(groupsData);
+// setPendingGroups(filteredGroup)
+
+
+// console.log('filtered groups:', filteredGroup);
+// console.log('pending groups:', pendingGroups);
+//
+// // count pending groups
+// const countPendingGroups = filteredGroup.length
 
 // export const NotificationsProvider = ({children}) => {
 //     const [notifications, setNotifications] = useState([]); // holds the list of notification
