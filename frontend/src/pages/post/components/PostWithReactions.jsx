@@ -109,7 +109,7 @@ export function PostWithReactions({ postId }) {
   return (
     <div className="reactionContainer">
       {/* Like Icon or Selected Reaction for Post */}
-      <span className="likeBtn" onClick={handlePostLikeClick}>
+      <span className="likeBtn" onClick={selectedPostReaction ? () => handlePostReaction(selectedPostReaction) : handlePostLikeClick}>
         {selectedPostReaction ? (
           <span
             className={`selectedReaction animate__animated animate__bounceIn`}
