@@ -4,6 +4,7 @@ import CreatePost from '../post/components/CreatePost';
 import ListOfPosts from '../post/components/ListOfPosts';
 import { useState } from 'react';
 import './Group.css';
+import Groupnav from '../../components/groupnav';
 
 export default function Group() {
   // const initialPosts = [
@@ -106,29 +107,13 @@ export default function Group() {
   // }
 
   return (
+
     <div className="groupContainer">
       {/* <div className="feedContent">
         <CreatePost text={text} onAdd={handleAddPost} onPostChange={handleInput} />
         <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} />
       </div> */}
-      <div className="sidebar">
-        <button className="sidebarButton">Discover Groups</button>
-        <button className="sidebarButton">View All Groups</button>
-        <button className="sidebarButton" onClick={() => navigate('/creategroup')}> {/* 버튼에 onClick 추가 */}
-          Create New Group
-        </button>
-        <button className="sidebarButton" onClick={() => navigate('/managegroup')}> {/* 버튼에 onClick 추가 */}
-          Manage Group
-        </button>
-        <div className="sidebarList">
-          {/* <h3>Group List</h3>
-          <ul>
-            <li>Group 1</li>
-            <li>Group 2</li>
-            <li>Group 3</li>
-          </ul> */}
-        </div>
-      </div>
+      <Groupnav/>
     </div>
   );
 }
