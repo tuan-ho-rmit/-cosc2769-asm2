@@ -199,4 +199,18 @@ export const getGroups = async (req, res) => {
     }
   };
 
+  export const getGroupById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const group = await Group.findById(id);
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found' });
+        }
+        res.status(200).json(group);
+    } catch (error) {
+        console.error('Error fetching group:', error);
+        res.status(500).json({ message: 'Failed to fetch group', error: error.message });
+    }
+};
   
