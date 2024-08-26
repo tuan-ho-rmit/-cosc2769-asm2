@@ -199,20 +199,27 @@ export const getGroups = async (req, res) => {
     const { groupId, userId } = req.body;
   
     try {
+      // Log to confirm data received
+      console.log('Received groupId:', groupId);
+      console.log('Received userId:', userId);
+  
       const group = await Group.findById(groupId);
       if (!group) {
         return res.status(404).json({ message: 'Group not found' });
       }
   
+      // Remove the member's ObjectId from the group's members array
       group.members = group.members.filter(member => member.toString() !== userId);
       await group.save();
   
-      res.status(200).json({ message: 'Member removed from group' });
+      res.status(200).json({ message: 'Member removed from group successfully' });
     } catch (error) {
       console.error('Error removing member from group:', error);
       res.status(500).json({ message: 'Failed to remove member from group', error: error.message });
     }
   };
+
+
 
   export const getGroupById = async (req, res) => {
     const { id } = req.params;
@@ -243,5 +250,41 @@ export const getGroupsForUser = async (req, res) => {
   } catch (error) {
       console.error('Error fetching groups for member:', error);
       res.status(500).json({ message: 'Failed to fetch groups for member', error: error.message });
+  }
+};
+
+// 특정 그룹의 멤버들을 가져오는 API
+export const getMembersOfGroup = async (req, res) => {
+  const { groupName } = req.params;
+
+  try {
+    const group = await Group.findOne({ groupName });
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    const members = await User.find({ _id: { $in: group.members } });
+    res.status(200).json(members);
+  } catch (error) {
+    console.error('Error fetching members of group:', error);
+    res.status(500).json({ message: 'Failed to fetch members of group', error: error.message });
+  }
+};
+
+
+export const getGroupByName = async (req, res) => {
+  const { groupName } = req.params;
+
+  try {
+    const group = await Group.findOne({ groupName }); // Find the group by name
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // Return only the ObjectId of the group
+    res.status(200).json({ _id: group._id });
+  } catch (error) {
+    console.error('Error fetching group by name:', error);
+    res.status(500).json({ message: 'Failed to fetch group', error: error.message });
   }
 };
