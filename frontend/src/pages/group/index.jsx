@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Groupnav from '../../components/groupnav';
 
 const Group = () => {
   const [groups, setGroups] = useState([]);
@@ -73,6 +74,8 @@ const Group = () => {
   };
 
   return (
+    <>
+    <Groupnav/>
     <div style={{ padding: '2rem' }}>
       <h2 style={{ color: '#EEEEEE', marginBottom: '1rem' }}>My Groups</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -104,6 +107,7 @@ const Group = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 
