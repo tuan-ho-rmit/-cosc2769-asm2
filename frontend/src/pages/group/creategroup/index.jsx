@@ -43,12 +43,12 @@ const CreateGroup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!user) {
       alert('You need to log in to create a group.');
       return;
     }
-
+  
     const groupData = {
       ...formData,
       status: 'pending',
@@ -56,7 +56,7 @@ const CreateGroup = () => {
       createdAt: new Date().toISOString(),
       members: [user.id], // 유저의 오브젝트 아이디를 members 배열에 추가
     };
-
+  
     try {
       const response = await fetch('http://localhost:3000/api/groups/create', {
         method: 'POST',
@@ -66,11 +66,17 @@ const CreateGroup = () => {
         body: JSON.stringify(groupData),
         credentials: 'include', // 세션 쿠키 포함
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        if (response.status === 400) {
+          alert(errorData.message); // 그룹 이름이 이미 존재할 경우 경고 메시지 표시
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return;
       }
-
+  
       const result = await response.json();
       alert(`Your group: ${result.groupName} is successfully registered! Wait for system admin's approval.`);
       console.log('Group created:', result);

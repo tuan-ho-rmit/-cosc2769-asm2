@@ -12,6 +12,12 @@ export const createGroup = async (req, res) => {
 
     const { groupName, description, avatar, visibility } = req.body;
 
+    // 동일한 이름의 그룹이 이미 존재하는지 확인
+    const existingGroup = await Group.findOne({ groupName });
+    if (existingGroup) {
+      return res.status(400).json({ message: 'A group with this name already exists. Please choose a different name.' });
+    }
+
     // 유저 오브젝트 아이디 가져오기
     const user = await User.findOne({ email: req.session.user.email });
     if (!user) {
@@ -35,6 +41,7 @@ export const createGroup = async (req, res) => {
     res.status(500).json({ message: 'Failed to create group', error: err.message });
   }
 };
+
 
 
 export const getGroups = async (req, res) => {
