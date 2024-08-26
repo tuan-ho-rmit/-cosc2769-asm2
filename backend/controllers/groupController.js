@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Group from '../models/Group.js';
 import GroupJoinRequest from '../models/GroupJoinRequest.js';
 import User from '../models/User.js';
@@ -214,3 +215,19 @@ export const getGroups = async (req, res) => {
     }
 };
   
+export const getGroupsForUser = async (req, res) => {
+  const { memberId } = req.query;
+
+  if (!mongoose.Types.ObjectId.isValid(memberId)) {
+      return res.status(400).json({ message: 'Invalid memberId format' });
+  }
+
+  try {
+      // memberId를 가지고 멤버가 속한 모든 그룹을 찾습니다.
+      const groups = await Group.find({ members: new mongoose.Types.ObjectId(memberId) });
+      res.status(200).json(groups); // 그룹 자체를 반환합니다.
+  } catch (error) {
+      console.error('Error fetching groups for member:', error);
+      res.status(500).json({ message: 'Failed to fetch groups for member', error: error.message });
+  }
+};

@@ -1,6 +1,6 @@
 import express from 'express';
 import { createGroup } from '../controllers/groupController.js';
-import { getGroups, deleteGroup, joinGroup, getRequestedGroups , getJoinRequests,acceptMember,rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById} from '../controllers/groupController.js';
+import { getGroups, deleteGroup, joinGroup, getRequestedGroups , getJoinRequests,acceptMember,rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser } from '../controllers/groupController.js';
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.post('/create', createGroup);
 router.get('/', getGroups);
 
 // 그룹 삭제 라우트
+router.get('/member-groups', getGroupsForUser);
 router.delete('/:id', deleteGroup);
 router.post('/join-group', joinGroup);
 router.get('/requested-groups', getRequestedGroups);
