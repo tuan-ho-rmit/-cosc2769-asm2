@@ -115,3 +115,25 @@ export const getUserFriendsList = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch user friends list', error: err.message });
     }
 };
+
+export const getPendingFriendRequests = async (req, res) => {
+    try {
+        const userId = req.params.id; // Get the user ID from the route parameter
+        const pendingRequests = await FriendRequest.find({
+            toId: userId,
+            status: 'pending'
+        }).populate('fromId'); // Populate fromId to get user details
+
+        if (!pendingRequests) {
+            return res.status(404).json({ message: "No pending friend requests found" });
+        }
+
+        res.status(200).json({
+            message: "Successfully fetched pending friend requests",
+            pendingRequests
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch pending friend requests', error: err.message });
+    }
+};

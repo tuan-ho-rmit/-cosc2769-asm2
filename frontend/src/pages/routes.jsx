@@ -17,6 +17,9 @@ import AdminPosts from "./admin/components/posts";
 import DiscoverGroup from "./discovergroup";
 import GroupMemberManagement from "./groupmembermanagement";
 import GroupMain from "./groupmain";
+import Friends from "./friends/index.jsx";
+import FriendList from "./friends/components/friendlist/index.jsx";
+import FriendRequest from "./friends/components/friendrequest/index.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +49,16 @@ export const router = createBrowserRouter([
           { path: "users", element: <AdminUsers />, name: "Users" },
           { path: "groups", element: <AdminGroups />, name: "Forum Posts" },
           { path: "posts", element: <AdminPosts />, name: "Tours" },
+        ]
+      },
+      {
+        path: '/friends', element: <Friends />, children: [
+          {
+            path: 'friendlist', element: <FriendList />, name:"Friend List"
+          },
+          {
+            path: "friendrequest", element: <FriendRequest />, name: "Friend Requests"
+          },
         ]
       }
     ],

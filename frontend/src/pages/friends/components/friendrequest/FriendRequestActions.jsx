@@ -1,5 +1,5 @@
 // function to accept a friend request
-const acceptFriendRequest = async (requestId) => {
+export const acceptFriendRequest = async (requestId) => {
     try {
         const response = await fetch(`http://localhost:3000/api/friendrequest/${requestId}/accept`, {
             method: 'PATCH',
@@ -24,7 +24,7 @@ const acceptFriendRequest = async (requestId) => {
 };
 
 // function to reject a friend request
-const rejectFriendRequest = async (requestId) => {
+export const rejectFriendRequest = async (requestId) => {
     try {
         const response = await fetch(`http://localhost:3000/api/friendrequest/${requestId}/reject`, {
             method: 'PATCH',
