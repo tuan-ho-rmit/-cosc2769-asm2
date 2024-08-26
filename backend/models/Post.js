@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+const reactionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    type: { type: String, enum: ['Like', 'Love', 'HaHa', 'Angry'], required: true }
+  });
+
+
 const postSchema = new mongoose.Schema({
     userProfile: { 
         type: mongoose.Schema.Types.ObjectId, 
@@ -25,6 +31,7 @@ const postSchema = new mongoose.Schema({
         default: Date.now 
     },
     images: [String],
+    reactions: [reactionSchema],
 });
 
 // Populate author with firstName and lastName, and userProfile with avatar
@@ -43,6 +50,8 @@ postSchema.virtual('userProfileDetails', {
     justOne: true,
     select: 'avatar'
 });
+
+
 
 const Post = mongoose.model('Post', postSchema);
 
