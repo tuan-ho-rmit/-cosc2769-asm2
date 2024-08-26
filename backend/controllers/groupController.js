@@ -12,13 +12,20 @@ export const createGroup = async (req, res) => {
 
     const { groupName, description, avatar, visibility } = req.body;
 
+    // 유저 오브젝트 아이디 가져오기
+    const user = await User.findOne({ email: req.session.user.email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const newGroup = new Group({
       groupName,
       description,
       avatar,
       status: 'pending',
-      createdBy: req.session.user.email, // 세션에서 이메일을 가져와서 저장
+      createdBy: req.session.user.email,
       visibility,
+      members: [user._id], // 유저 오브젝트 아이디를 members 배열에 추가
     });
 
     const savedGroup = await newGroup.save();
