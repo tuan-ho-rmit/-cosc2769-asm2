@@ -7,7 +7,7 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    fromId: currentUser._id,
+                    fromId: currentUser.id, // TODO: IM CRYING IT IS NOT WORKING
                     toId: userId,
                     status: 'pending'
                 }),
@@ -16,6 +16,7 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
 
             console.log(currentUser)
             console.log(userId)
+            console.log(user)
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);

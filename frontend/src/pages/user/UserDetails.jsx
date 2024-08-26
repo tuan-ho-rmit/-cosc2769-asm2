@@ -58,9 +58,8 @@ export default function UserDetails() {
         })
             .then(response => response.json())
             .then(data => {
+                console.log('Fetched current user', data.user) // THIS RETURN UNDEFINED ugly cri
                 setCurrentUser(data.user)
-                console.log('data.user: ', data.user) // log the current user data
-                console.log('currentUser: ', currentUser) // log the current user data
             })
             .catch(error => console.error('Error fetching current user:', error));
     }, [userId]);
@@ -80,11 +79,14 @@ export default function UserDetails() {
                     <span className="userName">
                         {user.firstName} {user.lastName}
                     </span>
-                    <CreateFriendRequest
-                        currentUser = {currentUser}
-                        userId = {userId}
-                        user = {user}
-                    />
+                    {currentUser && (
+                        <CreateFriendRequest
+                            currentUser = {currentUser}
+                            userId = {userId}
+                            user = {user}
+                        />
+                    )}
+
                 </div>
             </div>
             <hr className="solid"></hr>
