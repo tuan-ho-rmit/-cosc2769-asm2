@@ -1,6 +1,19 @@
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/User.js";
 
+export const findFriendRequest = async (req, res) => {
+    try {
+        const {fromId, toId} = req.params;
+        const existedRequest = await FriendRequest.findOne({fromId: fromId, toId: toId})
+
+        return res.status(200).json(existedRequest || null);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: 'Failed to  ', error: err.message});
+    }
+}
+
 export const createFriendRequest = async (req, res) => {
     try {
         const {
@@ -8,13 +21,20 @@ export const createFriendRequest = async (req, res) => {
             toId,
             status,
         } = req.body;
-        const newFriendRequest = new FriendRequest ({
-            fromId,
-            toId,
-            status: "pending",
-        })
-        const savedFriendRequest = await newFriendRequest.save();
-        res.status(200).json(savedFriendRequest);
+        console.log('from id: ', fromId)
+        console.log('to id: ', toId)
+        const existedRequest = await FriendRequest.findOne({fromId: fromId, toId: toId})
+        if (!existedRequest) {
+            const newFriendRequest = new FriendRequest ({
+                fromId,
+                toId,
+                status: "pending",
+            })
+            const savedFriendRequest = await newFriendRequest.save();
+            res.status(200).json(savedFriendRequest);
+        } else {
+            res.status(500).json({message: 'request already existed '});
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({message: 'Failed to create the friend rq: ', error: err.message});
@@ -30,7 +50,7 @@ export const acceptFriendRequest = async (req, res) => {
             return res.status(404).json({message: "Friend request not found"})
         }
 
-        friendRequest.sttus = 'accepted';
+        friendRequest.status = 'accepted';
         await friendRequest.save();
 
         const fromUser = await User.findByIdAndUpdate(
@@ -70,7 +90,7 @@ export const acceptFriendRequest = async (req, res) => {
 export const rejectFriendRequest = async (req, res) => {
     try {
         const {requestId} = req.params;
-        const friendRequest = await friendRequest.findOne({_id: requestId});
+        const friendRequest = await FriendRequest.findOne({_id: requestId});
         if (!friendRequest) {
             return res.status(404).json({message: "Friend rq not found"})
         }
@@ -97,19 +117,18 @@ export const getAllFriendRequests = async (req, res) => {
     }
 }
 
-export const getUserFriendsList = async (req, res) => {
+export const getUserFriendsList = async (req, res) => { // get friendslist on id
     try {
         const userId = req.params.id;
         const user = await User.findById(userId).populate('friendIds');
 
-        if (!user) {
+        console.log(user)
+
+        if (!user) { // TODO: cannot define the user
             return res.status(404).json({ message: "User not found" });
         }
-
-        res.status(200).json({
-            message: "Successfully fetched user friends list",
-            friendList: user.friendIds
-        });
+        // return the populated friendids
+        res.status(200).json(user);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to fetch user friends list', error: err.message });
