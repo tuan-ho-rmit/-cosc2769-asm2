@@ -7,6 +7,10 @@ import authRoutes from './routes/authRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import postRoutes from './routes/postRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import notiRoutes from './routes/notiRoutes.js'
+import friendRequestRoutes from './routes/friendRequestRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
+import reactionRoutes from './routes/reactionRoutes.js';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
@@ -33,11 +37,15 @@ const connect = async () => {
 
 // Session middleware setup
 app.use(session({
-  secret: 'your-secret-key',  // Replace with your own secret key
+  secret: 'your-secret-key',  // 비밀 키
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }  // Set to true if using HTTPS
+  cookie: {
+    secure: false,  // HTTPS를 사용하는 경우 true로 설정
+    sameSite: 'lax',  // 세션 쿠키를 보호하기 위한 설정
+  }
 }));
+
 
 // Middleware
 app.use(cors(corsOptions));
@@ -50,7 +58,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api', postRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/notifications', notiRoutes);
+app.use('/api/friendrequest', friendRequestRoutes);
+app.use('/api/posts', commentRoutes);
+app.use('/api', reactionRoutes); // 리액션 라우트 추가
 
 app.listen(process.env.PORT || 3000, () => {
   connect();

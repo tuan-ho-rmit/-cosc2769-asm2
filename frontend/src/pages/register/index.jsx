@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // 추가된 부분
 
 // default img url
 import defaultAvatar from './defaultAvatar.png'; 
@@ -14,6 +15,8 @@ const Register = () => {
     gender: '',
     avatar: defaultAvatar, // default img.
   });
+
+  const navigate = useNavigate(); // 추가된 부분
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -57,6 +60,8 @@ const Register = () => {
 
       const result = await response.json();
       console.log('User registered:', result);
+
+      navigate('/login'); // 회원가입 성공 시 /login으로 리디렉트
     } catch (error) {
       console.error('Error registering user:', error.message);
     }
@@ -64,18 +69,20 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md p-8 bg-grey shadow-md rounded-lg" style={{ marginTop: '2rem' }}>
+      <div className="w-full max-w-md p-8 shadow-md rounded-lg" style={{ marginTop: '2rem', backgroundColor: '#393E46' }}>
         <h2 className="text-2xl font-bold mb-6 text-center text-white">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col items-center mb-4">
             <img
               src={formData.avatar}
               alt="User Avatar"
-              className="w-24 h-24 rounded-full border-4 border-yellow-500"
+              className="w-24 h-24 rounded-full border-4"
+              style={{ borderColor: '#FFD369' }}
             />
             <label
               htmlFor="avatar"
-              className="mt-4 px-4 py-2 border border-yellow text-yellow text-sm rounded-full cursor-pointer"
+              className="mt-4 px-4 py-2 text-sm rounded-full cursor-pointer"
+              style={{ border: '1px solid #FFD369', color: '#FFD369' }}
             >
               Upload a Photo
               <input
@@ -100,6 +107,7 @@ const Register = () => {
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                style={{ color: '#222831' }}
               />
             </div>
             <div className="flex-1">
@@ -113,6 +121,7 @@ const Register = () => {
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                style={{ color: '#222831' }}
               />
             </div>
           </div>
@@ -127,6 +136,7 @@ const Register = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              style={{ color: '#222831' }}
             />
           </div>
           <div>
@@ -140,6 +150,7 @@ const Register = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              style={{ color: '#222831' }}
             />
           </div>
           <div>
@@ -153,6 +164,7 @@ const Register = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              style={{ color: '#222831' }}
             />
           </div>
           <div>
@@ -165,6 +177,7 @@ const Register = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              style={{ color: '#222831' }}
             />
           </div>
           <div>
@@ -176,6 +189,7 @@ const Register = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              style={{ color: '#222831' }}
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
@@ -186,7 +200,8 @@ const Register = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-black text-yellow text-lg font-bold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full py-2 px-4 text-lg font-bold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              style={{ backgroundColor: '#222831', color: '#FFD369' }}
             >
               Register
             </button>

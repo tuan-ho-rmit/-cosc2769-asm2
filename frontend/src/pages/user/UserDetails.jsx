@@ -1,59 +1,87 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import ListOfPosts from '../post/components/ListOfPosts'; // ListOfPosts 컴포넌트 임포트
 import './UserDetails.css';
 
 export default function UserDetails() {
-    const [name, setName] = useState("Cho Jaesuk"); // 초기 상태값을 기본 이름으로 설정
-    const [isEditing, setIsEditing] = useState(false);
+    const { userId } = useParams(); // URL에서 userId를 가져옵니다.
+    const [user, setUser] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true); // 로딩 상태 추가
+    const [currentUser, setCurrentUser] = useState(null); // 현재 로그인한 사용자 상태 추가
 
-    const handleNameChange = (e) => {
-        setName(e.target.value); // 새로운 값으로 상태를 업데이트
-    };
+    useEffect(() => {
+        console.log('Requested userId:', userId); // URL에서 가져온 userId가 올바른지 확인
+    
+        // 유저 정보를 가져옵니다.
+        fetch(`http://localhost:3000/api/users/${userId}`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => {
+            console.log('Response status:', response.status); // 응답 상태 코드 확인
+            if (!response.ok) {
+                throw new Error('User not found');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Fetched user data:', data); // 가져온 데이터 출력
+            setUser(data.data);
+        })
+        .catch(error => {
+            console.error('Error fetching user details:', error);
+            setLoading(false); // 에러 발생 시 로딩 상태 해제
+        });
 
-    const toggleEditing = () => {
-        setIsEditing(!isEditing); // 편집 모드 전환
-    };
+        // 해당 유저가 작성한 포스트를 가져옵니다.
+        fetch(`http://localhost:3000/api/posts/user/${userId}`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched user posts:', data); // 가져온 게시물 데이터 출력
+            setPosts(data);
+            setLoading(false); // 로딩 상태 해제
+        })
+        .catch(error => {
+            console.error('Error fetching user posts:', error);
+            setLoading(false); // 에러 발생 시 로딩 상태 해제
+        });
+
+        // 현재 로그인한 사용자 정보를 가져옵니다.
+        fetch(`http://localhost:3000/api/auth/user`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(data => setCurrentUser(data.user))
+        .catch(error => console.error('Error fetching current user:', error));
+        
+    }, [userId]);
+
+    if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
+
+    if (!user) return <div>User not found</div>; // 유저 정보가 없는 경우 메시지 추가
 
     return (
         <div>
             <div className="mainContent">
                 <div className="userProfileContainer">
-                    <span className="profileImgContaimer">
-                        <img src="/Images/example2.png" alt="userImage" className="profileImg" />
-                        <button className="changeProfileImg">
-                            <svg className="h-8 w-8 text-yellow-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                        </button>
+                    <span className="profileImgContainer">
+                        <img src={user.avatar || '/Images/default-avatar.png'} alt="User Avatar" className="profileImg" />
                     </span>
                     <span className="userName">
-                        {isEditing ? (
-                            <input
-                                type="text"
-                                value={name} // 입력된 값이 표시됩니다.
-                                onChange={handleNameChange} // 입력값이 변경될 때마다 상태를 업데이트
-                                onBlur={toggleEditing}  // 입력이 끝나면 편집 모드 해제
-                                className="nameInput"
-                            />
-                        ) : (
-                            <p>{name}</p>  // 수정 모드가 아닐 때 이름을 표시
-                        )}
-                        <button onClick={toggleEditing} className="changeNameBtn">
-                            <svg className="h-8 w-8 text-yellow-500" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" />
-                                <path d="M9 7 h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3" />
-                                <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
-                                <line x1="16" y1="5" x2="19" y2="8" />
-                            </svg>
-                        </button>
-                    </span>
-                    <span className="editBtn">
-                        <button>Save New Changes</button>
+                        {user.firstName} {user.lastName}
                     </span>
                 </div>
             </div>
             <hr className="solid"></hr>
+
+            <div className="newFeedContent">
+                <ListOfPosts posts={posts} user={currentUser} onPostEdit={() => {}} onPostDelete={() => {}} />
+            </div>
         </div>
     );
 }
