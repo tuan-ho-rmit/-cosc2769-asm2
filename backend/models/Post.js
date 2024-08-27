@@ -5,6 +5,12 @@ const reactionSchema = new mongoose.Schema({
     type: { type: String, enum: ['Like', 'Love', 'HaHa', 'Angry'], required: true }
   });
 
+  const historySchema = new mongoose.Schema({
+    modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // 수정한 사용자
+    modifiedAt: { type: Date, default: Date.now }, // 수정된 시간
+    previousContent: String, // 수정 이전의 내용
+    previousImages: [String] // 수정 이전의 이미지 배열
+  });
 
 const postSchema = new mongoose.Schema({
     userProfile: { 
@@ -40,7 +46,8 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Group',
         required: false
-    }
+    },
+    history: [historySchema],
 });
 
 // Populate author with firstName and lastName, and userProfile with avatar

@@ -173,27 +173,69 @@ router.delete('/posts/:id', async (req, res) => {
 });
 
 // Update Post
+// router.put('/posts/:id', async (req, res) => {
+//     try {
+//         const postId = req.params.id;
+//         const { content, images } = req.body;
+
+//         // ObjectId가 유효한지 확인
+//         if (!mongoose.Types.ObjectId.isValid(postId)) {
+//             return res.status(400).json({ message: "Invalid post ID" });
+//         }
+
+//         const updatedPost = await Post.findByIdAndUpdate(
+//             postId,
+//             { content, images, date: new Date() },  // 수정할 필드
+//             { new: true }  // 수정된 데이터를 반환
+//         );
+
+//         if (!updatedPost) {
+//             return res.status(404).json({ message: "Post not found" });
+//         }
+
+//         res.status(200).json(updatedPost);
+//     } catch (error) {
+//         console.error('Error updating post:', error);
+//         res.status(500).json({ message: "Error updating post", error });
+//     }
+// });
+// Update Post
 router.put('/posts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
         const { content, images } = req.body;
+        const userId = req.session.user.id; // 현재 사용자의 ID 가져오기
 
         // ObjectId가 유효한지 확인
         if (!mongoose.Types.ObjectId.isValid(postId)) {
             return res.status(400).json({ message: "Invalid post ID" });
         }
 
-        const updatedPost = await Post.findByIdAndUpdate(
-            postId,
-            { content, images, date: new Date() },  // 수정할 필드
-            { new: true }  // 수정된 데이터를 반환
-        );
-
-        if (!updatedPost) {
+        const post = await Post.findById(postId);
+        if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
 
-        res.status(200).json(updatedPost);
+        // history 배열 초기화 또는 추가
+        if (!post.history) {
+            post.history = [];
+        }
+
+        post.history.push({
+            modifiedBy: userId,
+            modifiedAt: new Date(),
+            previousContent: post.content,
+            previousImages: post.images
+        });
+
+        // 새로운 내용으로 업데이트
+        post.content = content;
+        post.images = images;
+        post.date = new Date();
+
+        await post.save();
+
+        res.status(200).json(post);
     } catch (error) {
         console.error('Error updating post:', error);
         res.status(500).json({ message: "Error updating post", error });

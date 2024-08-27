@@ -8,6 +8,14 @@ import { PostWithReactions } from "./PostWithReactions";
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const currentUserId = user ? user.id : null; 
     const [commentsByPost, setCommentsByPost] = useState({});
+    const [editingPostId, setEditingPostId] = useState(null); // 현재 편집 중인 게시글 ID
+    const [updatedContent, setUpdatedContent] = useState(""); // 업데이트할 내용
+    const [updatedImages, setUpdatedImages] = useState([]); // 업데이트할 이미지
+    const [localPosts, setLocalPosts] = useState(posts); // 로컬 상태로 게시글 관리
+
+    useEffect(() => {
+        setLocalPosts(posts);
+    }, [posts]);
 
     // 댓글 가져오기 함수
     const fetchComments = async (postId) => {
@@ -24,10 +32,10 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     };
 
     useEffect(() => {
-        posts.forEach(post => {
+        localPosts.forEach(post => {
             fetchComments(post._id);
         });
-    }, [posts]);
+    }, [localPosts]);
 
     const handleAddComment = (postId, newCommentText) => {
         const newComment = { content: newCommentText, id: Date.now(), author: user };
@@ -78,7 +86,65 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         .catch(error => console.error('Error deleting comment:', error));
     };
 
-    const postItems = posts.map((each) => {
+    const handleEditPost = (postId) => {
+        setEditingPostId(postId);
+        const postToEdit = localPosts.find(post => post._id === postId);
+        setUpdatedContent(postToEdit.content);
+        setUpdatedImages(postToEdit.images);
+    };
+
+    const handleSaveEditPost = (postId) => {
+        fetch(`http://localhost:3000/api/posts/${postId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ content: updatedContent, images: updatedImages })
+        })
+        .then(response => response.json())
+        .then(() => {
+            // 서버에서 업데이트된 포스트를 다시 불러와 populate된 필드를 유지
+            fetch(`http://localhost:3000/api/posts/${postId}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            .then(response => response.json())
+            .then(updatedPost => {
+                setEditingPostId(null); // 편집 모드 종료
+                setLocalPosts(prevPosts => 
+                    prevPosts.map(post => post._id === postId ? updatedPost : post)
+                ); // 로컬 상태 업데이트
+            });
+        })
+        .catch(error => console.error('Error updating post:', error));
+    };
+
+    const handleImageChange = (event) => {
+        const files = event.target.files;
+        const fileReaders = [];
+        const images = [];
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                images.push(e.target.result);
+                if (images.length === files.length) {
+                    setUpdatedImages(images);
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRemoveImage = (imageIndex) => {
+        setUpdatedImages(updatedImages.filter((_, idx) => idx !== imageIndex));
+    };
+
+    const postItems = localPosts.map((each) => {
         const displayImages = each.images.slice(0, 3);
         const remainingImagesCount = each.images.length - 3;
         const isAuthor = currentUserId === each.author._id;
@@ -110,34 +176,56 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                     {isAuthor && (
                         <div className="dropDown">
                             <DropDowns
-                                onEdit={() => onPostEdit(each._id)}
+                                onEdit={() => handleEditPost(each._id)}
                                 onDelete={() => onPostDelete(each._id)}
                             />
                         </div>
                     )}
                 </div>
-                <Link to={`/post/${each._id}`}>
-                    <div className="postContent">
-                        {each.content}
+                
+                {/* 게시글 편집 모드 */}
+                {editingPostId === each._id ? (
+                    <div>
+                        <input 
+                            type="text" 
+                            value={updatedContent} 
+                            onChange={(e) => setUpdatedContent(e.target.value)} 
+                        />
+                        <div>
+                            {updatedImages.map((image, idx) => (
+                                <div key={idx} className="imageWrapper">
+                                    <img src={image} alt={`Post image ${idx}`} className="postImage" />
+                                    <button onClick={() => handleRemoveImage(idx)}>Remove</button>
+                                </div>
+                            ))}
+                        </div>
+                        <input type="file" onChange={handleImageChange} multiple />
+                        <button onClick={() => handleSaveEditPost(each._id)}>Save</button>
                     </div>
-                    <div className="postContentImg">
-                        {displayImages.map((image, idx) => (
-                            <div key={idx} className="imageWrapper">
-                                <img src={image} alt={`Post image ${idx}`} className="postImage" />
-                                {idx === 2 && remainingImagesCount > 0 && (
-                                    <div className="imageOverlay">
-                                        +{remainingImagesCount} Pictures
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </Link>
+                ) : (
+                    <Link to={`/post/${each._id}`}>
+                        <div className="postContent">
+                            {each.content}
+                        </div>
+                        <div className="postContentImg">
+                            {displayImages.map((image, idx) => (
+                                <div key={idx} className="imageWrapper">
+                                    <img src={image} alt={`Post image ${idx}`} className="postImage" />
+                                    {idx === 2 && remainingImagesCount > 0 && (
+                                        <div className="imageOverlay">
+                                            +{remainingImagesCount} Pictures
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </Link>
+                )}
+
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
                     <PostWithReactions postId={each._id} />
-
                     </span>
                     <span className="commentBtn">
                         <button>Comment</button>
