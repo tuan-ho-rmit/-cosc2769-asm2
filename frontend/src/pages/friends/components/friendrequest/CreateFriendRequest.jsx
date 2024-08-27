@@ -66,15 +66,45 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
         console.log('log request', request)
     }, []);
 
+    const deleteFriendRequest = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/friendrequest/${request._id}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+            }
+
+            fetchFriendRequest(); // Refresh the request state
+            pushSuccess("Friend request deleted successfully");
+        } catch (error) {
+            console.error('Error deleting friend request:', error.message);
+            pushError(error.message);
+            throw error;
+        }
+    };
+
+
     return (
             !request || (request && request.status) === 'rejected' ?
             <button onClick={sendFriendRequest}
                     className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
             >
                 Send Friend Request
-            </button> : request && request.status === 'accepted' ? <button>
-                    Unfriend
-                </button> : <button> Cancel </button>
+            </button> : request && request.status === 'accepted' ?
+                    <button>
+                        Unfriend
+                    </button>
+                    :
+                    <button onClick={deleteFriendRequest}>
+                        Cancel
+                    </button>
         );
 }
 

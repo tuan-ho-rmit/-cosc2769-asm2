@@ -58,7 +58,7 @@ export default function UserDetails() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Fetched current user', data.user) // TODO: THIS RETURN UNDEFINED ugly cri
+                console.log('Fetched current user', data.user)
                 setCurrentUser(data.user)
             })
             .catch(error => console.error('Error fetching current user:', error));

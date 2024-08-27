@@ -3,7 +3,8 @@ import {
     acceptFriendRequest,
     createFriendRequest, findFriendRequest,
     getAllFriendRequests, getPendingFriendRequests,
-    getUserFriendsList, rejectFriendRequest
+    getUserFriendsList, rejectFriendRequest,
+    deleteFriendRequest
 } from "../controllers/friendRequestController.js";
 
 const router = express.Router();
@@ -13,6 +14,7 @@ router.get ('/friendslist/:userId', getUserFriendsList)
 router.patch ('/:requestId/accept', acceptFriendRequest)
 router.patch ('/:requestId/reject', rejectFriendRequest)
 router.get('/single/:fromId/:toId', findFriendRequest)
+router.delete('/:requestId/delete', deleteFriendRequest)
 
 
 

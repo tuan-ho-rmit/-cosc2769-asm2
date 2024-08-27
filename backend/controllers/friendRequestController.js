@@ -106,6 +106,33 @@ export const rejectFriendRequest = async (req, res) => {
     }
 }
 
+// Function to delete a friend request
+export const deleteFriendRequest = async (req, res) => {
+    try {
+        const { requestId } = req.params;
+
+        // find the friend request by ID
+        const friendRequest = await FriendRequest.findOne({ _id: requestId });
+
+        if (!friendRequest) {
+            return res.status(404).json({ message: "Friend request not found" });
+        }
+
+        // Delete the friend request
+        await FriendRequest.deleteOne({ _id: requestId });
+
+        //Send a success response
+        res.status(200).json({
+            message: "Friend request deleted successfully",
+            friendRequest
+        });
+    } catch (err) {
+        console.error('Error deleting friend request:', err.message);
+        res.status(500).json({ message: 'Failed to delete friend request', error: err.message });
+    }
+};
+
+
 export const getAllFriendRequests = async (req, res) => {
     try {
         console.log('testing getall friend rq')
