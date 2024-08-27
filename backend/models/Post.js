@@ -32,6 +32,11 @@ const postSchema = new mongoose.Schema({
     },
     images: [String],
     reactions: [reactionSchema],
+    groupId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Group',
+        required: false
+    }
 });
 
 // Populate author with firstName and lastName, and userProfile with avatar

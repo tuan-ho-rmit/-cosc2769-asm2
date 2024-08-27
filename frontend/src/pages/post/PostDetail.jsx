@@ -146,7 +146,7 @@ export default function PostDetail() {
         </div>
       )}
       <hr className="solidPostForDetail"></hr>
-      <div className="likeComment">
+      <div className="likeAndComment">
         <span className="likeBtn">
         <PostWithReactions postId={postId} />
         </span>

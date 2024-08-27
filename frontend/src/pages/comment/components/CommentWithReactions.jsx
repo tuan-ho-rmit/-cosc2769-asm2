@@ -16,26 +16,34 @@ export function CommentWithReactions({ commentId }) {
   const currentUserId = JSON.parse(localStorage.getItem('user')).id;
 
   useEffect(() => {
-    const fetchUserReaction = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/comments/${commentId}/reactions/user`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+    // commentId가 있는 경우에만 fetch 요청을 보냅니다.
+    if (commentId) {
+      const fetchUserReaction = async () => {
+        try {
+          const response = await fetch(`http://localhost:3000/api/comments/${commentId}/reactions/user`, {
+            method: 'GET',
+            credentials: 'include',
+          });
 
-        if (!response.ok) {
-          throw new Error('Error fetching user reaction for comment');
+          if (!response.ok) {
+            throw new Error('Error fetching user reaction for comment');
+          }
+
+          const data = await response.json();
+          console.log('Fetched user reaction:', data);
+
+          if (data.reaction) {
+            setSelectedCommentReaction(data.reaction);
+          } else {
+            setSelectedCommentReaction(null);
+          }
+        } catch (error) {
+          console.error('Error fetching user reaction:', error);
         }
+      };
 
-        const data = await response.json();
-        setSelectedCommentReaction(data.reaction || null);
-        console.log('Fetched user reaction:', data.reaction);
-      } catch (error) {
-        console.error('Error fetching user reaction:', error);
-      }
-    };
-
-    fetchUserReaction();
+      fetchUserReaction();
+    }
   }, [commentId, currentUserId]);
 
   const handleCommentLikeClick = () => {

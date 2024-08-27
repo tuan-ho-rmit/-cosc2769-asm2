@@ -204,4 +204,54 @@ router.get('/posts/user/:userId', async (req, res) => {
     }
 });
 
+// group
+
+// 특정 그룹의 모든 포스트 가져오기
+router.get('/:groupId/posts', async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        
+        // 그룹 ID로 포스트 검색
+        const posts = await Post.find({ groupId })
+            .sort({ date: -1 })
+            .populate('author', 'firstName lastName avatar')
+            .populate('userProfile', 'avatar');
+        
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching group posts:', error);
+        res.status(500).json({ message: "Error fetching group posts", error });
+    }
+});
+
+// 특정 그룹에 포스트 추가하기
+router.post('/:groupId/posts', async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const { content, images } = req.body;
+
+        // 세션에 저장된 유저 정보 확인
+        if (!req.session.user) {
+            return res.status(401).json({ message: 'User is not logged in' });
+        }
+
+        const newPost = new Post({
+            content,
+            userProfile: req.session.user.id,
+            userId: req.session.user.id,
+            author: req.session.user.id,
+            images,
+            date: new Date(),
+            groupId,  // 그룹 ID 추가
+        });
+
+        await newPost.save();
+        res.status(201).json(newPost);
+    } catch (error) {
+        console.error('Error creating group post:', error);
+        res.status(500).json({ message: "Error creating group post", error });
+    }
+});
+
+
 export default router;
