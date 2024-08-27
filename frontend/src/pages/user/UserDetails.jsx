@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import ListOfPosts from '../post/components/ListOfPosts'; // ListOfPosts 컴포넌트 임포트
 import './UserDetails.css';
 import CreateFriendRequest from "../friends/components/friendrequest/CreateFriendRequest.jsx";
+import FriendRequestActions from "../friends/components/actions/FriendRequestActions.jsx";
+
 
 export default function UserDetails() {
     const {userId} = useParams(); // URL에서 userId를 가져옵니다. Get user ID from the URL
@@ -10,8 +12,36 @@ export default function UserDetails() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true); // 로딩 상태 추가. Add Loader state
     const [currentUser, setCurrentUser] = useState(null); // 현재 로그인한 사용자 상태 추가. Add current logged-in user state
+    const [request, setRequest] = useState()
+
+
+    const fetchFriendRequest = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/friendrequest/single/${currentUser.id}/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            }); // throw error
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+            }
+
+            const result = await response.json();
+            setRequest(result)
+            return result; // Return result to handle it in the component
+        } catch (error) {
+            console.error('Error sending friend request:', error.message);
+            throw error; // Rethrow error to handle it in the component
+        }
+    }
+
 
     useEffect(() => {
+
         console.log('Requested userId:', userId); // URL에서 가져온 userId가 올바른지 확인
 
         // 유저 정보를 가져옵니다.
@@ -62,6 +92,8 @@ export default function UserDetails() {
                 setCurrentUser(data.user)
             })
             .catch(error => console.error('Error fetching current user:', error));
+
+        fetchFriendRequest()
     }, [userId]);
 
     if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
@@ -80,11 +112,24 @@ export default function UserDetails() {
                         {user.firstName} {user.lastName}
                     </span>
                     {currentUser && (
-                        <CreateFriendRequest
-                            currentUser = {currentUser}
-                            userId = {userId}
-                            user = {user}
-                        />
+                        currentUser.id === userId ? (
+                            <></>
+                        ) : request ? (
+                            <FriendRequestActions
+                                currentUser={currentUser}
+                                userId={userId}
+                                request = {request}
+                                fetchFriendRequest={fetchFriendRequest}
+                            />
+                        ) : (
+                            <CreateFriendRequest
+                                currentUser = {currentUser}
+                                userId = {userId}
+                                user = {user}
+                                request = {request}
+                                fetchFriendRequest={fetchFriendRequest}
+                            />
+                        )
                     )}
 
                 </div>

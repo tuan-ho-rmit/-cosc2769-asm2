@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import FriendRequestActions from "./FriendRequestActions.jsx";
+import FriendRequestActions from "../actions/FriendRequestActions.jsx";
 
 export default function FriendRequest() {
     const [requests, setRequests] = useState([]);
