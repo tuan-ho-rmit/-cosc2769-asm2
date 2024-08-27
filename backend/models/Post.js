@@ -32,6 +32,10 @@ const postSchema = new mongoose.Schema({
     },
     images: [String],
     reactions: [reactionSchema],
+    isGroupPost: { 
+        type: Boolean, 
+        default: false 
+      },
     groupId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Group',
