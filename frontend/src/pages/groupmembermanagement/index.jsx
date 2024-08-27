@@ -33,6 +33,43 @@ const GroupMemberManagement = () => {
     fetchGroupData();
   }, [groupName]);
 
+  const handleAccept = async (request) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/groups/accept-member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ groupName, userEmail: request.userEmail }),
+      });
+  
+      if (response.ok) {
+        setRequests(requests.filter(r => r._id !== request._id));
+        setMembers([...members, { email: request.userEmail, _id: request.userId }]);
+      } else {
+        throw new Error('Failed to accept member');
+      }
+    } catch (error) {
+      console.error('Error accepting member:', error);
+    }
+  };
+
+  const handleReject = async (requestId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/groups/join-requests/${requestId}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        setRequests(requests.filter(request => request._id !== requestId));
+      } else {
+        throw new Error('Failed to reject request');
+      }
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+    }
+  };
+  
   const handleRemoveMember = async (memberId) => {
     try {
       const response = await fetch('http://localhost:3000/api/groups/remove-member', {
