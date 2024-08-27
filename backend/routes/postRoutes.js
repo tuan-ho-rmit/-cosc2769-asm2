@@ -4,6 +4,55 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+// get post pagination
+router.get('/posts/list', async (req, res) => {
+    try {
+        let { page, limit, status, search, searchType, role } = req.query;
+
+        page = parseInt(page);
+        limit = parseInt(limit);
+
+        const filter = {};
+        if (status) {
+            filter.status = status;
+        }
+        if (role) {
+            filter.role = role;
+        }
+        if (search) {
+            if (searchType === "email") {
+                filter.email = { $regex: search, $options: "i" };
+            } else if (searchType === "username") {
+                filter.username = { $regex: search, $options: "i" };
+            } else {
+                filter.$or = [
+                    { username: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                ];
+            }
+        }
+
+        const totalCount = await Post.countDocuments();
+        const totalPages = (await Post.countDocuments(filter)) / limit;
+        const users = await Post.find(filter)
+            .limit(limit)
+            .skip((page - 1) * limit);
+
+        res.status(200).json({
+            success: true,
+            totalPages: Math.ceil(totalPages),
+            totalCount: totalCount,
+            message: "Successfully fetched posts",
+            data: users,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error. Please try again.",
+        });
+    }
+})
+
 // 모든 Posts 불러오기
 router.get('/posts', async (req, res) => {
     try {
@@ -113,6 +162,8 @@ router.put('/posts/:id', async (req, res) => {
         res.status(500).json({ message: "Error updating post", error });
     }
 });
+
+
 
 // Read a Post
 router.get('/posts/:id', async (req, res) => {
