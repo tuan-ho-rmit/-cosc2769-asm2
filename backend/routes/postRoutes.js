@@ -114,6 +114,54 @@ router.put('/posts/:id', async (req, res) => {
     }
 });
 
+
+router.get('/posts/list', async (req, res) => {
+    try {
+        let { page, limit, status, search, searchType, role } = req.query;
+
+        page = parseInt(page);
+        limit = parseInt(limit);
+
+        const filter = {};
+        if (status) {
+            filter.status = status;
+        }
+        if (role) {
+            filter.role = role;
+        }
+        if (search) {
+            if (searchType === "email") {
+                filter.email = { $regex: search, $options: "i" };
+            } else if (searchType === "username") {
+                filter.username = { $regex: search, $options: "i" };
+            } else {
+                filter.$or = [
+                    { username: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                ];
+            }
+        }
+
+        const totalCount = await Post.countDocuments();
+        const totalPages = (await Post.countDocuments(filter)) / limit;
+        const users = await Post.find(filter)
+            .limit(limit)
+            .skip((page - 1) * limit);
+
+        res.status(200).json({
+            success: true,
+            totalPages: Math.ceil(totalPages),
+            totalCount: totalCount,
+            message: "Successfully fetched posts",
+            data: users,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error. Please try again.",
+        });
+    }
+})
 // Read a Post
 router.get('/posts/:id', async (req, res) => {
     try {
