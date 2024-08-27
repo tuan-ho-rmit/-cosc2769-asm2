@@ -4,7 +4,7 @@ import {
     createFriendRequest, findFriendRequest,
     getAllFriendRequests, getPendingFriendRequests,
     getUserFriendsList, rejectFriendRequest,
-    deleteFriendRequest
+    deleteFriendRequest, unfriend
 } from "../controllers/friendRequestController.js";
 
 const router = express.Router();
@@ -15,9 +15,6 @@ router.patch ('/:requestId/accept', acceptFriendRequest)
 router.patch ('/:requestId/reject', rejectFriendRequest)
 router.get('/single/:fromId/:toId', findFriendRequest)
 router.delete('/:requestId/delete', deleteFriendRequest)
-
-
-
-router.get ('/pending/', getPendingFriendRequests) // no need
+router.patch('/:requestId/unfriend', unfriend)
 
 export default router;

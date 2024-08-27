@@ -61,6 +61,32 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
             throw error; // Rethrow error to handle it in the component
         }
     }
+
+    // unfriend function
+    const unfriend = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/friendrequest/${request._id}/unfriend`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+            }
+
+            fetchFriendRequest(); // Refresh the request state
+            pushSuccess("Unfriended successfully");
+        } catch (error) {
+            console.error('Error unfriending:', error.message);
+            pushError(error.message);
+            throw error;
+        }
+    };
+
     useEffect(() => {
         fetchFriendRequest()
         console.log('log request', request)
@@ -98,9 +124,10 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
             >
                 Send Friend Request
             </button> : request && request.status === 'accepted' ?
-                    <button>
-                        Unfriend
-                    </button>
+                // <UnfriendAction/>
+                <button onClick={unfriend}>
+                    Unfriend
+                </button>
                     :
                     <button onClick={deleteFriendRequest}>
                         Cancel
