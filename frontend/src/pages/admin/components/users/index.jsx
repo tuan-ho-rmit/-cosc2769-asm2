@@ -48,12 +48,6 @@ export default function AdminUsers() {
         }, 300),
         []
     );
-    const handleOnChangeStatus = (c) => {
-        setFilter((prev) => ({ ...prev, status: c, page: 1 }));
-    };
-    const handleOnChangeRole = (r) => {
-        setFilter((prev) => ({ ...prev, role: r, page: 1 }));
-    };
     const handleInactiveCofirm = async (userId) => {
         try {
             const url = new URL(
@@ -147,7 +141,7 @@ export default function AdminUsers() {
             display: "flex",
             flexDirection: "column",
         }}>
-            <div style={{margin:"16px"}}>
+            <div style={{ margin: "16px" }}>
                 <WrapperFilter
                     onReset={handleResetFilter}
                     customAction={

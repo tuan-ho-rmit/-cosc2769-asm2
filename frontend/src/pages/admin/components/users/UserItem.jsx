@@ -23,16 +23,14 @@ export default function UserItem({
     };
 
     return (
-        <div className="card mb-3 p-4 border rounded-md shadow-md" tabIndex="0" aria-label={`User card for ${user.username}`}>
+        <div className="card mb-3 p-4 border rounded-md shadow-md" >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div className="flex flex-col md:flex-row items-start md:items-center">
                     {/* <Link
                         to={`/profile/${user._id}`}
                         className="flex items-end text-decoration-none mb-2 md:mb-0"
-                        tabIndex="0"
-                        aria-label={`View profile of ${user.username}`}
                     > */}
-                    <h5 className="text-lg font-semibold cursor-pointer">
+                    <h5 className="text-lg font-semibold cursor-pointer hover:text-primary">
                         {user.username}
                     </h5>
                     {/* </Link> */}
@@ -65,22 +63,22 @@ export default function UserItem({
             </div>
             <hr className="my-4" />
             <div className="flex flex-col md:flex-row">
-                <p className="text-sm text-grey-200 mb-1 md:mb-0" tabIndex="0" aria-label={`Email: ${user.email}`}>
+                <p className="text-sm text-grey-200 mb-1 md:mb-0" >
                     <strong>Email: {user.email}</strong>
                 </p>
-                <p className="text-sm text-grey-200 mb-1 md:mb-0 ml-0 md:ml-3" tabIndex="0" aria-label={`Role: ${getUserRoleName(user.role)}`}>
+                <p className="text-sm text-grey-200 mb-1 md:mb-0 ml-0 md:ml-3" >
                     <strong>Role: {getUserRoleName(user.role)}</strong>
                 </p>
             </div>
             <div className="flex flex-col md:flex-row">
-                <p className="text-sm text-grey-200 mb-1 md:mb-0" tabIndex="0" aria-label={`Created at: ${user.createdAt}`}>
+                <p className="text-sm text-grey-200 mb-1 md:mb-0" >
                     <small>Created At: {user.createdAt}</small>
                 </p>
-                <p className="text-sm text-grey-200 mb-0 ml-0 md:ml-3" tabIndex="0" aria-label={`Updated at: ${user.updatedAt}`}>
+                <p className="text-sm text-grey-200 mb-0 ml-0 md:ml-3" >
                     <small>Updated At: {user.updatedAt}</small>
                 </p>
             </div>
-        </div>
+        </div >
     );
 };
 
@@ -126,7 +124,7 @@ export const UserStatusBox = ({ status }) => {
     const userStatus = userStatuses.find((item) => item.Value === status);
 
     return (
-        <div className={`px-2 py-1 rounded-md`} style={{ backgroundColor: userStatus?.bgColor }} tabIndex="0" aria-label={`User status: ${userStatus?.Name}`}>
+        <div className={`px-2 py-1 rounded-md`} style={{ backgroundColor: userStatus?.bgColor }}>
             <p className={`text-sm`} style={{ color: userStatus?.color, margin: 0 }}>{userStatus?.Name}</p>
         </div>
     );
