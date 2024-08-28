@@ -100,20 +100,20 @@ export default function CreateFriendRequest({currentUser, userId, user, fetchFri
     }
 
     return (
-            !request || (request && request.status) === 'rejected' ?
+            // !request || (request && request.status) === 'rejected' ?
             <button onClick={sendFriendRequest}
                     className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
             >
                 Send Friend Request
             </button>
-                : request && request.status === 'accepted' ?
-                <UnfriendAction request={request}
-                    fetchFriendRequest={fetchFriendRequest}
-                />
-                    :
-                    <button onClick={deleteFriendRequest}>
-                        Cancel Friend Request
-                    </button>
+                // : request && request.status === 'accepted' ?
+                // <UnfriendAction request={request}
+                //     fetchFriendRequest={fetchFriendRequest}
+                // />
+                //     :
+                //     <button onClick={deleteFriendRequest}>
+                //         Cancel Friend Request
+                //     </button>
         );
 }
 

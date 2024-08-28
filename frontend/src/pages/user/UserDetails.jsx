@@ -183,6 +183,7 @@ export default function UserDetails() {
         // }
     }, [userId]);
 
+    fetchFriendRequest()
     useEffect(() => {
         if (currentUser && userId) {
             fetchFriendRequest();
@@ -205,22 +206,22 @@ export default function UserDetails() {
                         {user.firstName} {user.lastName}
                     </span>
                     {currentUser && (
-                        // check if the user is viewing their own profile, then return nothing
                         currentUser.id === userId ? (
                             <></>
+                            // user is viewing their own profile
                         ) : (
-                            areFriends ? ( // check if they are already friends
+                            areFriends ? (
                                     <UnfriendAction
                                         request={requestFromCurrentUser || requestFromUserId}
                                         fetchFriendRequest={fetchFriendRequest}
                                     />
                                 )
                                 : (
-                                    // Check if there is a friend request from either the current user or the other user
+                                    // users are not friends
                                     (requestFromCurrentUser && requestFromCurrentUser.fromId === currentUser.id) ||
                                     (requestFromUserId && requestFromUserId.fromId === currentUser.id) ? (
-                                        // check if the request's fromid is the same as the currentuser's id
-                                        (requestFromCurrentUser.fromId !== currentUser.id) ? (
+                                        // request is from the viewed user
+                                        (requestFromCurrentUser === null) ? (
                                             <FriendRequestActions
                                                 currentUser={currentUser}
                                                 userId={userId}
@@ -228,18 +229,14 @@ export default function UserDetails() {
                                                 fetchFriendRequest={fetchFriendRequest}
                                             />
                                         ) : (
+                                            // request is from the current user
                                             <CancelRequestAction
                                                 request={requestFromCurrentUser}
                                                 fetchFriendRequest={fetchFriendRequest}
                                             />
                                         )
-                                        //                         <FriendRequestActions
-                                        //                 currentUser={currentUser}
-                                        // userId={userId}
-                                        // request={requestFromUserId}
-                                        // fetchFriendRequest={fetchFriendRequest}
-                                        // />
                                     ) : (
+                                        // no pending requests
                                         <CreateFriendRequest
                                             currentUser={currentUser}
                                             userId={userId}
