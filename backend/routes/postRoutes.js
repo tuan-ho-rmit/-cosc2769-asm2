@@ -148,7 +148,30 @@ router.get('/posts/:id', async (req, res) => {
   });
   
 
+// 특정 포스트의 모든 reaction 가져오기
+router.get('/posts/:postId/reactions/count', async (req, res) => {
+    const { postId } = req.params; // URL에서 postId를 가져옴
 
+    try {
+        // 해당 postId에 대한 모든 reaction의 개수를 가져옵니다.
+        const post = await Post.findById(postId).populate('reactions');
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const reactionCounts = post.reactions.reduce((acc, reaction) => {
+            acc[reaction.type] = (acc[reaction.type] || 0) + 1;
+            return acc;
+        }, {});
+
+
+        res.status(200).json(reactionCounts);
+    } catch (error) {
+        console.error('Error fetching reaction count:', error);
+        res.status(500).json({ message: "Error fetching reaction count", error });
+    }
+});
 
 // Delete Post
 router.delete('/posts/:id', async (req, res) => {

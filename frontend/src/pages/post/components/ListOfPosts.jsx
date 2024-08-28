@@ -8,14 +8,22 @@ import { PostWithReactions } from "./PostWithReactions";
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const currentUserId = user ? user.id : null; 
     const [commentsByPost, setCommentsByPost] = useState({});
-    const [editingPostId, setEditingPostId] = useState(null); // 현재 편집 중인 게시글 ID
-    const [updatedContent, setUpdatedContent] = useState(""); // 업데이트할 내용
-    const [updatedImages, setUpdatedImages] = useState([]); // 업데이트할 이미지
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [updatedContent, setUpdatedContent] = useState("");
+    const [updatedImages, setUpdatedImages] = useState([]);
     const [localPosts, setLocalPosts] = useState(posts); // 로컬 상태로 게시글 관리
+    const [reactionCounts, setReactionCounts] = useState({}); // 모든 게시글의 리액션 개수 상태
 
     useEffect(() => {
         setLocalPosts(posts);
     }, [posts]);
+
+    useEffect(() => {
+        localPosts.forEach(post => {
+            fetchComments(post._id);
+            fetchReactionCounts(post._id); // 각 게시글에 대한 리액션 개수 가져오기
+        });
+    }, [localPosts]);
 
     // 댓글 가져오기 함수
     const fetchComments = async (postId) => {
@@ -31,11 +39,18 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         }
     };
 
-    useEffect(() => {
-        localPosts.forEach(post => {
-            fetchComments(post._id);
-        });
-    }, [localPosts]);
+    const fetchReactionCounts = async (postId) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions/count`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setReactionCounts(prev => ({ ...prev, [postId]: data }));
+        } catch (error) {
+            console.error('Error fetching reaction counts:', error);
+        }
+    };
 
     const handleAddComment = (postId, newCommentText) => {
         const newComment = { content: newCommentText, id: Date.now(), author: user };
@@ -53,15 +68,13 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             body: JSON.stringify(newComment)
         })
         .then(response => response.json())
-        .then(data => {
+        .then(() => {
             fetchComments(postId);
         })
         .catch(error => console.error('Error adding comment:', error));
     };
 
     const handleEditComment = (postId, commentId, newContent) => {
-        console.log(`Editing comment with ID: ${commentId} for post ID: ${postId}`); // 콘솔 로그 추가
-
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'PUT',
             headers: {
@@ -71,25 +84,23 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             body: JSON.stringify({ content: newContent })
         })
         .then(response => response.json())
-        .then(data => {
-            console.log(`Comment updated successfully: ${data}`); // 콘솔 로그 추가
+        .then(() => {
             fetchComments(postId);
         })
         .catch(error => console.error('Error editing comment:', error));
     };
 
     const handleDeleteComment = (postId, commentId) => {
-        console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`); // 로그 수정
-
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'DELETE',
             credentials: 'include',
         })
         .then(() => {
-            fetchComments(postId); // 댓글 목록 업데이트
+            fetchComments(postId);
         })
         .catch(error => console.error('Error deleting comment:', error));
     };
+
     const handleEditPost = (postId) => {
         setEditingPostId(postId);
         const postToEdit = localPosts.find(post => post._id === postId);
@@ -108,17 +119,16 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         })
         .then(response => response.json())
         .then(() => {
-            // 서버에서 업데이트된 포스트를 다시 불러와 populate된 필드를 유지
             fetch(`http://localhost:3000/api/posts/${postId}`, {
                 method: 'GET',
                 credentials: 'include',
             })
             .then(response => response.json())
             .then(updatedPost => {
-                setEditingPostId(null); // 편집 모드 종료
+                setEditingPostId(null);
                 setLocalPosts(prevPosts => 
                     prevPosts.map(post => post._id === postId ? updatedPost : post)
-                ); // 로컬 상태 업데이트
+                );
             });
         })
         .catch(error => console.error('Error updating post:', error));
@@ -146,6 +156,10 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
 
     const handleRemoveImage = (imageIndex) => {
         setUpdatedImages(updatedImages.filter((_, idx) => idx !== imageIndex));
+    };
+
+    const updateReactionCounts = (postId) => {
+        fetchReactionCounts(postId);
     };
 
     const postItems = localPosts.map((each) => {
@@ -187,7 +201,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                     )}
                 </div>
                 
-                {/* 게시글 편집 모드 */}
                 {editingPostId === each._id ? (
                     <div>
                         <input 
@@ -226,10 +239,18 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                     </Link>
                 )}
 
+                <div className="reactionCounts">
+                    {Object.entries(reactionCounts[each._id] || {}).map(([type, count]) => (
+                        <div key={type} className="reactionCount">
+                            {type}: {count}
+                        </div>
+                    ))}
+                </div>
+
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
-                    <PostWithReactions postId={each._id} />
+                        <PostWithReactions postId={each._id} onReactionUpdate={() => updateReactionCounts(each._id)} />
                     </span>
                     <span className="commentBtn">
                         <button>Comment</button>

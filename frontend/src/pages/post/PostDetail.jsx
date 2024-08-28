@@ -17,6 +17,7 @@ export default function PostDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
   const [editedImages, setEditedImages] = useState([]);
+  const [reactionCounts, setReactionCounts] = useState({}); // reaction 개수 상태 추가
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -26,6 +27,7 @@ export default function PostDetail() {
 
     fetchPostDetails(postId);
     fetchComments(postId);
+    fetchReactionCounts(postId); // 리액션 개수 가져오기
   }, [postId]);
 
   const fetchPostDetails = async (postId) => {
@@ -139,6 +141,23 @@ export default function PostDetail() {
     }
   };
 
+  const fetchReactionCounts = async (postId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions/count`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      setReactionCounts(data);
+    } catch (error) {
+      console.error('Error fetching reaction counts:', error);
+    }
+  };
+
+  const updateReactionCounts = () => {
+    fetchReactionCounts(postId);
+  };
+
   if (!post) return <div>Loading...</div>;
 
   const settings = {
@@ -192,7 +211,13 @@ export default function PostDetail() {
           <p>{post.content}</p>
         )}
       </div>
-
+      <div className="reactionCounts">
+        {Object.entries(reactionCounts).map(([type, count]) => (
+          <div key={type} className="reactionCount">
+            {type}: {count}
+          </div>
+        ))}
+      </div>
       {post.images && post.images.length > 0 && (
         <div className="imageSlider">
           <Slider {...settings}>
@@ -215,7 +240,7 @@ export default function PostDetail() {
       <hr className="solidPostForDetail"></hr>
       <div className="likeAndComment">
         <span className="likeBtn">
-          <PostWithReactions postId={postId} />
+          <PostWithReactions postId={postId} onReactionUpdate={updateReactionCounts} />
         </span>
         <span className="commentBtn">
           <button>Comment</button>
