@@ -60,6 +60,8 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     };
 
     const handleEditComment = (postId, commentId, newContent) => {
+        console.log(`Editing comment with ID: ${commentId} for post ID: ${postId}`); // 콘솔 로그 추가
+
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'PUT',
             headers: {
@@ -70,22 +72,24 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         })
         .then(response => response.json())
         .then(data => {
+            console.log(`Comment updated successfully: ${data}`); // 콘솔 로그 추가
             fetchComments(postId);
         })
         .catch(error => console.error('Error editing comment:', error));
     };
 
     const handleDeleteComment = (postId, commentId) => {
+        console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`); // 로그 수정
+
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'DELETE',
             credentials: 'include',
         })
         .then(() => {
-            fetchComments(postId);
+            fetchComments(postId); // 댓글 목록 업데이트
         })
         .catch(error => console.error('Error deleting comment:', error));
     };
-
     const handleEditPost = (postId) => {
         setEditingPostId(postId);
         const postToEdit = localPosts.find(post => post._id === postId);
