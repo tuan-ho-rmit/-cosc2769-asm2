@@ -110,12 +110,6 @@ export default function CreateFriendRequest({currentUser, userId, user, fetchFri
                 <UnfriendAction request={request}
                     fetchFriendRequest={fetchFriendRequest}
                 />
-                // :
-                // : request && request.toId === userId ?
-                //     <FriendRequestActions request={request}
-                //                           fetchFriendRequest={fetchFriendRequest}
-                //                           userId={userId}
-                //     />
                     :
                     <button onClick={deleteFriendRequest}>
                         Cancel Friend Request
