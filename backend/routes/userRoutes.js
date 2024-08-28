@@ -1,6 +1,12 @@
 
 import express from "express";
-import { activateUser, deactivateUser, getListUser, updateUserProfile, getUserDetails } from "../controllers/userController.js";
+import {
+    activateUser,
+    deactivateUser,
+    getListUser,
+    updateUserProfile,
+    getUserDetails,
+} from "../controllers/userController.js";
 // import {verifyAdmin} from "../util/verifyToken.js"
 
 const router = express.Router();

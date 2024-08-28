@@ -138,8 +138,8 @@ export const getUserDetails = async (req, res) => {
             });
         }
 
-        // userId로 사용자 찾기
-        const user = await User.findById(userId);
+        // userId로 사용자 찾기 and populate friendIds
+        const user = await User.findById(userId).populate('friendIds', 'firstName lastName')
 
         // 사용자가 존재하지 않을 경우
         if (!user) {
@@ -166,5 +166,4 @@ export const getUserDetails = async (req, res) => {
         });
     }
 };
-
 

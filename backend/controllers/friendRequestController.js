@@ -134,7 +134,7 @@ export const getUserFriendsList = async (req, res) => { // get friendslist on id
 
         console.log(user)
 
-        if (!user) { // TODO: cannot define the user
+        if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
         // return the populated friendids

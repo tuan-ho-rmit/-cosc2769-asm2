@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
       {
         path: '/friends', element: <Friends />, children: [
           {
-            path: 'friendlist', element: <FriendList />, name:"Friend List"
+            path: 'friendlist/', element: <FriendList />, name:"Friend List"
           },
           {
             path: "friendrequest", element: <FriendRequest />, name: "Friend Requests"
