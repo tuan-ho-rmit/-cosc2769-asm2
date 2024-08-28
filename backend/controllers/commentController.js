@@ -64,7 +64,6 @@ export const updateComment = async (req, res) => {
             modifiedBy: req.session.user.id, // 현재 사용자를 수정자로 설정
             modifiedAt: new Date(), // 현재 시간을 수정 시간으로 설정
             previousContent: previousContent, // 이전 내용을 history에 저장
-            previousImages: [] // 필요한 경우, 이전 이미지를 추가
         });
 
         console.log(`Previous content added to history: ${previousContent}`); // 콘솔 로그 추가

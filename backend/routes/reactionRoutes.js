@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOrUpdateReaction, addOrUpdateCommentReaction, removeReaction, removeCommentReaction, getUserReactionForPost, getUserReactionForComment } from '../controllers/reactionController.js';
+import { addOrUpdateReaction, addOrUpdateCommentReaction, removeReaction, removeCommentReaction, getUserReactionForPost, getUserReactionForComment, getCommentReactionsCount } from '../controllers/reactionController.js';
 
 const router = express.Router();
 
@@ -17,4 +17,5 @@ router.delete('/comments/:commentId/reactions', removeCommentReaction);
 // 사용자가 특정 포스트에 남긴 리액션 가져오기
 router.get('/posts/:postId/reactions/user', getUserReactionForPost);
 router.get('/comments/:commentId/reactions/user', getUserReactionForComment);
+router.get('/comments/:commentId/reactions/count', getCommentReactionsCount);
 export default router;
