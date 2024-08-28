@@ -4,15 +4,19 @@ import Slider from 'react-slick';
 import CreateComment from '../comment/components/CreateComment';
 import ListOfComments from '../comment/components/ListOfComments';
 import { PostWithReactions } from './components/PostWithReactions';
+import DropDowns from './components/DropDowns';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './PostDetail.css';
 
 export default function PostDetail() {
-  const { id: postId } = useParams(); // URL 파라미터에서 postId 가져오기
+  const { id: postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [user, setUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState("");
+  const [editedImages, setEditedImages] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -20,23 +24,29 @@ export default function PostDetail() {
       setUser(storedUser);
     }
 
-    // API 요청을 통해 포스트 데이터를 가져옵니다.
-    fetch(`http://localhost:3000/api/posts/${postId}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error fetching the post');
-        }
-        return response.json();
-      })
-      .then(data => setPost(data))
-      .catch(error => console.error('Error fetching the post:', error));
-
-    // 댓글 데이터 가져오기
+    fetchPostDetails(postId);
     fetchComments(postId);
   }, [postId]);
+
+  const fetchPostDetails = async (postId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error fetching the post');
+      }
+
+      const data = await response.json();
+      setPost(data);
+      setEditedContent(data.content);
+      setEditedImages(data.images);
+    } catch (error) {
+      console.error('Error fetching the post:', error);
+    }
+  };
 
   const fetchComments = async (postId) => {
     try {
@@ -65,7 +75,7 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(postId); // 댓글 목록 업데이트
+        fetchComments(postId);
       })
       .catch(error => console.error('Error adding comment:', error));
   };
@@ -81,22 +91,52 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(postId); // 댓글 목록 업데이트
+        fetchComments(postId);
       })
       .catch(error => console.error('Error editing comment:', error));
   };
 
   const handleDeleteComment = (postId, commentId) => {
-    console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`); // 로그 수정
+    console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`);
 
     fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
       method: 'DELETE',
       credentials: 'include',
     })
       .then(() => {
-        fetchComments(postId); // 댓글 목록 업데이트
+        fetchComments(postId);
       })
       .catch(error => console.error('Error deleting comment:', error));
+  };
+
+  const handleSavePost = () => {
+    fetch(`http://localhost:3000/api/posts/${postId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ content: editedContent, images: editedImages }),
+    })
+      .then(response => response.json())
+      .then(() => {
+        fetchPostDetails(postId); // 업데이트 후 다시 데이터 불러오기
+        setIsEditing(false);
+      })
+      .catch(error => console.error('Error updating post:', error));
+  };
+
+  const handleDeletePost = () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      fetch(`http://localhost:3000/api/posts/${postId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+        .then(() => {
+          window.location.href = '/';
+        })
+        .catch(error => console.error('Error deleting post:', error));
+    }
   };
 
   if (!post) return <div>Loading...</div>;
@@ -116,7 +156,7 @@ export default function PostDetail() {
         <div className="imgContainer">
           <div className='mx-4'>
             <img 
-              src={post.author.avatar || 'default-avatar-url.jpg'}
+              src={post.author?.avatar || 'default-avatar-url.jpg'}
               className='w-10 h-10 ring-yellow ring-2 rounded-full' 
               alt='rounded-avatar'
             />
@@ -124,16 +164,35 @@ export default function PostDetail() {
         </div>
         <div className="postInfo">
           <div className="userName">
-            <p>{post.author.firstName} {post.author.lastName}</p>
+            <p>{post.author?.firstName} {post.author?.lastName}</p>
           </div>
           <div className="postDate">
             <p>{new Date(post.date).toLocaleString()}</p>
           </div>
         </div>
+        {user && user.id === post.author?._id && (
+          <div className="dropDown">
+            <DropDowns
+              onEdit={() => setIsEditing(true)}
+              onDelete={handleDeletePost}
+            />
+          </div>
+        )}
       </div>
+      
       <div className="postContent">
-        {post.content}
+        {isEditing ? (
+          <input
+            type="text"
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            className="editInput"
+          />
+        ) : (
+          <p>{post.content}</p>
+        )}
       </div>
+
       {post.images && post.images.length > 0 && (
         <div className="imageSlider">
           <Slider {...settings}>
@@ -145,10 +204,18 @@ export default function PostDetail() {
           </Slider>
         </div>
       )}
+
+      {isEditing && (
+        <div className="editButtons">
+          <button onClick={handleSavePost}>Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </div>
+      )}
+
       <hr className="solidPostForDetail"></hr>
       <div className="likeAndComment">
         <span className="likeBtn">
-        <PostWithReactions postId={postId} />
+          <PostWithReactions postId={postId} />
         </span>
         <span className="commentBtn">
           <button>Comment</button>
