@@ -1,11 +1,9 @@
 import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
 import FriendRequestActions from "../actions/FriendRequestActions.jsx";
 
 export default function FriendRequest() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {userId} = useParams();
     const [currentUser, setCurrentUser] = useState()
 
 
@@ -61,7 +59,7 @@ export default function FriendRequest() {
     useEffect(() => {
         fetchPendingFriendRequest()
         setLoading(false)
-    }, []);
+    }, [currentUser]);
 
 
 
