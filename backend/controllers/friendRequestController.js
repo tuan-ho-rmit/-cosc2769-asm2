@@ -10,7 +10,7 @@ export const findFriendRequest = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Failed to  ', error: err.message});
+        res.status(500).json({message: 'Failed to find friend request: ', error: err.message});
     }
 }
 
