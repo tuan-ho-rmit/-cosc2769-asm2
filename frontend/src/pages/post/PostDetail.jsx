@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+
 import Slider from 'react-slick';
 import CreateComment from '../comment/components/CreateComment';
 import ListOfComments from '../comment/components/ListOfComments';
@@ -227,6 +228,15 @@ export default function PostDetail() {
               </div>
             ))}
           </Slider>
+        </div>
+      )}
+
+      {/* Modified History Button - 작성자에게만 표시 */}
+      {user && user.id === post.author?._id && post.history && post.history.length > 0 && (
+        <div className="modifiedSection">
+          <Link to={`/post/${postId}/history`}>
+            <button>Show Modified History</button>
+          </Link>
         </div>
       )}
 

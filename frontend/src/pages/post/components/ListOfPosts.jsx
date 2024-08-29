@@ -247,6 +247,15 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                     ))}
                 </div>
 
+                {/* Modified Button - 작성자에게만 표시 */}
+                {isAuthor && each.history && each.history.length > 0 && (
+                    <div className="modifiedSection">
+                        <Link to={`/post/${each._id}/history`}>
+                            <button>Show Modified History</button>
+                        </Link>
+                    </div>
+                )}
+
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
