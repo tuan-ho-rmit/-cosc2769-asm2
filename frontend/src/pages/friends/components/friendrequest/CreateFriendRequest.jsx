@@ -1,8 +1,9 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
 import {useEffect, useState} from "react";
 import UnfriendAction from "../actions/UnfriendAction.jsx";
+import {creatNotificationService} from "../../../../components/right-side-bar/NotificationService.js";
 
-export default function CreateFriendRequest({currentUser, userId, user, fetchFriendRequest, request}) {
+export default async function CreateFriendRequest({currentUser, userId, user, fetchFriendRequest, request}) {
     console.log('current user:', currentUser)
     console.log(userId)
     console.log(user)
@@ -93,6 +94,13 @@ export default function CreateFriendRequest({currentUser, userId, user, fetchFri
         }
     };
 
+    await creatNotificationService({
+        notiTitle: "send you a friend request", //"requested to join your group" || "commented on your post"|| etc.
+        description: "", // expanded description for the notification title/ not important
+        userIds: [userId], // user's ID
+        activityType: "friendrequest", // type of notification: "reaction" || "comment" || "group"
+        activityUrl: `/friends/friendlist`, // NavLink path
+    });
 
     // Condition to check if the profile belongs to the current user
     if (currentUser.id === userId) {
@@ -100,20 +108,20 @@ export default function CreateFriendRequest({currentUser, userId, user, fetchFri
     }
 
     return (
-            // !request || (request && request.status) === 'rejected' ?
-            <button onClick={sendFriendRequest}
-                    className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
-            >
-                Send Friend Request
-            </button>
-                // : request && request.status === 'accepted' ?
-                // <UnfriendAction request={request}
-                //     fetchFriendRequest={fetchFriendRequest}
-                // />
-                //     :
-                //     <button onClick={deleteFriendRequest}>
-                //         Cancel Friend Request
-                //     </button>
-        );
+        // !request || (request && request.status) === 'rejected' ?
+        <button onClick={sendFriendRequest}
+                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
+        >
+            Send Friend Request
+        </button>
+        // : request && request.status === 'accepted' ?
+        // <UnfriendAction request={request}
+        //     fetchFriendRequest={fetchFriendRequest}
+        // />
+        //     :
+        //     <button onClick={deleteFriendRequest}>
+        //         Cancel Friend Request
+        //     </button>
+    );
 }
 
