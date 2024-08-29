@@ -1,4 +1,5 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
+import {creatNotificationService} from "../../../../components/right-side-bar/NotificationService.js";
 // import {useEffect, useState} from "react";
 
 export default function FriendRequestActions({userId, currentUser, fetchFriendRequest, request}) {
@@ -59,6 +60,15 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
             const result = await response.json();
             pushSuccess("accept Friend successfully");
             return result;
+
+            const sendAcceptNotification = creatNotificationService({
+                notiTitle: "accepted your Friend Request", //"requested to join your group" || "commented on your post"|| etc.
+                description: "", // expanded description for the notification title/ not important
+                userIds: [userId], // user's ID
+                activityType: "friendrequest", // type of notification: "reaction" || "comment" || "group"
+                activityUrl: `/friends/friendlist`, // NavLink path
+            });
+            console.log(sendAcceptNotification)
         } catch (error) {
             console.error('Error accepting friend request:', error.message);
             pushError(error.message);

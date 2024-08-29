@@ -54,7 +54,7 @@ export default function FriendList() {
             console.log('all friend requests:', allFriendRequests)
             // setFriendRequest(resultToUser)
 
-            const acceptedRequests = allFriendRequests.filter(request => ((request.status = 'accepted') && (request.toId === currentUserId)) || ((request.status = 'accepted') && (request.fromId === currentUserId)))
+            const acceptedRequests = allFriendRequests.filter(request => ((request.status === 'accepted') && (request.toId === currentUserId)) || ((request.status === 'accepted') && (request.fromId === currentUserId)))
             console.log ('accepted rq:', acceptedRequests)
 
 
