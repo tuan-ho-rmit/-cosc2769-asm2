@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'animate.css';
 
-export function PostWithReactions({ postId }) {
+export function PostWithReactions({ postId, onReactionUpdate }) {
   const [showPostReactionBar, setShowPostReactionBar] = useState(false);
   const [selectedPostReaction, setSelectedPostReaction] = useState(null);
   const [hoveredReaction, setHoveredReaction] = useState(null);
@@ -13,7 +13,6 @@ export function PostWithReactions({ postId }) {
     { type: 'Angry', emoji: '😡' },
   ];
 
-  // 현재 사용자 ID 가져오기 (예: 세션 또는 로컬 저장소에서 가져오기)
   const currentUserId = JSON.parse(localStorage.getItem('user')).id;
 
   useEffect(() => {
@@ -30,28 +29,26 @@ export function PostWithReactions({ postId }) {
 
         const post = await response.json();
 
-        console.log('Fetched post data:', post);
-
-        // 사용자 리액션 체크 및 설정
         const userReaction = post.reactions.find(
           (reaction) => reaction.userId.toString() === currentUserId.toString()
         );
 
-        console.log('Found user reaction:', userReaction);
-
-        // 사용자 리액션이 존재하면 상태 업데이트
         if (userReaction) {
           setSelectedPostReaction(userReaction.type);
         } else {
           setSelectedPostReaction(null);
         }
+
+        // 리액션 상태가 업데이트될 때마다 외부 콜백 호출
+        if (onReactionUpdate) {
+          onReactionUpdate();
+        }
       } catch (error) {
-        console.error('Error fetching reactions:', error);
       }
     };
 
     fetchReactions();
-  }, [postId, currentUserId]);
+  }, [postId, currentUserId, onReactionUpdate]);
 
   const handlePostLikeClick = () => {
     setShowPostReactionBar(!showPostReactionBar);
@@ -59,7 +56,6 @@ export function PostWithReactions({ postId }) {
 
   const handlePostReaction = async (reaction) => {
     if (selectedPostReaction === reaction) {
-      // 동일한 리액션을 선택한 경우 삭제
       try {
         const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions`, {
           method: 'DELETE',
@@ -67,7 +63,7 @@ export function PostWithReactions({ postId }) {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify({ userId: currentUserId }), // 사용자 ID를 보내서 리액션 삭제
+          body: JSON.stringify({ userId: currentUserId }),
         });
 
         if (!response.ok) {
@@ -76,11 +72,15 @@ export function PostWithReactions({ postId }) {
 
         setSelectedPostReaction(null);
         console.log('Reaction removed');
+
+        // 리액션이 삭제되었을 때 외부 콜백 호출
+        if (onReactionUpdate) {
+          onReactionUpdate();
+        }
       } catch (error) {
         console.error('Error removing reaction:', error);
       }
     } else {
-      // 새로운 리액션을 추가하거나 업데이트
       try {
         setSelectedPostReaction(reaction);
         setShowPostReactionBar(false);
@@ -100,6 +100,11 @@ export function PostWithReactions({ postId }) {
 
         const data = await response.json();
         console.log('Reaction added or updated:', data);
+
+        // 리액션이 추가되었을 때 외부 콜백 호출
+        if (onReactionUpdate) {
+          onReactionUpdate();
+        }
       } catch (error) {
         console.error('Error adding or updating reaction:', error);
       }
