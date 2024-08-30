@@ -61,14 +61,6 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
             pushSuccess("accept Friend successfully");
             return result;
 
-            const sendAcceptNotification = creatNotificationService({
-                notiTitle: "accepted your Friend Request", //"requested to join your group" || "commented on your post"|| etc.
-                description: "", // expanded description for the notification title/ not important
-                userIds: [userId], // user's ID
-                activityType: "friendrequest", // type of notification: "reaction" || "comment" || "group"
-                activityUrl: `/friends/friendlist`, // NavLink path
-            });
-            console.log(sendAcceptNotification)
         } catch (error) {
             console.error('Error accepting friend request:', error.message);
             pushError(error.message);

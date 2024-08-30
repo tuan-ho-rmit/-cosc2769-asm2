@@ -94,13 +94,6 @@ export default async function CreateFriendRequest({currentUser, userId, user, fe
         }
     };
 
-    await creatNotificationService({
-        notiTitle: "send you a friend request", //"requested to join your group" || "commented on your post"|| etc.
-        description: "", // expanded description for the notification title/ not important
-        userIds: [userId], // user's ID
-        activityType: "friendrequest", // type of notification: "reaction" || "comment" || "group"
-        activityUrl: `/friends/friendlist`, // NavLink path
-    });
 
     // Condition to check if the profile belongs to the current user
     if (currentUser.id === userId) {
