@@ -32,8 +32,6 @@ const NotificationsProvider = ({ children }) => {
                 })}
             )
 
-
-
             // todo: append the new notifications to the existing state
             // setNotifications(prevNotifications => [...prevNotifications, ...result]);
 

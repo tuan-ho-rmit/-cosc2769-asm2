@@ -36,9 +36,8 @@ export default function UserDetails() {
 
             const result = await response.json();
             console.log('Fetch friend request:', result)
-            setFriendRequest(result)
-
             // set friendship status on the request status
+
             if (result?.status === 'accepted') {
                 console.log('are already friends')
                 setAreFriends(true)
@@ -46,7 +45,9 @@ export default function UserDetails() {
                 console.log('are not friends')
                 setAreFriends(false)
             }
+            setFriendRequest(result)
 
+            return result
         } catch (error) {
             console.error('Error sending friend request:', error.message);
             throw error; // Rethrow error to handle it in the component
@@ -161,8 +162,18 @@ export default function UserDetails() {
         //     fetchFriendRequest();
         // }
 
-        fetchFriendRequest();
+
+
+        // const intervalId = setInterval(() => {
+        //     fetchFriendRequest();
+        //     console.log('after 5 seconds:')
+        // }, 5000);
+        // return () => clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+        fetchFriendRequest();
+    }, [currentUser]);
 
     if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
 
@@ -190,32 +201,33 @@ export default function UserDetails() {
                                         fetchFriendRequest={fetchFriendRequest}
                                     />
                                 )
-                                : (
+                                :
+                                (
                                     // users are not friends: handle pending and new friend request
-                                friendRequest ? (
-                                    friendRequest.fromId === currentUser.id ? (
-                                        // display cancel request button if the fq is sent
-                                        <CancelRequestAction
-                                    request={friendRequest}
-                                    fetchFriendRequest={fetchFriendRequest}
-                                />
+                                    friendRequest ? (
+                                        friendRequest.fromId === currentUser.id ? (
+                                            // display cancel request button if the fq is sent
+                                            <CancelRequestAction
+                                            request={friendRequest}
+                                            fetchFriendRequest={fetchFriendRequest}
+                                            />
+                                        ) : (
+                                            // display approve rq button
+                                            <FriendRequestActions
+                                                currentUser={currentUser}
+                                                userId={userId}
+                                                request={friendRequest}
+                                                fetchFriendRequest={fetchFriendRequest}
+                                            />
+                                            )
                                     ) : (
-                                        // display approve rq button
-                                                <FriendRequestActions
-                                                    currentUser={currentUser}
-                                                    userId={userId}
-                                                    request={friendRequest}
-                                                    fetchFriendRequest={fetchFriendRequest}
-                                                />
-                                    )
-                                ) : (
                                     // display send fr rq button
                                         <CreateFriendRequest
                                             currentUser={currentUser}
                                             userId={userId}
                                             fetchFriendRequest={fetchFriendRequest}
                                         />
-                                )
+                                        )
                                 )
                         ))}
                 </div>
