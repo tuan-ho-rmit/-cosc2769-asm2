@@ -1,12 +1,14 @@
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/User.js";
+import {createNoti} from "./notiController.js";
 
 export const findFriendRequest = async (req, res) => {
     try {
-        const {fromId, toId} = req.params;
-        const existedRequest = await FriendRequest.findOne({fromId: fromId, toId: toId})
+        const {firstId, secondId} = req.params;
+        const existedRequest1 = await FriendRequest.findOne({fromId: firstId, toId: secondId})
+        const existedRequest2 = await FriendRequest.findOne({fromId: secondId, toId: firstId})
 
-        return res.status(200).json(existedRequest || null);
+        return res.status(200).json(existedRequest1 || existedRequest2 || null);
 
     } catch (err) {
         console.error(err);
@@ -16,6 +18,7 @@ export const findFriendRequest = async (req, res) => {
 
 export const createFriendRequest = async (req, res) => {
     try {
+        // const {firstId, secondId} = req.body; // extract data from body
         const {
             fromId,
             toId,
@@ -23,14 +26,18 @@ export const createFriendRequest = async (req, res) => {
         } = req.body;
         console.log('from id: ', fromId)
         console.log('to id: ', toId)
-        const existedRequest = await FriendRequest.findOne({fromId: fromId, toId: toId})
-        if (!existedRequest) {
+        const existedRequest1 = await FriendRequest.findOne({fromId: fromId, toId: toId})
+        const existedRequest2 = await FriendRequest.findOne({fromId: toId, toId: fromId})
+        if (!existedRequest1 && !existedRequest2) {
             const newFriendRequest = new FriendRequest ({
                 fromId,
                 toId,
                 status: "pending",
             })
             const savedFriendRequest = await newFriendRequest.save();
+
+            createNoti([toId])
+
             res.status(200).json(savedFriendRequest);
         } else {
             res.status(500).json({message: 'request already existed '});
