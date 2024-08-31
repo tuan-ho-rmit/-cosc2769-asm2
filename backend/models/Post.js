@@ -3,36 +3,38 @@ import mongoose from "mongoose";
 const reactionSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     type: { type: String, enum: ['Like', 'Love', 'HaHa', 'Angry'], required: true }
-  });
+});
 
 
 const postSchema = new mongoose.Schema({
-    userProfile: { 
-        type: mongoose.Schema.Types.ObjectId, 
+    userProfile: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true 
+        required: true
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    content: { 
-        type: String, 
-        required: true 
+    content: {
+        type: String,
+        required: true
     },  // content 필드가 필수
-    author: { 
-        type: mongoose.Schema.Types.ObjectId, 
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true 
+        required: true
     },
-    date: { 
-        type: Date, 
-        default: Date.now 
+    date: {
+        type: Date,
+        default: Date.now
     },
     images: [String],
     reactions: [reactionSchema],
-});
+},
+    { timestamps: true }
+);
 
 // Populate author with firstName and lastName, and userProfile with avatar
 postSchema.virtual('authorDetails', {
