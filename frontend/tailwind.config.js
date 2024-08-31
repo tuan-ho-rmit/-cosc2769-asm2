@@ -36,8 +36,8 @@ module.exports = {
       white: '#EEEEEE',
 
       primary: '#FFD369',
-      lightPrimary: '',
-      darkPrimary: '',
+      lightPrimary: '#ffe8b3',
+      darkPrimary: '#e6a100',
 
       danger: '#E01B00',
       darkDanger: '#BE1700',

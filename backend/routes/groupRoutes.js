@@ -1,5 +1,5 @@
 import express from 'express';
-import { createGroup } from '../controllers/groupController.js';
+import { approveGroupRequest, createGroup, rejectGroupRequest } from '../controllers/groupController.js';
 import { getGroups, deleteGroup, joinGroup, getRequestedGroups , getJoinRequests,acceptMember,rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost  } from '../controllers/groupController.js';
 
 const router = express.Router();
@@ -10,6 +10,7 @@ router.post('/create', createGroup);
 router.get('/', getGroups);
 
 // 그룹 삭제 라우트
+router.get('/list', getListGroup)
 router.get('/member-groups', getGroupsForUser);
 router.get('/:groupName/members', getMembersOfGroup);
 router.post('/join-group', joinGroup);
@@ -21,6 +22,8 @@ router.get('/', getGroupsForMember); // 멤버가 포함된 그룹 가져오기
 router.post('/remove-member', removeMemberFromGroup); // 그룹에서 멤버 제거
 router.get('/get-group-id/:groupName', getGroupByName);
 router.delete('/:id', deleteGroup);
+router.put('/approve/:groupId', approveGroupRequest)
+router.put('/reject/:groupId', rejectGroupRequest)
 router.get('/:id', getGroupById); 
 // 특정 그룹의 모든 포스트 가져오기
 router.get('/:groupId/posts', getGroupPosts);

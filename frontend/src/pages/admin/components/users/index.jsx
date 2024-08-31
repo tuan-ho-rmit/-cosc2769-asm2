@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import UserItem from './UserItem';
+import UserItem, { userRoles, userStatuses } from './UserItem';
 import BasePaginationList from '../../../../components/pagination/BasePaginationList'
 import NoData from '../../../../components/pagination/NoData'
 import WrapperFilter from '../../../../components/pagination/WrapperFilter'
@@ -7,6 +7,8 @@ import { baseUrl } from '../../../../config';
 import { pushError, pushSuccess } from '../../../../components/Toast/index'
 import debounce from '../../../../helper';
 import TextField from '../../../../components/text-field/index'
+import Autocomplete from '../../../../components/autocomplete/Autocomplete'
+import { useCustomAutocomplete } from '../../../../components/autocomplete/useAutocomplete'
 const userSearchTypes = [
     {
         id: 1,
@@ -19,6 +21,8 @@ const userSearchTypes = [
         value: "email",
     },
 ];
+
+
 export default function AdminUsers() {
     const pageSize = 5;
     const [loading, setLoading] = useState(false);
@@ -27,6 +31,7 @@ export default function AdminUsers() {
         page: 1,
         searchValue: "",
         status: undefined,
+        role: undefined
     });
     const [paging, setPaging] = useState({
         data: [],
@@ -135,6 +140,25 @@ export default function AdminUsers() {
     useEffect(() => {
         fetchUsers();
     }, [filter.page, filter.searchValue, filter.status, filter.role]);
+
+    const statusAutocomplete = useCustomAutocomplete({
+        list: {
+            options: userStatuses,
+            searchFields: ["Name"],
+        },
+    });
+    const roleAutocomplete = useCustomAutocomplete({
+        list: {
+            options: userRoles,
+            searchFields: ["Name"],
+        },
+    });
+    const handleOnChangeStatus = (c) => {
+        setFilter((prev) => ({ ...prev, status: c, page: 1 }));
+    };
+    const handleOnChangeRole = (r) => {
+        setFilter((prev) => ({ ...prev, role: r, page: 1 }));
+    };
     return (
         <div style={{
             height: "100%",
@@ -145,15 +169,17 @@ export default function AdminUsers() {
                 <WrapperFilter
                     onReset={handleResetFilter}
                     customAction={
-                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", gap: "16px" }}>
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginLeft: "16px", width:"100%", gap:"16px" }}>
                             <select
-                                className="form-select block w-[200px] cursor-pointer bg-white border border-grey-300 text-black text-sm rounded-md py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                className="form-select block cursor-pointer bg-white border border-grey-300 text-black text-sm rounded-md py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 ref={searchTypeRef}
                                 onChange={(e) => {
-                                    setFilter((prev) => {
-                                        return { ...prev, searchType: e.target.value };
-                                    });
+                                    setFilter((prev) => ({
+                                        ...prev,
+                                        searchType: e.target.value,
+                                    }));
                                 }}
+                                // style={{ width: "50%" }}
                             >
                                 {userSearchTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -162,20 +188,41 @@ export default function AdminUsers() {
                                 ))}
                             </select>
                             <TextField
-                                style={{
-                                    width: "200px"
-                                }}
+                                // style={{ width: "100%" }}
                                 placeholder="Search"
                                 aria-label="Search"
                                 ref={searchRef}
-                                onChange={(e) => {
-                                    handleOnChangeSearch(e.target.value);
-                                }}
+                                onChange={(e) => handleOnChangeSearch(e.target.value)}
                             />
                         </div>
-
                     }
                 >
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+                        <div style={{ width: "50%", paddingRight: "16px" }}>
+                            <Autocomplete
+                                {...statusAutocomplete}
+                                getOptionLabel={(o) => o.Name}
+                                // label={"Statuses"}
+                                value={filter.status}
+                                placeholder={"All statuses"}
+                                onChange={(s) => {
+                                    handleOnChangeStatus(s);
+                                }}
+                            ></Autocomplete>
+                        </div>
+                        <div style={{ width: "50%", paddingLeft: "16px" }}>
+                            <Autocomplete
+                                {...roleAutocomplete}
+                                getOptionLabel={(o) => o.Name}
+                                // label={"Statuses"}
+                                value={filter.role}
+                                placeholder={"All roles"}
+                                onChange={(r) => {
+                                    handleOnChangeRole(r);
+                                }}
+                            ></Autocomplete>
+                        </div>
+                    </div>
                 </WrapperFilter>
             </div>
 

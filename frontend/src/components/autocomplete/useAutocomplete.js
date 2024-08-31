@@ -10,18 +10,16 @@ function omit(obj, keys) {
 }
 function search(option, searchText, fields) {
     return fields.some((field) => {
-        const value = option[field];
-        return String(value).toLowerCase().includes(searchText.toLowerCase());
+      const value = option[field];
+      return String(value).toLowerCase().includes(searchText.toLowerCase());
     });
-}
-export function useStyledAutocomplete(props) {
+  }
+export function useCustomAutocomplete(props) {
     const { listProps } = props;
 
     const [state, setState] = useState({
         initLoading: !props.disabled,
         searchLoading: false,
-        hasNextPage: false,
-        isNextPageLoading: false,
         paging: {
             page: 1,
             pageSize: props.listProps?.pageSize || 20,
@@ -31,20 +29,18 @@ export function useStyledAutocomplete(props) {
         },
     });
 
-    const getList = async (_props = {}, reset = false) => {
+    const getList = async (_props, reset) => {
         if (props.list) {
             setState(() => {
                 const searchText = _props?.search?.content || '';
-                return {
-                    hasNextPage: false,
-                    isNextPageLoading: false,
+                const _state = {
                     paging: {
                         page: 1,
                         pageSize: 100000,
                         rows: props.list.options.filter((option) =>
                             props.list.searchOption
                                 ? props.list.searchOption(option, searchText)
-                                : search(option, searchText, props.list.searchFields)
+                                : search(option, searchText, props.list.searchFields),
                         ),
                         total: props.list.options.length,
                         totalPages: 1,
@@ -52,6 +48,8 @@ export function useStyledAutocomplete(props) {
                     searchLoading: false,
                     initLoading: false,
                 };
+
+                return _state;
             });
         } else {
             setState((prev) => ({ ...prev, isNextPageLoading: true }));
@@ -61,8 +59,8 @@ export function useStyledAutocomplete(props) {
                     page: 1,
                     pageSize: 20,
                     filter: {
-                        ...listProps?.filter,
-                        ..._props?.filter,
+                        ...(listProps?.filter || {}),
+                        ...(_props?.filter || {}),
                     },
                     ...omit(listProps, 'filter'),
                     ...omit(_props, 'filter'),
@@ -85,13 +83,11 @@ export function useStyledAutocomplete(props) {
                     isNextPageLoading: false,
                     paging: {
                         ...res,
-                        rows:
-                            _props.page === 1 ? res.rows : prev.paging.rows.concat(res.rows),
+                        rows: _props?.page === 1 ? res.rows : prev.paging.rows.concat(res.rows),
                     },
-                    hasNextPage: res.page < res.totalPages,
                 }));
             } catch (error) {
-                // Handle error
+                /* empty */
             }
         }
     };
@@ -101,16 +97,9 @@ export function useStyledAutocomplete(props) {
         return getList(undefined, true);
     };
 
-    const getListFn = (_props = {}) => {
+    const getListFn = (_props) => {
         setState((prev) => ({ ...prev, initLoading: true }));
         return getList(_props);
-    };
-
-    const fetchMore = (searchValue) => {
-        getList({
-            page: state.paging.page + 1,
-            search: { content: searchValue },
-        });
     };
 
     const handleChangeSearch = (text) => {
@@ -131,11 +120,8 @@ export function useStyledAutocomplete(props) {
 
     return {
         ...props,
-        loadNextPage: fetchMore,
         handleChangeSearch,
         paging: state.paging,
-        hasNextPage: state.hasNextPage,
-        isNextPageLoading: state.isNextPageLoading,
         searchLoading: state.searchLoading,
         loading: props.loading || state.initLoading,
         getList: getListFn,
