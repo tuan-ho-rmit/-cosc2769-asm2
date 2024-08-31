@@ -6,6 +6,7 @@ const NotificationsProvider = ({ children }) => {
 
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
+    const [recipentUser, setRecipentUser] = useState(null);
 
 
     // fetch notification from backend
@@ -23,7 +24,28 @@ const NotificationsProvider = ({ children }) => {
             }
             const notificationsData = await response1.json();
             console.log('Fetched result for notificationsData from notificationsContext: ', notificationsData);
+            // fetch notification for the current user
+
+            const userResponse = await fetch(`http://localhost:3000/api/auth/user`, {
+                method: "GET",
+                credentials: "include",
+            })
+            if (!userResponse.ok) {
+                console.log('Error fetching current user info')
+                throw new Error(`HTTP error! status: ${userResponse.status}`);
+            }
+            const currentUserData = await userResponse.json();
+            const currentUserId = currentUserData.id;
+            console.log( 'Currentuserid: ', currentUserId);
+
+
+            // set notifications
             setNotifications(notificationsData);
+
+
+
+
+
 
             // fetch name for each user
             notificationsData.forEach(notification => {
