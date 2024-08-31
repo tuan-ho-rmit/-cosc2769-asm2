@@ -1,16 +1,22 @@
 import express from "express";
 import {
     acceptFriendRequest,
-    createFriendRequest,
-    getAllFriendRequests,
-    getUserFriendsList, rejectFriendRequest
+    createFriendRequest, findFriendRequest,
+    getAllFriendRequests, getPendingFriendRequests,
+    getUserFriendsList, rejectFriendRequest,
+    deleteFriendRequest, unfriend
 } from "../controllers/friendRequestController.js";
 
 const router = express.Router();
 router.post ('/', createFriendRequest)
 router.get ('/', getAllFriendRequests)
-router.get ('/friendslist/:id', getUserFriendsList)
-router.post ('/acceptFriendRequest', acceptFriendRequest)
-router.post ('/rejectFriendRequest', rejectFriendRequest)
+router.get ('/friendslist/:userId', getUserFriendsList)
+router.patch ('/:requestId/accept', acceptFriendRequest)
+router.patch ('/:requestId/reject', rejectFriendRequest)
+router.get('/single/:firstId/:secondId', findFriendRequest)
+
+
+router.delete('/:requestId/delete', deleteFriendRequest)
+router.patch('/:requestId/unfriend', unfriend)
 
 export default router;
