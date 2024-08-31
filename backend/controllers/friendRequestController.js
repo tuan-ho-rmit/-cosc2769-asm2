@@ -36,6 +36,7 @@ export const createFriendRequest = async (req, res) => {
             })
             const savedFriendRequest = await newFriendRequest.save();
 
+            // create notification
             createNoti([toId])
 
             res.status(200).json(savedFriendRequest);

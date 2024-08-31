@@ -38,21 +38,27 @@ const NotificationsProvider = ({ children }) => {
             const currentUserId = currentUserData.id;
             console.log( 'Currentuserid: ', currentUserId);
 
+            // filter notification that belong to the current user
+            const filteredNotifications = notificationsData.filter(notification =>
+                notification.userIds.includes(currentUserId)
+            )
+
+            console.log( 'filteredNotifications: ', filteredNotifications);
+
 
             // set notifications
             setNotifications(notificationsData);
 
 
 
-
-
-
             // fetch name for each user
-            notificationsData.forEach(notification => {
-                notification.userIds.forEach(user => {
-                    console.log('Fetched notification user\'name from notificationsContext:', user.name);
-                })}
-            )
+
+
+            // notificationsData.forEach(notification => {
+            //     notification.userIds.forEach(user => {
+            //         console.log('Fetched notification user\'name from notificationsContext:', user.name);
+            //     })}
+            // )
 
             // todo: append the new notifications to the existing state
             // setNotifications(prevNotifications => [...prevNotifications, ...result]);
