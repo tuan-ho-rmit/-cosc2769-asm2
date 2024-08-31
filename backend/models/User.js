@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
         default: "active",
         required: true,
     },
-    friendIds: { // func: sendReq (create a friendrq with pending status), acceptRq(modify created rq to accept status; push id to both the receiver and sender ), rejectRq
+    friendIds: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true,
         ref: 'User',

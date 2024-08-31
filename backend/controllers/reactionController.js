@@ -212,3 +212,26 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       res.status(500).json({ message: 'Error removing comment reaction', error: error.message });
     }
   };
+
+// 댓글에 리액션 개수 가져오기
+export const getCommentReactionsCount = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    
+    const comment = await Comment.findById(commentId).select('reactions');
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    const reactionCounts = comment.reactions.reduce((acc, reaction) => {
+      acc[reaction.type] = (acc[reaction.type] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.status(200).json(reactionCounts);
+  } catch (error) {
+    console.error('Error fetching comment reaction counts:', error);
+    res.status(500).json({ message: 'Error fetching comment reaction counts', error: error.message });
+  }
+};
