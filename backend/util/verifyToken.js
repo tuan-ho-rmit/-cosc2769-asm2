@@ -1,7 +1,7 @@
 import User from "../models/user.js";
 
 export const verifyToken = async (req, res, next) => {
-    const token = req.cookies.sessionToken || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
+    const token = req.session || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
     if (!token) {
         return res.status(401).json({

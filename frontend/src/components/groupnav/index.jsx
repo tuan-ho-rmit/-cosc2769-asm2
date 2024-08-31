@@ -27,9 +27,9 @@ const Groupnav = () => {
           }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#555')}
           onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#444')}
-          onClick={() => navigate('/discovergroup')}
+          onClick={() => navigate('/groups')}
         >
-          Discover Groups
+          My Groups
         </button>
         <button
           style={{
@@ -46,7 +46,7 @@ const Groupnav = () => {
           onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#444')}
           onClick={() => navigate('/discovergroup')}
         >
-          View All Groups
+          Discover Groups
         </button>
         <button
           style={{

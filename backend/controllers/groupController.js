@@ -1,6 +1,9 @@
+import mongoose from 'mongoose';
 import Group from '../models/Group.js';
 import GroupJoinRequest from '../models/GroupJoinRequest.js';
 import User from '../models/User.js';
+import Post from '../models/Post.js';
+
 
 export const createGroup = async (req, res) => {
   try {
@@ -11,13 +14,26 @@ export const createGroup = async (req, res) => {
 
     const { groupName, description, avatar, visibility } = req.body;
 
+    // 동일한 이름의 그룹이 이미 존재하는지 확인
+    const existingGroup = await Group.findOne({ groupName });
+    if (existingGroup) {
+      return res.status(400).json({ message: 'A group with this name already exists. Please choose a different name.' });
+    }
+
+    // 유저 오브젝트 아이디 가져오기
+    const user = await User.findOne({ email: req.session.user.email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const newGroup = new Group({
       groupName,
       description,
       avatar,
       status: 'pending',
-      createdBy: req.session.user.email, // 세션에서 이메일을 가져와서 저장
+      createdBy: req.session.user.email,
       visibility,
+      members: [user._id], // 유저 오브젝트 아이디를 members 배열에 추가
     });
 
     const savedGroup = await newGroup.save();
@@ -27,6 +43,7 @@ export const createGroup = async (req, res) => {
     res.status(500).json({ message: 'Failed to create group', error: err.message });
   }
 };
+
 
 
 export const getGroups = async (req, res) => {
@@ -184,20 +201,27 @@ export const getGroups = async (req, res) => {
     const { groupId, userId } = req.body;
   
     try {
+      // Log to confirm data received
+      console.log('Received groupId:', groupId);
+      console.log('Received userId:', userId);
+  
       const group = await Group.findById(groupId);
       if (!group) {
         return res.status(404).json({ message: 'Group not found' });
       }
   
+      // Remove the member's ObjectId from the group's members array
       group.members = group.members.filter(member => member.toString() !== userId);
       await group.save();
   
-      res.status(200).json({ message: 'Member removed from group' });
+      res.status(200).json({ message: 'Member removed from group successfully' });
     } catch (error) {
       console.error('Error removing member from group:', error);
       res.status(500).json({ message: 'Failed to remove member from group', error: error.message });
     }
   };
+
+
 
   export const getGroupById = async (req, res) => {
     const { id } = req.params;
@@ -214,3 +238,105 @@ export const getGroups = async (req, res) => {
     }
 };
   
+export const getGroupsForUser = async (req, res) => {
+  const { memberId } = req.query;
+
+  if (!mongoose.Types.ObjectId.isValid(memberId)) {
+      return res.status(400).json({ message: 'Invalid memberId format' });
+  }
+
+  try {
+      // memberId를 가지고 멤버가 속한 모든 그룹을 찾습니다.
+      const groups = await Group.find({ members: new mongoose.Types.ObjectId(memberId) });
+      res.status(200).json(groups); // 그룹 자체를 반환합니다.
+  } catch (error) {
+      console.error('Error fetching groups for member:', error);
+      res.status(500).json({ message: 'Failed to fetch groups for member', error: error.message });
+  }
+};
+
+// 특정 그룹의 멤버들을 가져오는 API
+export const getMembersOfGroup = async (req, res) => {
+  const { groupName } = req.params;
+
+  try {
+    const group = await Group.findOne({ groupName });
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    const members = await User.find({ _id: { $in: group.members } });
+    res.status(200).json(members);
+  } catch (error) {
+    console.error('Error fetching members of group:', error);
+    res.status(500).json({ message: 'Failed to fetch members of group', error: error.message });
+  }
+};
+
+
+export const getGroupByName = async (req, res) => {
+  const { groupName } = req.params;
+
+  try {
+    const group = await Group.findOne({ groupName }); // Find the group by name
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // Return only the ObjectId of the group
+    res.status(200).json({ _id: group._id });
+  } catch (error) {
+    console.error('Error fetching group by name:', error);
+    res.status(500).json({ message: 'Failed to fetch group', error: error.message });
+  }
+};
+
+
+// group post
+// 특정 그룹의 모든 포스트 가져오기
+export const getGroupPosts = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        
+        // 그룹 ID로 포스트 검색
+        const posts = await Post.find({ groupId })
+            .sort({ date: -1 })
+            .populate('author', 'firstName lastName avatar')
+            .populate('userProfile', 'avatar');
+        
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching group posts:', error);
+        res.status(500).json({ message: "Error fetching group posts", error });
+    }
+};
+
+// 특정 그룹에 포스트 추가하기
+export const createGroupPost = async (req, res) => {
+  try {
+      const { groupId } = req.params;
+      const { content, images } = req.body;
+
+      // 세션에 저장된 유저 정보 확인
+      if (!req.session.user) {
+          return res.status(401).json({ message: 'User is not logged in' });
+      }
+
+      const newPost = new Post({
+          content,
+          userProfile: req.session.user.id,
+          userId: req.session.user.id,
+          author: req.session.user.id,
+          images,
+          date: new Date(),
+          groupId,  // 그룹 ID 추가
+          isGroupPost: true,  // 그룹 게시물로 설정
+      });
+
+      await newPost.save();
+      res.status(201).json(newPost);
+  } catch (error) {
+      console.error('Error creating group post:', error);
+      res.status(500).json({ message: "Error creating group post", error });
+  }
+};

@@ -14,12 +14,12 @@ export default function PrivateLayout() {
                 </div>
                 <div className='flex flex-row w-[100%] overflow-hidden min-h-[calc(100vh - 50px)]'>
                     <LeftSideBar />
-                    <NotificationsProvider>
-                        <RightSideBar />
-                    </NotificationsProvider>
                     <div className='flex-1 overflow-auto'>
                         <Outlet />
                     </div>
+                    <NotificationsProvider>
+                        <RightSideBar />
+                    </NotificationsProvider>
                 </div>
             </div>
             {/*<div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: "black" }}>*/}

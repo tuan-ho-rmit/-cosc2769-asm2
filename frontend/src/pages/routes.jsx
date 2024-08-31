@@ -17,6 +17,7 @@ import AdminPosts from "./admin/components/posts";
 import DiscoverGroup from "./discovergroup";
 import GroupMemberManagement from "./groupmembermanagement";
 import GroupMain from "./groupmain";
+import ProtectedRoute from "../components/protectedRoute";
 import Friends from "./friends/index.jsx";
 import FriendList from "./friends/components/friendlist/index.jsx";
 import FriendRequest from "./friends/components/friendrequest/index.jsx";
@@ -26,29 +27,28 @@ export const router = createBrowserRouter([
     path: '/',
     element: <PrivateLayout />,
     children: [
-      { index: true, element: <Home /> },
-      { path: 'groups', element: <Group /> },
-      { path: '/creategroup', element: <CreateGroup /> },
-      { path: '/managegroup', element: <ManageGroup /> },
-      { path: '/discovergroup', element: <DiscoverGroup /> },
-      { path: '/groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
-      { path: 'groupmain/:groupId', element: <GroupMain />},
-      { path: '/register', element: <Register /> },
-      { path: '/login', element: <Login /> },
-      { path: '/register', element: <Register /> },
-      { path: 'post/:id', element: <PostDetail /> },
-      { path: '/mydetail', element: <MyDetails /> },
-      { path: '/user/:userId', element: <UserDetails /> },
-      { path: 'config', element: <ConfigPage /> },
+      { index: true, element: <ProtectedRoute element={<Home />} /> },
+      { path: 'groups', element: <ProtectedRoute element={<Group />} /> },
+      { path: 'creategroup', element: <ProtectedRoute element={<CreateGroup />} /> },
+      { path: 'managegroup', element: <ProtectedRoute element={<ManageGroup />} /> },
+      { path: 'discovergroup', element: <ProtectedRoute element={<DiscoverGroup />} /> },
+      { path: 'groupmembermanagement/:groupName', element: <ProtectedRoute element={<GroupMemberManagement />} /> },
+      { path: 'groupmain/:groupId', element: <ProtectedRoute element={<GroupMain />} /> },
+      { path: 'register', element: <Register /> },  // Register 페이지는 보호하지 않음
+      { path: 'login', element: <Login /> },        // Login 페이지는 보호하지 않음
+      { path: 'post/:id', element: <ProtectedRoute element={<PostDetail />} /> },
+      { path: 'mydetail', element: <ProtectedRoute element={<MyDetails />} /> },
+      { path: 'user/:userId', element: <ProtectedRoute element={<UserDetails />} /> },
+      { path: 'config', element: <ProtectedRoute element={<ConfigPage />} /> },
       {
         path: "/admin",
-        element: <Navigate to="/admin/users" />,
+        element: <ProtectedRoute element={<Navigate to="/admin/users" />} />,
       },
       {
-        path: '/admin', element: <Admin />, children: [
+        path: 'admin', element: <ProtectedRoute element={<Admin />} />, children: [
           { path: "users", element: <AdminUsers />, name: "Users" },
-          { path: "groups", element: <AdminGroups />, name: "Forum Posts" },
-          { path: "posts", element: <AdminPosts />, name: "Tours" },
+          { path: "groups", element: <AdminGroups />, name: "Groups" },
+          { path: "posts", element: <AdminPosts />, name: "Posts" },
         ]
       },
       {
@@ -64,4 +64,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-

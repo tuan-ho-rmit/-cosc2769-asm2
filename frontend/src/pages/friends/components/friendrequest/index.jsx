@@ -50,7 +50,73 @@ export default function FriendRequest() {
             const pendingRequestsForCurrentUser = pendingRequests.filter(request => request.toId === currentUserId);
             console.log('incoming pending requests for current user: ', pendingRequestsForCurrentUser)
 
-            setRequests(pendingRequestsForCurrentUser)
+            // testing filtering duplicated requests
+            const uniqueRequests = [];
+            const seenPairs = new Set();
+
+            // Iterate over each request in acceptedRequests
+            pendingRequestsForCurrentUser.forEach(request => {
+                const {fromId, toId} = request;
+
+                // Create a unique key for the pair
+                const pairKey = fromId < toId ? `${fromId}-${toId}` : `${toId}-${fromId}`;
+
+                // If this pairKey has not been seen before, add it to the Set and push to uniqueRequests
+                if (!seenPairs.has(pairKey)) {
+                    seenPairs.add(pairKey);
+                    uniqueRequests.push(request);
+                }
+            })
+
+            console.log('unique requests: ', uniqueRequests)
+
+            // Fetch user details for each request
+            const requestsWithUserDetails = await Promise.all(uniqueRequests.map(async (request) => {
+                const {fromId, toId} = request;
+
+                // Fetch details for fromId
+                const fromUserResponse = await fetch(`http://localhost:3000/api/users/${fromId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                if (!fromUserResponse.ok) {
+                    const errorText = await fromUserResponse.text();
+                    throw new Error(`HTTP error! Status: ${fromUserResponse.status}, Message: ${errorText}`);
+                }
+                const fromUserData = await fromUserResponse.json();
+                console.log('fromUserDAta:', fromUserData.data.firstName)
+
+                // Fetch details for toId
+                const toUserResponse = await fetch(`http://localhost:3000/api/users/${toId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                if (!toUserResponse.ok) {
+                    const errorText = await toUserResponse.text();
+                    throw new Error(`HTTP error! Status: ${toUserResponse.status}, Message: ${errorText}`);
+                }
+                const toUserData = await toUserResponse.json();
+                console.log('toUserData:', toUserData.data.firstName);
+
+                return {
+                    ...request,
+                    fromUser: `${fromUserData.data.firstName} ${fromUserData.data.lastName}`,
+                    toUser: `${toUserData.data.firstName} ${toUserData.data.lastName}`
+                };
+            }))
+
+            console.log('requestsWithUserDetails: ', requestsWithUserDetails)
+
+            // set the useState
+            setRequests(requestsWithUserDetails)
         } catch (error) {
             console.log('error fetching pending requests:', error);
         }
@@ -60,32 +126,6 @@ export default function FriendRequest() {
         fetchPendingFriendRequest()
         setLoading(false)
     }, [currentUser]);
-
-
-
-    // useEffect(() => {
-    //     const fetchPendingRequests = async () => {
-    //         try {
-    //             const response = await fetch('http://localhost:3000/api/friendrequest/pending/',
-    //                 {
-    //                     method: 'GET',
-    //                     credentials: 'include'
-    //                 })
-    //             if (!response.ok) {
-    //                 throw new Error ('Failed to fetch pending requests')
-    //             }
-    //             const data = await response.json();
-    //             setRequests(data)
-    //
-    //             console.log(data)
-    //         } catch (error) {
-    //             console.log('error fetching pending requests:', error);
-    //         } finally {
-    //             setLoading(false)
-    //         }
-    //     }
-    //     fetchPendingRequests();
-    // }, [userId])
 
     if (loading) return <p>Loading...</p>;
 
@@ -100,7 +140,7 @@ export default function FriendRequest() {
                 requests.map(request => (
                     <div key={request.id} className="mb-4">
                         <div className="border p-4 rounded-md shadow-md">
-                            {request.fromId}
+                            {request.fromUser}
                             <FriendRequestActions
                                 userId = {null}
                             currentUser = {currentUser}

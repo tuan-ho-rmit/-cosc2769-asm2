@@ -47,9 +47,9 @@ export default function ListOfComments({ comments, onEditComment, onDeleteCommen
                         <div className="commentContent">
                             {comment.content}
                         </div>
-                        <div className="likeComment">
+                        <div className="likeAndComment">
                             {/* ReactionForComment 컴포넌트 추가 */}
-                            <CommentWithReactions commentId={comment._id} />
+                            <CommentWithReactions commentId={comment._id} onReactionUpdate={() => {}} />
                         </div>
                     </div>
                 ))
