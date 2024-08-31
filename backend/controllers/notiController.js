@@ -3,15 +3,12 @@ import Notification from "../models/Notification.js";
 
 export const createNoti = async (req, res) => {
     try {
-        const { notiTitle, description, userIds, status, activityType, timeSent, activityUrl } = req.body;
+        const { notiTitle, userIds, status, activityUrl } = req.body;
 
         const newNoti = new Notification({
             notiTitle,
-            description,
             userIds,
             status: 'unread',
-            activityType,
-            timeSent,
             activityUrl,
         });
 
