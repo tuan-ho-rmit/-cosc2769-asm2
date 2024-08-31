@@ -8,6 +8,22 @@ import { PostWithReactions } from "./PostWithReactions";
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const currentUserId = user ? user.id : null; 
     const [commentsByPost, setCommentsByPost] = useState({});
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [updatedContent, setUpdatedContent] = useState("");
+    const [updatedImages, setUpdatedImages] = useState([]);
+    const [localPosts, setLocalPosts] = useState(posts); // 로컬 상태로 게시글 관리
+    const [reactionCounts, setReactionCounts] = useState({}); // 모든 게시글의 리액션 개수 상태
+
+    useEffect(() => {
+        setLocalPosts(posts);
+    }, [posts]);
+
+    useEffect(() => {
+        localPosts.forEach(post => {
+            fetchComments(post._id);
+            fetchReactionCounts(post._id); // 각 게시글에 대한 리액션 개수 가져오기
+        });
+    }, [localPosts]);
 
     // 댓글 가져오기 함수
     const fetchComments = async (postId) => {
@@ -23,11 +39,18 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         }
     };
 
-    useEffect(() => {
-        posts.forEach(post => {
-            fetchComments(post._id);
-        });
-    }, [posts]);
+    const fetchReactionCounts = async (postId) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions/count`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setReactionCounts(prev => ({ ...prev, [postId]: data }));
+        } catch (error) {
+            console.error('Error fetching reaction counts:', error);
+        }
+    };
 
     const handleAddComment = (postId, newCommentText) => {
         const newComment = { content: newCommentText, id: Date.now(), author: user };
@@ -45,7 +68,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             body: JSON.stringify(newComment)
         })
         .then(response => response.json())
-        .then(data => {
+        .then(() => {
             fetchComments(postId);
         })
         .catch(error => console.error('Error adding comment:', error));
@@ -61,7 +84,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             body: JSON.stringify({ content: newContent })
         })
         .then(response => response.json())
-        .then(data => {
+        .then(() => {
             fetchComments(postId);
         })
         .catch(error => console.error('Error editing comment:', error));
@@ -78,7 +101,68 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         .catch(error => console.error('Error deleting comment:', error));
     };
 
-    const postItems = posts.map((each) => {
+    const handleEditPost = (postId) => {
+        setEditingPostId(postId);
+        const postToEdit = localPosts.find(post => post._id === postId);
+        setUpdatedContent(postToEdit.content);
+        setUpdatedImages(postToEdit.images);
+    };
+
+    const handleSaveEditPost = (postId) => {
+        fetch(`http://localhost:3000/api/posts/${postId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ content: updatedContent, images: updatedImages })
+        })
+        .then(response => response.json())
+        .then(() => {
+            fetch(`http://localhost:3000/api/posts/${postId}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            .then(response => response.json())
+            .then(updatedPost => {
+                setEditingPostId(null);
+                setLocalPosts(prevPosts => 
+                    prevPosts.map(post => post._id === postId ? updatedPost : post)
+                );
+            });
+        })
+        .catch(error => console.error('Error updating post:', error));
+    };
+
+    const handleImageChange = (event) => {
+        const files = event.target.files;
+        const fileReaders = [];
+        const images = [];
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                images.push(e.target.result);
+                if (images.length === files.length) {
+                    setUpdatedImages(images);
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRemoveImage = (imageIndex) => {
+        setUpdatedImages(updatedImages.filter((_, idx) => idx !== imageIndex));
+    };
+
+    const updateReactionCounts = (postId) => {
+        fetchReactionCounts(postId);
+    };
+
+    const postItems = localPosts.map((each) => {
         const displayImages = each.images.slice(0, 3);
         const remainingImagesCount = each.images.length - 3;
         const isAuthor = currentUserId === each.author._id;
@@ -110,34 +194,63 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                     {isAuthor && (
                         <div className="dropDown">
                             <DropDowns
-                                onEdit={() => onPostEdit(each._id)}
+                                onEdit={() => handleEditPost(each._id)}
                                 onDelete={() => onPostDelete(each._id)}
                             />
                         </div>
                     )}
                 </div>
-                <Link to={`/post/${each._id}`}>
-                    <div className="postContent">
-                        {each.content}
+                
+                {editingPostId === each._id ? (
+                    <div>
+                        <input 
+                            type="text" 
+                            value={updatedContent} 
+                            onChange={(e) => setUpdatedContent(e.target.value)} 
+                        />
+                        <div>
+                            {updatedImages.map((image, idx) => (
+                                <div key={idx} className="imageWrapper">
+                                    <img src={image} alt={`Post image ${idx}`} className="postImage" />
+                                    <button onClick={() => handleRemoveImage(idx)}>Remove</button>
+                                </div>
+                            ))}
+                        </div>
+                        <input type="file" onChange={handleImageChange} multiple />
+                        <button onClick={() => handleSaveEditPost(each._id)}>Save</button>
                     </div>
-                    <div className="postContentImg">
-                        {displayImages.map((image, idx) => (
-                            <div key={idx} className="imageWrapper">
-                                <img src={image} alt={`Post image ${idx}`} className="postImage" />
-                                {idx === 2 && remainingImagesCount > 0 && (
-                                    <div className="imageOverlay">
-                                        +{remainingImagesCount} Pictures
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </Link>
+                ) : (
+                    <Link to={`/post/${each._id}`}>
+                        <div className="postContent">
+                            {each.content}
+                        </div>
+                        <div className="postContentImg">
+                            {displayImages.map((image, idx) => (
+                                <div key={idx} className="imageWrapper">
+                                    <img src={image} alt={`Post image ${idx}`} className="postImage" />
+                                    {idx === 2 && remainingImagesCount > 0 && (
+                                        <div className="imageOverlay">
+                                            +{remainingImagesCount} Pictures
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </Link>
+                )}
+
+                <div className="reactionCounts">
+                    {Object.entries(reactionCounts[each._id] || {}).map(([type, count]) => (
+                        <div key={type} className="reactionCount">
+                            {type}: {count}
+                        </div>
+                    ))}
+                </div>
+
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
-                    <PostWithReactions postId={each._id} />
-
+                        <PostWithReactions postId={each._id} onReactionUpdate={() => updateReactionCounts(each._id)} />
                     </span>
                     <span className="commentBtn">
                         <button>Comment</button>

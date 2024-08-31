@@ -6,6 +6,7 @@ const DiscoverGroup = () => {
   const [groups, setGroups] = useState([]);
   const [user, setUser] = useState(null);
   const [requestedGroups, setRequestedGroups] = useState([]);
+  const [joinedGroups, setJoinedGroups] = useState([]); // 빈 배열로 초기화
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const DiscoverGroup = () => {
       if (storedUser) {
         setUser(storedUser);
         fetchRequestedGroups(storedUser.email);
+        fetchJoinedGroups(storedUser.id); // 수정된 부분: 올바른 API 경로로 요청
       }
     };
 
@@ -34,6 +36,20 @@ const DiscoverGroup = () => {
         setRequestedGroups(result);
       } catch (error) {
         console.error('Error fetching requested groups:', error);
+      }
+    };
+
+    const fetchJoinedGroups = async (memberId) => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/groups/member-groups?memberId=${memberId}`);
+        const joinedGroups = await response.json();
+        if (Array.isArray(joinedGroups)) {
+          setJoinedGroups(joinedGroups.map(group => group.groupName));
+        } else {
+          console.error('Unexpected response format for joined groups:', joinedGroups);
+        }
+      } catch (error) {
+        console.error('Error fetching joined groups:', error);
       }
     };
 
@@ -98,7 +114,21 @@ const DiscoverGroup = () => {
                 >
                   View
                 </button>
-                {requestedGroups.includes(group.groupName) ? (
+                {joinedGroups.includes(group.groupName) ? (
+                  <button
+                    style={{
+                      padding: '0.5rem 1rem',
+                      backgroundColor: '#555',
+                      color: '#ccc',
+                      borderRadius: '0.25rem',
+                      border: 'none',
+                      cursor: 'not-allowed'
+                    }}
+                    disabled
+                  >
+                    Joined
+                  </button>
+                ) : requestedGroups.includes(group.groupName) ? (
                   <button
                     style={{
                       padding: '0.5rem 1rem',

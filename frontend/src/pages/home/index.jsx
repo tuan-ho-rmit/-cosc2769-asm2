@@ -11,21 +11,38 @@ export default function Home() {
 
   // 모든 게시글 불러오기
   useEffect(() => {
-    fetch('http://localhost:3000/api/posts')
-      .then(response => response.json())
-      .then(data => setPostList(data))
-      .catch(error => console.error('Error fetching posts:', error));
+    const fetchPosts = async () => {
+      try {
+        console.log('Fetching posts...');
+        const response = await fetch('http://localhost:3000/api/posts', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Error fetching posts');
+        }
+        const data = await response.json();
+        console.log('Fetched posts:', data);
+        setPostList(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
   }, []);
 
   // 사용자 정보 불러오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        console.log('Fetching user information...');
         const response = await fetch('http://localhost:3000/api/auth/user', {
           method: 'GET',
           credentials: 'include',
         });
         const data = await response.json();
+        console.log('Fetched user:', data.user);
         if (data && data.user) {
           setUser(data.user);
         } else {
@@ -73,6 +90,7 @@ export default function Home() {
       author: user._id, // 작성자 ID
       content: content,
       images: images, // Base64 인코딩된 이미지 배열
+      isGroupPost: false, // 홈에서 생성된 포스트이므로 false로 설정
     };
   
     fetch('http://localhost:3000/api/posts', {
@@ -90,6 +108,7 @@ export default function Home() {
         return response.json();
       })
       .then(newPost => {
+        console.log('New post created:', newPost);
         // 서버에서 새로 생성된 포스트를 다시 불러와 populate를 적용
         return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
           method: 'GET',
@@ -98,20 +117,20 @@ export default function Home() {
       })
       .then(response => response.json())
       .then(populatedPost => {
+        console.log('Populated new post:', populatedPost);
         setPostList([populatedPost, ...posts]); // 상태 업데이트
         setContent("");
         setImages([]); // 이미지 목록 초기화
       })
       .catch(error => console.error('Error creating post:', error));
   }
-  
 
   function handleInput(newPost) {
     setContent(newPost);
   }
 
   function handleDeletePost(id) {
-    console.log(id); // 삭제할 포스트의 id를 출력하여 확인
+    console.log('Deleting post with ID:', id);
 
     if (window.confirm("Are you sure you want to delete this post?")) {
       fetch(`http://localhost:3000/api/posts/${id}`, {
@@ -131,6 +150,7 @@ export default function Home() {
   function handleEditPost(id) {
     const updatedContent = prompt("Edit your post:");
     if (updatedContent !== null) {
+      console.log('Editing post with ID:', id);
       fetch(`http://localhost:3000/api/posts/${id}`, {
         method: 'PUT',
         headers: {
@@ -146,6 +166,7 @@ export default function Home() {
           return response.json();
         })
         .then(updatedPost => {
+          console.log('Updated post:', updatedPost);
           setPostList(posts.map(post => post._id === id ? updatedPost : post));
         })
         .catch(error => console.error('Error updating post:', error));
@@ -168,7 +189,6 @@ export default function Home() {
         currentUserId={user ? user._id : null}
         user={user}  // user 전체 객체를 전달
       />
-
     </div>
   );
 }
