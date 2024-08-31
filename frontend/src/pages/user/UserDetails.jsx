@@ -60,7 +60,7 @@ export default function UserDetails() {
 
             setRequestFromUserId(resultFromUser)
 
-            if (resultFromUser.status === 'accepted' || resultToUser.status === 'accepted') {
+            if (resultFromUser?.status === 'accepted' || resultToUser?.status === 'accepted') {
                 console.log('are already friends')
                 setAreFriends(true)
             } else {
@@ -181,14 +181,9 @@ export default function UserDetails() {
         // if (currentUser && userId) {
         //     fetchFriendRequest();
         // }
-    }, [userId]);
 
-    fetchFriendRequest()
-    useEffect(() => {
-        if (currentUser && userId) {
-            fetchFriendRequest();
-        }
-    }, [currentUser, userId]);
+        fetchFriendRequest();
+    }, []);
 
     if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
 
@@ -241,8 +236,8 @@ export default function UserDetails() {
                                             currentUser={currentUser}
                                             userId={userId}
                                             user={user}
-                                            request={requestFromCurrentUser || requestFromUserId}
-                                            fetchFriendRequest={fetchFriendRequest}
+                                            // request={requestFromCurrentUser || requestFromUserId}
+                                            // fetchFriendRequest={fetchFriendRequest}
                                         />
                                     )
                                 )

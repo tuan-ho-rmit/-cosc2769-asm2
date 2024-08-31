@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import UnfriendAction from "../actions/UnfriendAction.jsx";
 import {creatNotificationService} from "../../../../components/right-side-bar/NotificationService.js";
 
-export default async function CreateFriendRequest({currentUser, userId, user, fetchFriendRequest, request}) {
+export default function CreateFriendRequest({currentUser, userId, user}) {
     console.log('current user:', currentUser)
     console.log(userId)
     console.log(user)
@@ -56,7 +56,7 @@ export default async function CreateFriendRequest({currentUser, userId, user, fe
             }
 
             const result = await response.json();
-            fetchFriendRequest()
+            // fetchFriendRequest()
             pushSuccess("Friend request sent successfully")
             return result; // Return result to handle it in the component
         } catch (error) {
@@ -69,30 +69,6 @@ export default async function CreateFriendRequest({currentUser, userId, user, fe
     //     fetchFriendRequest()
     //     console.log('log request', request)
     // }, []);
-
-    const deleteFriendRequest = async () => {
-        try {
-            const response = await fetch(`http://localhost:3000/api/friendrequest/${request._id}/delete`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-            }
-
-            fetchFriendRequest(); // Refresh the request state
-            pushSuccess("Friend request deleted successfully");
-        } catch (error) {
-            console.error('Error deleting friend request:', error.message);
-            pushError(error.message);
-            throw error;
-        }
-    };
 
 
     // Condition to check if the profile belongs to the current user

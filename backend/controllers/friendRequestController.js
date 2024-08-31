@@ -23,8 +23,9 @@ export const createFriendRequest = async (req, res) => {
         } = req.body;
         console.log('from id: ', fromId)
         console.log('to id: ', toId)
-        const existedRequest = await FriendRequest.findOne({fromId: fromId, toId: toId})
-        if (!existedRequest) {
+        const existedRequest1 = await FriendRequest.findOne({fromId: fromId, toId: toId})
+        const existedRequest2 = await FriendRequest.findOne({fromId: toId, toId: fromId})
+        if (!existedRequest1 && !existedRequest2) {
             const newFriendRequest = new FriendRequest ({
                 fromId,
                 toId,
