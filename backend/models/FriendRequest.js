@@ -18,7 +18,10 @@ const friendRequestSchema = new mongoose.Schema({
         default: "pending",
         required: true,
     },
-})
+},
+{timestamps: true})
+
+
 
 const FriendRequest = mongoose.model("friendRequest", friendRequestSchema);
 export default FriendRequest;
