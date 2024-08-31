@@ -1,12 +1,6 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
-import {useEffect, useState} from "react";
-import UnfriendAction from "../actions/UnfriendAction.jsx";
-import {creatNotificationService} from "../../../../components/right-side-bar/NotificationService.js";
 
-export default function CreateFriendRequest({currentUser, userId, user}) {
-    console.log('current user:', currentUser)
-    console.log(userId)
-    console.log(user)
+export default function CreateFriendRequest({currentUser, userId, fetchFriendRequest}) {
     // const [request, setRequest] = useState()
     //
     // const fetchFriendRequest = async () => {
@@ -33,19 +27,21 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
     //     }
     // }
 
-
     const sendFriendRequest = async () => {
         try {
+            // Prepare data to send
+            const requestData = {
+                fromId: currentUser.id, // The current user's ID
+                toId: userId,           // The target user's ID
+                status: 'pending'
+            };
+
             const response = await fetch('http://localhost:3000/api/friendrequest/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    fromId: currentUser.id,
-                    toId: userId,
-                    status: 'pending'
-                }),
+                body: JSON.stringify(requestData),
                 credentials: 'include',
             }); // throw error
 
@@ -56,7 +52,7 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
             }
 
             const result = await response.json();
-            // fetchFriendRequest()
+            fetchFriendRequest()
             pushSuccess("Friend request sent successfully")
             return result; // Return result to handle it in the component
         } catch (error) {
@@ -65,16 +61,11 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
         }
     }
 
-    // useEffect(() => {
-    //     fetchFriendRequest()
-    //     console.log('log request', request)
-    // }, []);
-
-
     // Condition to check if the profile belongs to the current user
     if (currentUser.id === userId) {
         return null; // disable the friend request button when on your profile
     }
+
 
     return (
         // !request || (request && request.status) === 'rejected' ?
@@ -83,14 +74,6 @@ export default function CreateFriendRequest({currentUser, userId, user}) {
         >
             Send Friend Request
         </button>
-        // : request && request.status === 'accepted' ?
-        // <UnfriendAction request={request}
-        //     fetchFriendRequest={fetchFriendRequest}
-        // />
-        //     :
-        //     <button onClick={deleteFriendRequest}>
-        //         Cancel Friend Request
-        //     </button>
     );
 }
 

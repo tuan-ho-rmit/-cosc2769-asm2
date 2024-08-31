@@ -10,15 +10,16 @@ export default function RightSideBar() {
             <div className='bg-black h-[100vh] w-[250px] right-0 fixed border-white border-l-1 overflow-y-auto'>
                 <nav>
                     <ul>
-                        {notifications.map((notification) => (
-                            <li key={notification.id}
-                                className='p-2 border-b border-white bg-black text-white'>
-                                <NavLink to={notification.activityUrl}>
-                                    {/*TODO: handle activityURL and notification name*/}
-                                    {notification.userIds.name} {notification.notiTitle}
-                                </NavLink>
-                            </li>
-                        ))}
+
+                        {/*{notifications.map((notification) => (*/}
+                        {/*    <li key={notification.id}*/}
+                        {/*        className='p-2 border-b border-white bg-black text-white'>*/}
+                        {/*        <NavLink to={notification.activityUrl}>*/}
+                        {/*            /!*TODO: handle activityURL and notification name*!/*/}
+                        {/*            {notification.userIds.name} {notification.notiTitle}*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*))}*/}
                     </ul>
                 </nav>
             </div>

@@ -52,7 +52,7 @@ const NotificationsProvider = ({ children }) => {
         const intervalId = setInterval(() => {
             fetchNotification()
             console.log('after 60 seconds:')
-        }, 60000); // Pulling every 60 seconds
+        }, 500000); // Pulling every 5 seconds
         return () => clearInterval(intervalId); // Cleanup on component unmount
 
     }, []); // re-fetch if url changes

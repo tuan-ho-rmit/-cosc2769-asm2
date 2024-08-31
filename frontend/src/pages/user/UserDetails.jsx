@@ -14,8 +14,7 @@ export default function UserDetails() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true); // 로딩 상태 추가. Add Loader state
     const [currentUser, setCurrentUser] = useState(null); // 현재 로그인한 사용자 상태 추가. Add current logged-in user state
-    const [requestFromCurrentUser, setRequestFromCurrentUser] = useState(null)
-    const [requestFromUserId, setRequestFromUserId] = useState(null)
+    const [friendRequest, setFriendRequest] = useState()
     const [areFriends, setAreFriends] = useState(false)
 
 
@@ -35,32 +34,12 @@ export default function UserDetails() {
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
             }
 
-            const resultToUser = await response.json();
-            console.log('Fetch friend request from currentUser to userId:', resultToUser)
-            setRequestFromCurrentUser(resultToUser)
-            // return resultToUser; // Return result to handle it in the component
+            const result = await response.json();
+            console.log('Fetch friend request:', result)
+            setFriendRequest(result)
 
-
-            // fetch friend request from userId to currentUser
-            const responseFromUser = await fetch(`http://localhost:3000/api/friendrequest/single/${userId}/${currentUser.id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
-
-            if (!responseFromUser.ok) {
-                const errorText = await responseFromUser.text();
-                throw new Error(`HTTP error! Status: ${responseFromUser.status}, Message: ${errorText}`);
-            }
-
-            const resultFromUser = await responseFromUser.json();
-            console.log('Fetch friend request from userId to currentUser:', resultFromUser)
-
-            setRequestFromUserId(resultFromUser)
-
-            if (resultFromUser?.status === 'accepted' || resultToUser?.status === 'accepted') {
+            // set friendship status on the request status
+            if (result?.status === 'accepted') {
                 console.log('are already friends')
                 setAreFriends(true)
             } else {
@@ -202,50 +181,43 @@ export default function UserDetails() {
                     </span>
                     {currentUser && (
                         currentUser.id === userId ? (
-                            <></>
                             // user is viewing their own profile
+                            <></>
                         ) : (
                             areFriends ? (
                                     <UnfriendAction
-                                        request={requestFromCurrentUser || requestFromUserId}
+                                        request={friendRequest}
                                         fetchFriendRequest={fetchFriendRequest}
                                     />
                                 )
                                 : (
-                                    // users are not friends
-                                    (requestFromCurrentUser && requestFromCurrentUser.fromId === currentUser.id) ||
-                                    (requestFromUserId && requestFromUserId.fromId === currentUser.id) ? (
-                                        // request is from the viewed user
-                                        (requestFromCurrentUser === null) ? (
-                                            <FriendRequestActions
-                                                currentUser={currentUser}
-                                                userId={userId}
-                                                request={requestFromUserId}
-                                                fetchFriendRequest={fetchFriendRequest}
-                                            />
-                                        ) : (
-                                            // request is from the current user
-                                            <CancelRequestAction
-                                                request={requestFromCurrentUser}
-                                                fetchFriendRequest={fetchFriendRequest}
-                                            />
-                                        )
+                                    // users are not friends: handle pending and new friend request
+                                friendRequest ? (
+                                    friendRequest.fromId === currentUser.id ? (
+                                        // display cancel request button if the fq is sent
+                                        <CancelRequestAction
+                                    request={friendRequest}
+                                    fetchFriendRequest={fetchFriendRequest}
+                                />
                                     ) : (
-                                        // no pending requests
+                                        // display approve rq button
+                                                <FriendRequestActions
+                                                    currentUser={currentUser}
+                                                    userId={userId}
+                                                    request={friendRequest}
+                                                    fetchFriendRequest={fetchFriendRequest}
+                                                />
+                                    )
+                                ) : (
+                                    // display send fr rq button
                                         <CreateFriendRequest
                                             currentUser={currentUser}
                                             userId={userId}
-                                            user={user}
-                                            // request={requestFromCurrentUser || requestFromUserId}
-                                            // fetchFriendRequest={fetchFriendRequest}
+                                            fetchFriendRequest={fetchFriendRequest}
                                         />
-                                    )
+                                )
                                 )
                         ))}
-
-
-                    {/* Render friend request components */}
-                    {/*{renderFriendRequestComponent()}*/}
                 </div>
             </div>
             <hr className="solid"></hr>
