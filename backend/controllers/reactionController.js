@@ -88,7 +88,7 @@ export const addOrUpdateReaction = async (req, res) => {
           'New comment on your post',
           [existedPost.author._id],
           'unread',
-          `/posts/${postId}`
+          `/user/${existedPost.userId}`
       );
 
       res.status(200).json({ message: 'Reaction added or updated successfully', reactions: post.reactions });

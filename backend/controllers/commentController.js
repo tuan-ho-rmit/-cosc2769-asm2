@@ -33,7 +33,7 @@ export const addComment = async (req, res) => {
             'New comment on your post',
             [existedPost.author._id],
             'unread',
-            `/posts/${postId}`
+            `/user/${existedPost.userId}`
         );
 
         res.status(201).json(newComment);
