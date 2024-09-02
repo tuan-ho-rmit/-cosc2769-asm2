@@ -3,6 +3,7 @@ import Group from '../models/Group.js';
 import GroupJoinRequest from '../models/GroupJoinRequest.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
+import {createNoti} from "../services/notiService.js";
 
 
 export const createGroup = async (req, res) => {
@@ -37,6 +38,15 @@ export const createGroup = async (req, res) => {
     });
 
     const savedGroup = await newGroup.save();
+
+    const adminUsers = await User.find({ role: "admin"})
+    createNoti(
+        'New Pending Group Creation Request',
+        [adminUsers.map((item) => item._id)],
+        'unread',
+        '/admin/groups'
+    )
+
     res.status(201).json(savedGroup);
   } catch (err) {
     console.error(err);
@@ -111,6 +121,18 @@ export const approveGroupRequest = async (req, res) => {
       message: "Successfully approve group request",
       data: updatedGroup,
     });
+
+    const userEmail = Group.findOne({id: id}, 'createdBy')
+    console.log (userEmail)
+    const user = await User.findOne({ email: userEmail }); // TODO: not functional for now.
+    console.log(user)
+    createNoti(
+        'Your Group Creation Request has been approved',
+        [user._id],
+        'unread',
+        '/'
+    )
+
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -193,6 +215,16 @@ export const joinGroup = async (req, res) => {
 
     const savedRequest = await newRequest.save();
     res.status(201).json({ message: 'Group join request submitted successfully', request: savedRequest });
+
+    // TODO: unfinished
+    const userId = Group.findOne({createdBy: userEmail}, '_id')
+    createNoti(
+        'New Group Join Request',
+        [userId],
+        'unread',
+        '/'
+    )
+
   } catch (error) {
     console.error('Error creating group join request:', error);
     res.status(500).json({ message: 'Failed to create group join request', error: error.message });
@@ -257,6 +289,13 @@ export const acceptMember = async (req, res) => {
     if (!request) {
       return res.status(404).json({ message: 'Join request not found' });
     }
+
+    createNoti(
+        'You have successfully joined a group',
+        [],
+        'unread',
+        '/'
+    )
 
     res.status(200).json({ message: 'Member accepted and added to group' });
   } catch (error) {

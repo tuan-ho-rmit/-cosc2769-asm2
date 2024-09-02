@@ -1,5 +1,5 @@
 import express from 'express';
-import { approveGroupRequest, createGroup, rejectGroupRequest } from '../controllers/groupController.js';
+import {approveGroupRequest, createGroup, getListGroup, rejectGroupRequest} from '../controllers/groupController.js';
 import { getGroups, deleteGroup, joinGroup, getRequestedGroups , getJoinRequests,acceptMember,rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost  } from '../controllers/groupController.js';
 
 const router = express.Router();
