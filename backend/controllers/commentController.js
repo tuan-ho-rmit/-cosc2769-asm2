@@ -144,3 +144,35 @@ export const deleteCommentInPostDetail = async (req, res) => {
         res.status(500).json({ message: 'Error deleting comment', error: error.message });
     }
 };
+
+export const getCommentHistory = async (commentId) => {
+    try {
+        const comment = await Comment.findById(commentId)
+            .select('history')
+            .populate('history.modifiedBy', 'firstName lastName avatar');
+
+        if (!comment) {
+            return { status: 404, data: { message: "Comment not found" } };
+        }
+
+        return { status: 200, data: comment.history };
+    } catch (error) {
+        console.error('Error fetching comment history:', error);
+        return { status: 500, data: { message: "Error fetching comment history", error } };
+    }
+};
+// 댓글 수정 이력 가져오기 라우터 함수
+export const getCommentHistoryRoute = async (req, res) => {
+    const { commentId } = req.params; // URL에서 commentId를 가져옵니다.
+  
+    try {
+      // 댓글 수정 이력을 가져오는 함수 호출
+      const result = await getCommentHistory(commentId);
+  
+      // 상태 코드에 따라 응답 전송
+      res.status(result.status).json(result.data);
+    } catch (error) {
+      console.error('Error in fetching comment history route:', error);
+      res.status(500).json({ message: "Internal server error", error });
+    }
+  };

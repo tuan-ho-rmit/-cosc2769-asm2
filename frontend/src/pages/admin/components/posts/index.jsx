@@ -139,9 +139,6 @@ export default function AdminPosts() {
                                 ))}
                             </select>
                             <TextField
-                                style={{
-                                    width: "200px"
-                                }}
                                 placeholder="Search"
                                 aria-label="Search"
                                 ref={searchRef}

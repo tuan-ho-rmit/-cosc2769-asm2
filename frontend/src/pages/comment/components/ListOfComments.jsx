@@ -1,6 +1,7 @@
 import React from "react";
 import DropDowns from "../../post/components/DropDowns";
 import { CommentWithReactions } from "./CommentWithReactions";
+import { Link } from "react-router-dom"; // Link import 추가
 
 export default function ListOfComments({ comments, onEditComment, onDeleteComment, currentUserId }) {
     if (!comments) {
@@ -48,9 +49,17 @@ export default function ListOfComments({ comments, onEditComment, onDeleteCommen
                             {comment.content}
                         </div>
                         <div className="likeAndComment">
-                            {/* ReactionForComment 컴포넌트 추가 */}
                             <CommentWithReactions commentId={comment._id} onReactionUpdate={() => {}} />
                         </div>
+
+                        {/* 댓글 수정 이력 보기 버튼 - 작성자에게만 표시 */}
+                        {currentUserId === comment.author._id && comment.history && comment.history.length > 0 && (
+                            <div className="modifiedSection">
+                                <Link to={`/comment/${comment._id}/history`}>
+                                    <button>Show Comment History</button>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 ))
             ) : (
