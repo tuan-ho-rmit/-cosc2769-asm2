@@ -1,6 +1,7 @@
 import React, {useContext} from 'react'
 import { NotificationsContext } from './NotificationsContext.jsx'
 import {NavLink} from "react-router-dom";
+import './Notifications.css';
 
 export default function RightSideBar() {
     const {notifications, markAsRead} = useContext(NotificationsContext);
