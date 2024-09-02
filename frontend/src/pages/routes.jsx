@@ -21,6 +21,8 @@ import ProtectedRoute from "../components/protectedRoute";
 import Friends from "./friends/index.jsx";
 import FriendList from "./friends/components/friendlist/index.jsx";
 import FriendRequest from "./friends/components/friendrequest/index.jsx";
+import PostHistory from "./post/postHistory";
+import CommentHistory from "./comment/CommentHistory";
 
 
 
