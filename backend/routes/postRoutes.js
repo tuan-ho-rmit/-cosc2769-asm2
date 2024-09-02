@@ -266,6 +266,25 @@ router.put('/posts/:id', async (req, res) => {
 });
 
 
+// Get Post History
+router.get('/posts/:id/history', async (req, res) => {
+    const { id: postId } = req.params;
+
+    try {
+        const post = await Post.findById(postId)
+            .select('history')
+            .populate('history.modifiedBy', 'firstName lastName avatar'); // 수정한 사용자 정보 추가
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.status(200).json(post.history);
+    } catch (error) {
+        console.error('Error fetching post history:', error);
+        res.status(500).json({ message: "Error fetching post history", error });
+    }
+});
 
 // Read a Post
 router.get('/posts/:id', async (req, res) => {
