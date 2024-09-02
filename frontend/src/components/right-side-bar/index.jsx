@@ -1,9 +1,14 @@
 import React, {useContext} from 'react'
 import { NotificationsContext } from './NotificationsContext.jsx'
 import {NavLink} from "react-router-dom";
+import './Notifications.css';
 
 export default function RightSideBar() {
-    const {notifications} = useContext(NotificationsContext);
+    const {notifications, markAsRead} = useContext(NotificationsContext);
+
+    const handleNotificationClick = async (notificationId) => {
+        await markAsRead(notificationId);
+    };
 
     return (
         <>
@@ -13,7 +18,9 @@ export default function RightSideBar() {
 
                         {notifications.map((notification) => (
                             <li key={notification._id}
-                                className='p-2 border-b border-white bg-black text-white'>
+                                className={`p-2 border-b border-white text-white ${notification.status === 'unread' ? 'notification-unread' : 'notification-read'}`}
+                            onClick={() => handleNotificationClick(notification._id)}
+                            >
                                 <NavLink to={notification.activityUrl}>
                                     {notification.notiTitle}
                                     <br/>

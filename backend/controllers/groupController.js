@@ -216,11 +216,11 @@ export const joinGroup = async (req, res) => {
     const savedRequest = await newRequest.save();
     res.status(201).json({ message: 'Group join request submitted successfully', request: savedRequest });
 
-    // TODO: unfinished
-    const userId = Group.findOne({createdBy: userEmail}, '_id')
+    // notifying the group owner on new group join rq TODO: unfinished
+    const groupOwner = Group.findOne({createdBy: userEmail})
     createNoti(
-        'New Group Join Request',
-        [userId],
+        'You received a New Group Join Request',
+        [groupOwner.createdBy],
         'unread',
         '/'
     )
