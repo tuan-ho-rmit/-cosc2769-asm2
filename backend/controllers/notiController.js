@@ -59,10 +59,18 @@ export const getAllNoti = async (req, res) => {
 
 
 
-export const readNoti = async (req, res) => {
+export const changeNotiStatus = async (req, res) => {
     try {
-        console.log(getNoti(req.params.id))
+        const {notificationId} = req.params;
+        const notificationData = await Notification.findById(notificationId)
+        if(!notificationData) {
+            return res.status(404).json({message: "Notification not found"})
+        }
+        notificationData.status = 'read'
+        await notificationData.save()
+        res.status(200).json(notificationData);
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: 'Failed to update notification status', error: err.message });
     }
 }

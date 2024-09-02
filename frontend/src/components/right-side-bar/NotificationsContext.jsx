@@ -30,18 +30,46 @@ const NotificationsProvider = ({ children }) => {
             //     notification.userIds.includes(currentUserId)
             // )
 
+            // TODO: update unread notifications count
+            // setUnreadNotifications(prevUnread => prevUnread + result.filter(notifications))
+
             // set notifications
             setNotifications(notificationsData);
 
-            // todo: append the new notifications to the existing state
-            // setNotifications(prevNotifications => [...prevNotifications, ...result]);
-
-            // TODO: update unread notifications count
-            // setUnreadNotifications(prevUnread => prevUnread + result.filter(notifications))
 
         } catch (error)
             {
             console.error('Error fetching notifications:', error.message);
+        }
+    }
+
+
+    // Function to mark a notification as read
+    const markAsRead = async (notificationId) => {
+        try {
+            // Send request to update the notification status to "read"
+            const response = await fetch(
+                `http://localhost:3000/api/notifications/${notificationId}/read`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Failed to mark notification as read.`);
+            }
+
+            const updatedNotification = await response.json();
+            console.log('Notification marked as read:', updatedNotification);
+
+            // Update the unread count
+            // setUnreadNotifications((prevUnread) => prevUnread - 1);
+        } catch (error) {
+            console.error("Error marking notification as read:", error.message);
         }
     }
 
@@ -58,7 +86,8 @@ const NotificationsProvider = ({ children }) => {
 
     const value = {
         notifications,
-        unreadNotifications
+        unreadNotifications,
+        markAsRead
     }
 
     return (
