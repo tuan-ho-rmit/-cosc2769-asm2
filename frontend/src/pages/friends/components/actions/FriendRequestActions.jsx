@@ -1,40 +1,6 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
-import {creatNotificationService} from "../../../../components/right-side-bar/NotificationService.js";
-// import {useEffect, useState} from "react";
 
 export default function FriendRequestActions({userId, currentUser, fetchFriendRequest, request}) {
-    // const [request, setRequest] = useState(null)
-    //
-    // const fetchFriendRequest = async () => {
-    //     try {
-    //         const response = await fetch(`http://localhost:3000/api/friendrequest/single/${currentUser.id}/${userId}`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             credentials: 'include',
-    //         }); // throw error
-    //
-    //         if (!response.ok) {
-    //             const errorText = await response.text();
-    //             throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-    //         }
-    //
-    //         const result = await response.json();
-    //         setRequest(result)
-    //         return result; // Return result to handle it in the component
-    //     } catch (error) {
-    //         console.error('Error sending friend request:', error.message);
-    //         throw error; // Rethrow error to handle it in the component
-    //     }
-    // }
-    //
-    // useEffect(() => {
-    //     fetchFriendRequest()
-    //     console.log('log request', request)
-    //
-    // }, [currentUser.id, userId]);
-
     // Condition to check if the profile belongs to the current user || the current's request different from user
     if (currentUser.id === userId) {
         return null; // disable these button when on your profile
@@ -92,12 +58,6 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
             throw error;
         }
     };
-
-
-
-    // if (request.toId === userId) {
-    //
-    // }
 
     return (
         <>

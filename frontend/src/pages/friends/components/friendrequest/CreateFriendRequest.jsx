@@ -1,32 +1,6 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
 
 export default function CreateFriendRequest({currentUser, userId, fetchFriendRequest}) {
-    // const [request, setRequest] = useState()
-    //
-    // const fetchFriendRequest = async () => {
-    //     try {
-    //         const response = await fetch(`http://localhost:3000/api/friendrequest/single/${currentUser.id}/${userId}`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             credentials: 'include',
-    //         }); // throw error
-    //
-    //         if (!response.ok) {
-    //             const errorText = await response.text();
-    //             throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-    //         }
-    //
-    //         const result = await response.json();
-    //         setRequest(result)
-    //         return result; // Return result to handle it in the component
-    //     } catch (error) {
-    //         console.error('Error sending friend request:', error.message);
-    //         throw error; // Rethrow error to handle it in the component
-    //     }
-    // }
-
     const sendFriendRequest = async () => {
         try {
             // Prepare data to send

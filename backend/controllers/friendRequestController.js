@@ -1,6 +1,6 @@
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/User.js";
-import {createNoti} from "./notiController.js";
+import {createNoti} from "../services/notiService.js";
 
 export const findFriendRequest = async (req, res) => {
     try {
@@ -36,7 +36,14 @@ export const createFriendRequest = async (req, res) => {
             })
             const savedFriendRequest = await newFriendRequest.save();
 
-            createNoti([toId])
+            // create notifications
+            createNoti(
+                    'New Friend request',
+                [toId],
+                'unread',
+                'friends/friendrequest'
+            )
+
 
             res.status(200).json(savedFriendRequest);
         } else {
@@ -60,6 +67,13 @@ export const acceptFriendRequest = async (req, res) => {
 
         friendRequest.status = 'accepted';
         await friendRequest.save();
+
+        createNoti(
+            'Friend Request Accepted',
+            [friendRequest.fromId],
+            'unread',
+            'friends/friendlist'
+        )
 
         // Add the 'toId' to the 'fromId' user's friend list
         const fromUser = await User.findByIdAndUpdate(

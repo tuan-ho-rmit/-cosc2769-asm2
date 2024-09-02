@@ -1,6 +1,8 @@
 // controllers/commentController.js
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
+import {createNoti} from "../services/notiService.js";
+import user from "../models/User.js";
 
 export const addComment = async (req, res) => {
     try {
@@ -23,6 +25,17 @@ export const addComment = async (req, res) => {
         });
 
         await newComment.save();
+
+        const existedPost = await Post.findById(postId).populate('author');
+        console.log('logging existedPost: ', existedPost)
+        // Create a notification for the post author
+        await createNoti(
+            'New comment on your post',
+            [existedPost.author._id],
+            'unread',
+            `/posts/${postId}`
+        );
+
         res.status(201).json(newComment);
     } catch (error) {
         console.error('Error adding comment:', error);
