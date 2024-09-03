@@ -33,6 +33,43 @@ const GroupMemberManagement = () => {
     fetchGroupData();
   }, [groupName]);
 
+  const handleAccept = async (request) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/groups/accept-member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ groupName, userEmail: request.userEmail }),
+      });
+  
+      if (response.ok) {
+        setRequests(requests.filter(r => r._id !== request._id));
+        setMembers([...members, { email: request.userEmail, _id: request.userId }]);
+      } else {
+        throw new Error('Failed to accept member');
+      }
+    } catch (error) {
+      console.error('Error accepting member:', error);
+    }
+  };
+
+  const handleReject = async (requestId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/groups/join-requests/${requestId}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        setRequests(requests.filter(request => request._id !== requestId));
+      } else {
+        throw new Error('Failed to reject request');
+      }
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+    }
+  };
+  
   const handleRemoveMember = async (memberId) => {
     try {
       const response = await fetch('http://localhost:3000/api/groups/remove-member', {
@@ -63,7 +100,7 @@ const GroupMemberManagement = () => {
 
         <div>
           <h3 style={{ color: '#FFD369', marginBottom: '1rem' }}>Accept Group Join Requests</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '1rem' }}>
             {requests.map(request => (
               <div key={request._id} style={{ backgroundColor: '#393E46', padding: '1rem', borderRadius: '0.5rem', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -90,7 +127,7 @@ const GroupMemberManagement = () => {
 
         <div style={{ marginTop: '2rem' }}>
           <h3 style={{ color: '#FFD369', marginBottom: '1rem' }}>Manage Current Members</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '1rem' }}>
             {members.map(member => (
               <div key={member._id} style={{ backgroundColor: '#393E46', padding: '1rem', borderRadius: '0.5rem', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
