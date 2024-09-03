@@ -1,4 +1,5 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
+import Button from "../../../../components/button/index.jsx";
 
 export default function CreateFriendRequest({currentUser, userId, fetchFriendRequest}) {
     const sendFriendRequest = async () => {
@@ -43,11 +44,14 @@ export default function CreateFriendRequest({currentUser, userId, fetchFriendReq
 
     return (
         // !request || (request && request.status) === 'rejected' ?
-        <button onClick={sendFriendRequest}
-                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
+        <Button onClick={sendFriendRequest}
+                variant={'primary'}
+                size={'md'}
+                ripple={'true'}
+                // className="mt-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded-md cursor-pointer"
         >
             Send Friend Request
-        </button>
+        </Button>
     );
 }
 

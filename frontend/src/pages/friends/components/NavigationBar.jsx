@@ -1,4 +1,5 @@
 import {NavLink} from "react-router-dom";
+import Tooltip from '../../../components/tooltip'
 
 const navBarItems = [
     {
@@ -30,14 +31,29 @@ const navBarItems = [
 export default function NavigationBar() {
     return (
         <>
-            <nav>
-                <div>
-                    {navBarItems.map((item, i) => (
-                        <NavLink to={item.path}
-                                 key={i}>
-                        {item.icon}
-                        </NavLink>
-                    ))}
+            <nav className="bg-black border-b dark:border-gray-700">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-center items-center space-x-4">
+                        {navBarItems.map((item, i) => (
+                            <Tooltip text={item.title} position='bottom'>
+                                <NavLink to={item.path}
+                                         key={i}
+                                         className={({isActive}) =>
+                                isActive
+                                    ? "flex items-center px-5 py-3 text-sm font-medium text-primary border-b-2 border-primary"
+                                    : "flex items-center px-5 py-3 text-sm font-medium text-white"
+                                }
+                                         style={({isActive}) => {
+                                             return {
+                                                 color: isActive && "#FFD369"
+                                             }
+                                         }}
+                                >
+                                    {item.icon}
+                                </NavLink>
+                            </Tooltip>
+                        ))}
+                    </div>
                 </div>
             </nav>
         </>
