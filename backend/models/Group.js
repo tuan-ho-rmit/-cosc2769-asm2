@@ -15,12 +15,10 @@ const groupSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending","active", "inactive"],
     default: 'pending',
-    required: true
   },
   createdBy: {
-    type: String,
+    type: String, //reference //ref: 'User',
     default: null,
   },
   createdAt: {
