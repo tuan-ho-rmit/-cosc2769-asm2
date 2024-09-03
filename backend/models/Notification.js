@@ -5,9 +5,6 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    description: {
-        type: String,
-    },
     userIds: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true,
@@ -18,10 +15,6 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         enum: ["read", "unread"],
         default: "unread",
-        required: true,
-    },
-    activityType: {
-        type: String,
         required: true,
     },
     activityUrl: {

@@ -2,6 +2,7 @@
 
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import {createNoti} from "../services/notiService.js";
 
 // controllers/reactionController.js
 
@@ -80,6 +81,16 @@ export const addOrUpdateReaction = async (req, res) => {
       }
   
       await post.save();
+
+      // add Notification
+      const existedPost = await Post.findById(postId).populate('author');
+      await createNoti(
+          'New comment on your post',
+          [existedPost.author._id],
+          'unread',
+          `/user/${existedPost.userId}`
+      );
+
       res.status(200).json({ message: 'Reaction added or updated successfully', reactions: post.reactions });
     } catch (error) {
       console.error('Error adding or updating reaction:', error);
