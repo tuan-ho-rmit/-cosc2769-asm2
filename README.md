@@ -16,12 +16,13 @@ Video Demonstration Link: [here]()
 
 | Name                 | sID      | Contribution Score | Email                | Github                          |
 |----------------------|----------|--------------------|----------------------|---------------------------------|
-| Cho Jaesuk           | S        |                    | S@rmit.edu.vn        | https://github.com/ChoJaesuk    |
-| Cho Jimin            | S        |                    | S@rmit.edu.vn        | https://github.com/Jimin76      |
+| Cho Jaesuk           | S3914532 |                    | S3914532@rmit.edu.vn | https://github.com/ChoJaesuk    |
+| Cho Jimin            | S3940575 |                    | S3940575@rmit.edu.vn | https://github.com/Jimin76      |
 | Tran Ngoc Hong Doanh | S3927023 |                    | s3927023@rmit.edu.vn | https://github.com/yoantran     |
-| Ho Tuan              | S        |                    | S@rmit.edu.vn        | https://github.com/tuan-ho-rmit |
-| Mai Chi Nghi         | S        |                    | S@rmit.edu.vn        | https://github.com/chinghi      |
+| Ho Tuan              | S4019549 |                    | S4019549@rmit.edu.vn | https://github.com/tuan-ho-rmit |
+| Mai Chi Nghi         | S3864219 |                    | S3864219@rmit.edu.vn | https://github.com/chinghi      |
 
 ***
+
 ### How to install and run our project:
 
