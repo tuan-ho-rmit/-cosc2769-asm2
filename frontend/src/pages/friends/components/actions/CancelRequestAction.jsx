@@ -1,4 +1,5 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
+import Button from "../../../../components/button/index.jsx";
 
 export default function CancelRequestAction({request, fetchFriendRequest}) {
     const deleteFriendRequest = async () => {
@@ -26,8 +27,12 @@ export default function CancelRequestAction({request, fetchFriendRequest}) {
     };
 
     return (
-        <button onClick={deleteFriendRequest}>
+        <Button onClick={deleteFriendRequest}
+        variant ='outline-primary'
+        size = 'md'
+        ripple={'true'}
+        >
             Cancel Friend Request
-        </button>
+        </Button>
     )
 }

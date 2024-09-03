@@ -1,4 +1,5 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
+import Button from "../../../../components/button/index.jsx";
 
 export default function FriendRequestActions({userId, currentUser, fetchFriendRequest, request}) {
     // Condition to check if the profile belongs to the current user || the current's request different from user
@@ -62,18 +63,24 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
     return (
         <>
             <div>
-                <button
+                <Button
                     onClick={acceptFriendRequest}
-                    className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
+                    variant={'primary'}
+                    size={'md'}
+                    ripple={'true'}
+                    // className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
                 >
                     Confirm
-                </button>
-                <button
+                </Button>
+                <Button
                     onClick={rejectFriendRequest}
-                    className="mt-2 px-4 py-2 bg-red-400 text-white rounded-md cursor-pointer"
+                    variant={'outline-primary'}
+                    size={'md'}
+                    ripple={'true'}
+                    // className="mt-2 px-4 py-2 bg-red-400 text-white rounded-md cursor-pointer"
                 >
                 Cancel
-                </button>
+                </Button>
             </div>
         </>
     )

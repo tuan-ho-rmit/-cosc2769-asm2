@@ -1,5 +1,8 @@
 import {useEffect, useState} from "react";
 import UnfriendAction from "../actions/UnfriendAction.jsx";
+import BasePaginationList from "../../../../components/pagination/BasePaginationList.jsx";
+import Button from "../../../../components/button/index.jsx";
+import {NavLink} from "react-router-dom";
 
 export default function FriendList() {
     const [friends, setFriends] = useState([]);
@@ -145,32 +148,47 @@ export default function FriendList() {
 
     return(
         <>
-            <div>
-                <h1>
-                    Your Friend List
-                </h1>
-            </div>
-            <div>
-                <ul >
-                    {friends.map(friend =>
-                    {
-                        const displayName = (friend.fromId === currentUser)
-                            ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
-                            : friend.fromUser;  // Otherwise, display 'fromUser'
+            <div
+                style={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column"
+                }}
+            >
+                <div>
+                    <h1>
+                        Your Friend List
+                    </h1>
+                </div>
+                <div>
+                    <ul>
+                        {friends.map(friend => {
+                                const displayName = (friend.fromId === currentUser)
+                                    ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
+                                    : friend.fromUser;  // Otherwise, display 'fromUser'
 
-                        return (
-                            <li key={friend.id}
-                                className="border p-4 rounded-md shadow-md">
-                                <span>{displayName}</span>
-                                <UnfriendAction
-                                    fetchFriendRequest={fetchFriendRequest}
-                                    request={friend}
-                                />
-                            </li>
-                        );
-                    }
-                    )}
-                </ul>
+                                return (
+                                    <li key={friend.id}
+                                        className="border p-4 rounded-md shadow-md">
+                                        <span>{displayName}</span>
+                                        <Button
+                                        variant = 'primary'
+                                        size={'md'}
+                                        ripple={'true'}>
+                                            <NavLink to={`/user/${friend.fromId === currentUser ? friend.toId : friend.fromId}`}>
+                                                View Profile
+                                            </NavLink>
+                                        </Button>
+                                        <UnfriendAction
+                                            fetchFriendRequest={fetchFriendRequest}
+                                            request={friend}
+                                        />
+                                    </li>
+                                );
+                            }
+                        )}
+                    </ul>
+                </div>
             </div>
         </>
     )
