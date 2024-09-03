@@ -18,6 +18,7 @@ const ManageGroup = () => {
 
     const fetchGroups = async (email) => {
       try {
+        // createdBy가 세션의 이메일과 일치하는 그룹만 가져옴
         const response = await fetch(`http://localhost:3000/api/groups?createdBy=${email}`);
         const result = await response.json();
         setGroups(result);
@@ -25,6 +26,7 @@ const ManageGroup = () => {
         console.error('Error fetching groups:', error);
       }
     };
+    
 
     fetchUser();
   }, []);
