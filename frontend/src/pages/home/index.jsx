@@ -8,6 +8,7 @@ export default function Home() {
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
   const [user, setUser] = useState(null);
+  const [isPrivate, setIsPrivate] = useState(false); // 새로운 상태 추가
 
   // 모든 게시글 불러오기
   useEffect(() => {
@@ -77,53 +78,57 @@ export default function Home() {
     }
   }
 
-  // 게시글 추가하기
   function handleAddPost() {
     if (!user) {
-      alert('You need to log in to post.');
-      return;
+        alert('You need to log in to post.');
+        return;
     }
-  
+
+    // 디버깅 로그 추가
+    console.log('Creating post with isPrivate:', isPrivate);
+
     const newPostData = {
-      userProfile: user._id, // 사용자 프로필 ID
-      userId: user._id, // 사용자 ID
-      author: user._id, // 작성자 ID
-      content: content,
-      images: images, // Base64 인코딩된 이미지 배열
-      isGroupPost: false, // 홈에서 생성된 포스트이므로 false로 설정
+        userProfile: user._id,
+        userId: user._id,
+        author: user._id,
+        content: content,
+        images: images,
+        isGroupPost: false,
+        private: isPrivate // Ensure this is correctly passed from the state
     };
-  
+
     fetch('http://localhost:3000/api/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // 세션 쿠키를 포함하여 보냅니다.
-      body: JSON.stringify(newPostData),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(newPostData),
     })
-      .then(response => {
+    .then(response => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
-      })
-      .then(newPost => {
+    })
+    .then(newPost => {
         console.log('New post created:', newPost);
-        // 서버에서 새로 생성된 포스트를 다시 불러와 populate를 적용
         return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
-          method: 'GET',
-          credentials: 'include',
+            method: 'GET',
+            credentials: 'include',
         });
-      })
-      .then(response => response.json())
-      .then(populatedPost => {
+    })
+    .then(response => response.json())
+    .then(populatedPost => {
         console.log('Populated new post:', populatedPost);
-        setPostList([populatedPost, ...posts]); // 상태 업데이트
+        setPostList([populatedPost, ...posts]);
         setContent("");
-        setImages([]); // 이미지 목록 초기화
-      })
-      .catch(error => console.error('Error creating post:', error));
+        setImages([]);
+    })
+    .catch(error => console.error('Error creating post:', error));
   }
+
+
 
   function handleInput(newPost) {
     setContent(newPost);
@@ -179,15 +184,17 @@ export default function Home() {
         text={content}
         onAdd={handleAddPost}
         onPostChange={handleInput}
-        onImageUpload={handleImageUpload} // 이미지 업로드 핸들러 전달
-        user={user} // 현재 로그인된 유저 정보를 전달
+        onImageUpload={handleImageUpload}
+        user={user}
+        isPrivate={isPrivate} // 추가된 부분
+        setIsPrivate={setIsPrivate} // 추가된 부분
       />
       <ListOfPosts
         posts={posts}
         onPostEdit={handleEditPost}
         onPostDelete={handleDeletePost}
         currentUserId={user ? user._id : null}
-        user={user}  // user 전체 객체를 전달
+        user={user}
       />
     </div>
   );

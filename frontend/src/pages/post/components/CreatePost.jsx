@@ -1,15 +1,17 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 export default function CreatePost({
     text,
     onAdd,
     onPostChange,
     onImageUpload,
-    user, // 로그인된 유저 정보를 받아옴
+    user,
+    isPrivate, // 추가된 부분
+    setIsPrivate // 추가된 부분
 }) {
     const fileInputRef = useRef(null);
     const [previewImages, setPreviewImages] = useState([]);
-    const userAvatar = user?.avatar; // 유저 아바타를 가져옴
+    const userAvatar = user?.avatar;
 
     const handleImageUploadClick = () => {
         if (fileInputRef.current) {
@@ -26,6 +28,10 @@ export default function CreatePost({
 
     const handleRemoveImage = (indexToRemove) => {
         setPreviewImages(previewImages.filter((_, index) => index !== indexToRemove));
+    };
+
+    const handleTogglePrivacy = () => {
+        setIsPrivate(!isPrivate); // 공개/비공개 토글
     };
 
     return (
@@ -50,7 +56,6 @@ export default function CreatePost({
                 </div>
             </div>
             <hr className="solid"></hr>
-            {/* 이미지 미리보기 영역 */}
             <div className="imagePreviewContainer">
                 {previewImages.map((src, index) => (
                     <div key={index} className="imageWrapper">
@@ -71,6 +76,9 @@ export default function CreatePost({
                 />
                 <button className="submitImg" onClick={handleImageUploadClick}>Add Image</button>
                 <button className="submitBtn" onClick={onAdd}>Post</button>
+                <button className="togglePrivacyBtn" onClick={handleTogglePrivacy}>
+                    {isPrivate ? 'Friends Only' : 'Public'}
+                </button>
             </div>
         </div>
     );
