@@ -26,14 +26,14 @@ export default function UserItem({
         <div className="card mb-3 p-4 border rounded-md shadow-md" >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div className="flex flex-col md:flex-row items-start md:items-center">
-                    {/* <Link
-                        to={`/profile/${user._id}`}
+                    <Link
+                        to={`/user/${user._id}`}
                         className="flex items-end text-decoration-none mb-2 md:mb-0"
-                    > */}
+                    >
                     <h5 className="text-lg font-semibold cursor-pointer hover:text-primary">
-                        {user.username}
+                        {user.firstName} {user.lastName}
                     </h5>
-                    {/* </Link> */}
+                    </Link>
                     <div className="ml-0 md:ml-3">
                         <UserStatusBox status={user.status} />
                     </div>
@@ -54,7 +54,7 @@ export default function UserItem({
                                     {...popUpActivate}
                                     onConfirm={onChangeStatus}
                                     title="Change User Status Confirmation"
-                                    desc={`Are you sure you want to ${userStatus.Value === "active" ? "deactivate" : "activate"} the user ${user.username}?`}
+                                    desc={`Are you sure you want to ${userStatus.Value === "active" ? "deactivate" : "activate"} the user ${user.firstName} ${user.lastName}?`}
                                 />
                             </div>
                         </div>
@@ -74,9 +74,9 @@ export default function UserItem({
                 <p className="text-sm text-grey-200 mb-1 md:mb-0" >
                     <small>Created At: {user.createdAt}</small>
                 </p>
-                <p className="text-sm text-grey-200 mb-0 ml-0 md:ml-3" >
+                {/* <p className="text-sm text-grey-200 mb-0 ml-0 md:ml-3" >
                     <small>Updated At: {user.updatedAt}</small>
-                </p>
+                </p> */}
             </div>
         </div >
     );

@@ -2,6 +2,7 @@
 
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import {createNoti} from "../services/notiService.js";
 
 // controllers/reactionController.js
 
@@ -80,6 +81,16 @@ export const addOrUpdateReaction = async (req, res) => {
       }
   
       await post.save();
+
+      // add Notification
+      const existedPost = await Post.findById(postId).populate('author');
+      await createNoti(
+          'New comment on your post',
+          [existedPost.author._id],
+          'unread',
+          `/user/${existedPost.userId}`
+      );
+
       res.status(200).json({ message: 'Reaction added or updated successfully', reactions: post.reactions });
     } catch (error) {
       console.error('Error adding or updating reaction:', error);
@@ -212,3 +223,26 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       res.status(500).json({ message: 'Error removing comment reaction', error: error.message });
     }
   };
+
+// 댓글에 리액션 개수 가져오기
+export const getCommentReactionsCount = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    
+    const comment = await Comment.findById(commentId).select('reactions');
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    const reactionCounts = comment.reactions.reduce((acc, reaction) => {
+      acc[reaction.type] = (acc[reaction.type] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.status(200).json(reactionCounts);
+  } catch (error) {
+    console.error('Error fetching comment reaction counts:', error);
+    res.status(500).json({ message: 'Error fetching comment reaction counts', error: error.message });
+  }
+};

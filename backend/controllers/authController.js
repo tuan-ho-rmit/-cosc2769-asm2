@@ -5,7 +5,7 @@ import express from 'express'; // Added express import
 // Handle user registration
 export const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, dateOfBirth, gender, avatar } = req.body;
+    const { firstName, lastName, email, password, dateOfBirth, gender, avatar, friendIds } = req.body;
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
@@ -25,6 +25,7 @@ export const registerUser = async (req, res) => {
       dateOfBirth,
       gender,
       avatar,
+      friendIds
     });
 
     // Save the user to the database
@@ -70,7 +71,8 @@ export const loginUser = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        avatar: user.avatar
+        avatar: user.avatar,
+        friendIds: user.friendIds,
       };
     } else {
       return res.status(500).json({ message: 'Session is not initialized' });

@@ -18,6 +18,13 @@ import DiscoverGroup from "./discovergroup";
 import GroupMemberManagement from "./groupmembermanagement";
 import GroupMain from "./groupmain";
 import ProtectedRoute from "../components/protectedRoute";
+import Friends from "./friends/index.jsx";
+import FriendList from "./friends/components/friendlist/index.jsx";
+import FriendRequest from "./friends/components/friendrequest/index.jsx";
+import PostHistory from "./post/postHistory";
+import CommentHistory from "./comment/CommentHistory";
+
+
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +41,8 @@ export const router = createBrowserRouter([
       { path: 'register', element: <Register /> },  // Register 페이지는 보호하지 않음
       { path: 'login', element: <Login /> },        // Login 페이지는 보호하지 않음
       { path: 'post/:id', element: <ProtectedRoute element={<PostDetail />} /> },
+      { path: "post/:id/history", element: <ProtectedRoute element={<PostHistory />} /> },
+      { path: "comment/:commentId/history", element: <ProtectedRoute element={<CommentHistory />} />},
       { path: 'mydetail', element: <ProtectedRoute element={<MyDetails />} /> },
       { path: 'user/:userId', element: <ProtectedRoute element={<UserDetails />} /> },
       { path: 'config', element: <ProtectedRoute element={<ConfigPage />} /> },
@@ -46,6 +55,16 @@ export const router = createBrowserRouter([
           { path: "users", element: <AdminUsers />, name: "Users" },
           { path: "groups", element: <AdminGroups />, name: "Groups" },
           { path: "posts", element: <AdminPosts />, name: "Posts" },
+        ]
+      },
+      {
+        path: '/friends', element: <Friends />, children: [
+          {
+            path: 'friendlist/', element: <FriendList />, name:"Friend List"
+          },
+          {
+            path: "friendrequest", element: <FriendRequest />, name: "Friend Requests"
+          },
         ]
       }
     ],

@@ -18,7 +18,7 @@ const groupSchema = new mongoose.Schema({
     default: 'pending',
   },
   createdBy: {
-    type: String,
+    type: String, //reference //ref: 'User',
     default: null,
   },
   createdAt: {
