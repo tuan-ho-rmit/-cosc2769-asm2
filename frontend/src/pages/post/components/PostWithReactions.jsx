@@ -15,40 +15,50 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
 
   const currentUserId = JSON.parse(localStorage.getItem('user')).id;
 
+  // 이전 상태 저장 변수 추가
+  const [lastFetchedPostId, setLastFetchedPostId] = useState(null);
+
   useEffect(() => {
-    const fetchReactions = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+    // 이전에 호출한 postId와 동일한지 확인하여 중복 호출 방지
+    if (lastFetchedPostId !== postId) {
+      const fetchReactions = async () => {
+        try {
+          const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
 
-        if (!response.ok) {
-          throw new Error('Error fetching post reactions');
+          if (!response.ok) {
+            throw new Error('Error fetching post reactions');
+          }
+
+          const post = await response.json();
+
+          const userReaction = post.reactions.find(
+            (reaction) => reaction.userId.toString() === currentUserId.toString()
+          );
+
+          if (userReaction) {
+            setSelectedPostReaction(userReaction.type);
+          } else {
+            setSelectedPostReaction(null);
+          }
+
+          // 리액션 상태가 업데이트될 때마다 외부 콜백 호출
+          if (onReactionUpdate) {
+            onReactionUpdate();
+          }
+
+          // 상태 업데이트
+          setLastFetchedPostId(postId);
+        } catch (error) {
+          console.error('Error fetching post reactions:', error);
         }
+      };
 
-        const post = await response.json();
-
-        const userReaction = post.reactions.find(
-          (reaction) => reaction.userId.toString() === currentUserId.toString()
-        );
-
-        if (userReaction) {
-          setSelectedPostReaction(userReaction.type);
-        } else {
-          setSelectedPostReaction(null);
-        }
-
-        // 리액션 상태가 업데이트될 때마다 외부 콜백 호출
-        if (onReactionUpdate) {
-          onReactionUpdate();
-        }
-      } catch (error) {
-      }
-    };
-
-    fetchReactions();
-  }, [postId, currentUserId, onReactionUpdate]);
+      fetchReactions();
+    }
+  }, [postId, currentUserId, onReactionUpdate, lastFetchedPostId]); // lastFetchedPostId 추가
 
   const handlePostLikeClick = () => {
     setShowPostReactionBar(!showPostReactionBar);

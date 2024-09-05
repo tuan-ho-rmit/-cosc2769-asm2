@@ -11,27 +11,31 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const [editingPostId, setEditingPostId] = useState(null);
     const [updatedContent, setUpdatedContent] = useState("");
     const [updatedImages, setUpdatedImages] = useState([]);
-    const [localPosts, setLocalPosts] = useState(posts); // 로컬 상태로 게시글 관리
-    const [reactionCounts, setReactionCounts] = useState({}); // 모든 게시글의 리액션 개수 상태
+    const [reactionCounts, setReactionCounts] = useState({});
 
     useEffect(() => {
-        setLocalPosts(posts);
+        // 로컬 상태 초기화 및 데이터 가져오기
+        if (posts.length > 0) {
+            const fetchData = async () => {
+                await Promise.all(posts.map(async (post) => {
+                    await fetchComments(post._id);
+                    await fetchReactionCounts(post._id);
+                }));
+            };
+
+            fetchData();
+        }
     }, [posts]);
 
-    useEffect(() => {
-        localPosts.forEach(post => {
-            fetchComments(post._id);
-            fetchReactionCounts(post._id); // 각 게시글에 대한 리액션 개수 가져오기
-        });
-    }, [localPosts]);
-
-    // 댓글 가져오기 함수
     const fetchComments = async (postId) => {
         try {
             const response = await fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
                 method: 'GET',
                 credentials: 'include'
             });
+            if (!response.ok) {
+                throw new Error('Error fetching comments');
+            }
             const data = await response.json();
             setCommentsByPost(prev => ({ ...prev, [postId]: data }));
         } catch (error) {
@@ -45,12 +49,16 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                 method: 'GET',
                 credentials: 'include',
             });
+            if (!response.ok) {
+                throw new Error('Error fetching reaction counts');
+            }
             const data = await response.json();
             setReactionCounts(prev => ({ ...prev, [postId]: data }));
         } catch (error) {
             console.error('Error fetching reaction counts:', error);
         }
     };
+
 
     const handleAddComment = (postId, newCommentText) => {
         const newComment = { content: newCommentText, id: Date.now(), author: user };
@@ -103,7 +111,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
 
     const handleEditPost = (postId) => {
         setEditingPostId(postId);
-        const postToEdit = localPosts.find(post => post._id === postId);
+        const postToEdit = posts.find(post => post._id === postId);
         setUpdatedContent(postToEdit.content);
         setUpdatedImages(postToEdit.images);
     };
@@ -136,7 +144,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
 
     const handleImageChange = (event) => {
         const files = event.target.files;
-        const fileReaders = [];
         const images = [];
 
         for (let i = 0; i < files.length; i++) {
@@ -162,7 +169,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         fetchReactionCounts(postId);
     };
 
-    const postItems = localPosts.map((each) => {
+    const postItems = posts.map((each) => {
         const displayImages = each.images.slice(0, 3);
         const remainingImagesCount = each.images.length - 3;
         const isAuthor = currentUserId === each.author._id;
