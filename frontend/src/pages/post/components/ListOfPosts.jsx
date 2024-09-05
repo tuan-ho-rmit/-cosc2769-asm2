@@ -59,7 +59,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         }
     };
 
-
     const handleAddComment = (postId, newCommentText) => {
         const newComment = { content: newCommentText, id: Date.now(), author: user };
         setCommentsByPost(prevComments => ({
@@ -178,7 +177,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             <div key={each._id} className="postContainer">
                 <div className="postHeader">
                     <div className="imgContainer">
-                        <Link to={`/user/${each.author._id}`}>
+                        <Link to={currentUserId === each.author._id ? '/mydetail' : `/user/${each.author._id}`}>
                             <div className='mx-4'>
                                 <img
                                     src={each.userProfile.avatar || 'default-avatar-url.jpg'}
@@ -189,7 +188,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                         </Link>
                     </div>
                     <div className="postInfo">
-                        <Link to={`/user/${each.author._id}`}>
+                        <Link to={currentUserId === each.author._id ? '/mydetail' : `/user/${each.author._id}`}>
                             <div className="userName">
                                 <p>{each.author.firstName} {each.author.lastName || "Anonymous"}</p>
                             </div>

@@ -101,20 +101,22 @@ router.get('/posts', async (req, res) => {
             $or: [
                 { private: false },  // 전체공개 게시물
                 { private: true, author: { $in: friendIds } },  // 친구공개 게시물 (로그인한 유저의 친구만)
-                { isGroupPost: true, groupId: { $in: userGroupIds } }  // 로그인한 사용자가 가입한 그룹의 게시물들
+                { isGroupPost: true, groupId: { $in: userGroupIds } },  // 로그인한 사용자가 가입한 그룹의 게시물들
+                { author: userId }  // 본인이 작성한 게시물
             ]
         })
         .sort({ date: -1 })  // 최신순으로 정렬
         .populate('author', 'firstName lastName avatar')  // author 필드를 User의 firstName, lastName, avatar로 채움
         .populate('userProfile', 'avatar');  // userProfile 필드도 필요하면 채움
         
-        console.log(`Fetched ${posts.length} posts for the user including group, public, and friend-only posts.`);
+        console.log(`Fetched ${posts.length} posts for the user including group, public, friend-only, and own posts.`);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: "Error fetching posts", error });
     }
 });
+
 // Create Post
 router.post('/posts', async (req, res) => {
     try {
