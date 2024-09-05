@@ -42,7 +42,12 @@ const PostItem = ({ post, handleDeleteConfirm }) => {
                             <p
                                 className="text-sm text-gray-600 mb-0"
                             >
-                                <strong>Author: {post.author || "User"}{" "}</strong>
+                                <strong>Author: {post.author.email || "User"}{" "}</strong>
+                            </p>
+                            <p
+                                className="text-sm text-gray-600 mb-0"
+                            >
+                                <small>Group: {post.groupId?.groupName || "" }</small>
                             </p>
                             <p
                                 className="text-sm text-gray-600 mb-0"
