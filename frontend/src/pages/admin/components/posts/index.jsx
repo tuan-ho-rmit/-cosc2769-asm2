@@ -24,6 +24,11 @@ const postSearchTypes = [
         name: "Author",
         value: "author",
     },
+    {
+        id: 3,
+        name: "Group",
+        value: "group",
+    }
 ];
 export default function AdminPosts() {
     const pageSize = 5;
@@ -49,7 +54,10 @@ export default function AdminPosts() {
     };
     const handleOnChangeSearch = useCallback(
         debounce((value) => {
-            setFilter((prev) => ({ ...prev, searchValue: value, page: 1 }));
+            setFilter((prev) => {
+                console.log("🚀 ~ debounce ~ prev:", prev)
+                return ({ ...prev, searchValue: value, page: 1 })
+            })
         }, 300),
         []
     );

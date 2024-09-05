@@ -73,6 +73,8 @@ export const loginUser = async (req, res) => {
         email: user.email,
         avatar: user.avatar,
         friendIds: user.friendIds,
+        role: user.role,
+        status: user.status
       };
     } else {
       return res.status(500).json({ message: 'Session is not initialized' });

@@ -1,4 +1,4 @@
-import {createContext, useEffect, useState} from "react";
+import { createContext, useEffect, useState } from "react";
 
 const NotificationsContext = createContext();
 
@@ -6,7 +6,7 @@ const NotificationsProvider = ({ children }) => {
 
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
-
+    const [open, setOpen] = useState(false)
 
     // fetch notification from backend
     const fetchNotification = async () => {
@@ -37,8 +37,7 @@ const NotificationsProvider = ({ children }) => {
             setNotifications(notificationsData);
 
 
-        } catch (error)
-            {
+        } catch (error) {
             console.error('Error fetching notifications:', error.message);
         }
     }
@@ -65,7 +64,7 @@ const NotificationsProvider = ({ children }) => {
 
             const updatedNotification = await response.json();
             console.log('Notification marked as read:', updatedNotification);
-
+            fetchNotification()
             // Update the unread count
             // setUnreadNotifications((prevUnread) => prevUnread - 1);
         } catch (error) {
@@ -87,7 +86,9 @@ const NotificationsProvider = ({ children }) => {
     const value = {
         notifications,
         unreadNotifications,
-        markAsRead
+        markAsRead,
+        setOpen,
+        open
     }
 
     return (

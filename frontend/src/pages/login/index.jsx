@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { pushError } from '../../components/Toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,16 +21,19 @@ const Login = () => {
       const response = await axios.post('http://localhost:3000/api/auth/login', 
         { email, password },
         { withCredentials: true });
-
       if (response.status === 200) {
         // Fetch the user info after successful login
         const userResponse = await axios.get('http://localhost:3000/api/auth/user', { withCredentials: true });
+        if (userResponse.data.user.status === "inactive") {
+          pushError("User is deactivated. Please contact admin to activate your account");
+          return;
+        }
         localStorage.setItem('user', JSON.stringify(userResponse.data.user)); // Save user to localStorage
         console.log('User information fetched:', userResponse.data.user);
 
         // Redirect to main page after setting the user
         navigate('/');
-        window.location.reload(); // Reload to ensure that the header updates immediately
+        // window.location.reload(); // Reload to ensure that the header updates immediately
       } else {
         alert(response.data.message || 'Something went wrong');
       }
@@ -40,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <div className="w-full max-w-md p-8 shadow-md rounded-lg" style={{ backgroundColor: '#393E46' }}>
         <h2 className="text-2xl font-bold mb-6 text-center text-white">Log In</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

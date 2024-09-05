@@ -92,7 +92,7 @@ export default function Button({
     primary: 'bg-primary text-black hover:bg-darkPrimary',
     success: 'bg-success text-white hover:bg-darkSuccess',
     danger: 'bg-danger text-white hover:bg-darkDanger',
-    'outline-primary': 'border-2 border-primary text-primary hover:bg-lightPrimary',
+    'outline-primary': 'border-2 border-primary text-primary',
     'outline-danger': 'border-2 border-danger text-danger hover:bg-red-100',
   };
 

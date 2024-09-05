@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import UnfriendAction from "../actions/UnfriendAction.jsx";
 import BasePaginationList from "../../../../components/pagination/BasePaginationList.jsx";
 import Button from "../../../../components/button/index.jsx";
-import {NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function FriendList() {
     const [friends, setFriends] = useState([]);
@@ -13,32 +13,32 @@ export default function FriendList() {
 
     const fetchFriendRequest = async () => {
         try {
-        // Fetch current user
-        const currentUserResponse = await fetch(`http://localhost:3000/api/auth/user`, {
-            method: 'GET',
-            credentials: 'include',
-        });
+            // Fetch current user
+            const currentUserResponse = await fetch(`http://localhost:3000/api/auth/user`, {
+                method: 'GET',
+                credentials: 'include',
+            });
 
-        if (!currentUserResponse.ok) {
-            throw new Error('Error fetching current user');
-        }
+            if (!currentUserResponse.ok) {
+                throw new Error('Error fetching current user');
+            }
 
-        const currentUserData = await currentUserResponse.json();
-        console.log('fetched current User Data:', currentUserData)
-        // setCurrentUser(currentUserData.user);
+            const currentUserData = await currentUserResponse.json();
+            console.log('fetched current User Data:', currentUserData)
+            // setCurrentUser(currentUserData.user);
 
-        const currentData = currentUserData.user
-        console.log('currentUserData.user:', currentData)
+            const currentData = currentUserData.user
+            console.log('currentUserData.user:', currentData)
 
-        const currentUserId = currentUserData.user.id
-        console.log('currentUserData.user._id: ', currentUserId)
+            const currentUserId = currentUserData.user.id
+            console.log('currentUserData.user._id: ', currentUserId)
 
             setCurrentUser(currentUserId)
 
-        const friendList = currentData.friendIds
-        console.log('array of friends (currentData.friendIds): ', friendList)
+            const friendList = currentData.friendIds
+            console.log('array of friends (currentData.friendIds): ', friendList)
 
-        // fetch friend request
+            // fetch friend request
 
             const response = await fetch(`http://localhost:3000/api/friendrequest/`, {
                 method: 'GET',
@@ -58,7 +58,7 @@ export default function FriendList() {
             // setFriendRequest(resultToUser)
 
             const acceptedRequests = allFriendRequests.filter(request => ((request.status === 'accepted') && (request.toId === currentUserId)) || ((request.status === 'accepted') && (request.fromId === currentUserId)))
-            console.log ('accepted rq:', acceptedRequests)
+            console.log('accepted rq:', acceptedRequests)
 
 
             // testing filtering duplicated requests
@@ -67,7 +67,7 @@ export default function FriendList() {
 
             // Iterate over each request in acceptedRequests
             acceptedRequests.forEach(request => {
-                const {fromId, toId} = request;
+                const { fromId, toId } = request;
 
                 // Create a unique key for the pair
                 const pairKey = fromId < toId ? `${fromId}-${toId}` : `${toId}-${fromId}`;
@@ -84,7 +84,7 @@ export default function FriendList() {
 
             // Fetch user details for each request
             const requestsWithUserDetails = await Promise.all(uniqueRequests.map(async (request) => {
-                const {fromId, toId} = request;
+                const { fromId, toId } = request;
 
                 // Fetch details for fromId
                 const fromUserResponse = await fetch(`http://localhost:3000/api/users/${fromId}`, {
@@ -146,48 +146,45 @@ export default function FriendList() {
         return <p>You don't have any friends yet.</p>;
     }
 
-    return(
+    return (
         <>
             <div
                 style={{
                     height: "100%",
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
+                    marginTop: "16px"
                 }}
             >
-                <div>
-                    <h1>
-                        Your Friend List
-                    </h1>
-                </div>
-                <div>
-                    <ul>
-                        {friends.map(friend => {
-                                const displayName = (friend.fromId === currentUser)
-                                    ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
-                                    : friend.fromUser;  // Otherwise, display 'fromUser'
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px", margin: "0px 16px" }}>
+                    {friends.map(friend => {
+                        const displayName = (friend.fromId === currentUser)
+                            ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
+                            : friend.fromUser;  // Otherwise, display 'fromUser'
 
-                                return (
-                                    <li key={friend.id}
-                                        className="border p-4 rounded-md shadow-md">
-                                        <span>{displayName}</span>
-                                        <Button
-                                        variant = 'primary'
-                                        size={'md'}
-                                        ripple={'true'}>
-                                            <NavLink to={`/user/${friend.fromId === currentUser ? friend.toId : friend.fromId}`}>
-                                                View Profile
-                                            </NavLink>
-                                        </Button>
-                                        <UnfriendAction
-                                            fetchFriendRequest={fetchFriendRequest}
-                                            request={friend}
-                                        />
-                                    </li>
-                                );
-                            }
-                        )}
-                    </ul>
+                        return (
+                            <div key={friend.id}
+                                className="border p-4 rounded-md shadow-md"
+                                style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start", alignItems: "center", gap: "16px" }}
+                            >
+
+                                <span>{displayName}</span>
+                                <Button
+                                    variant='primary'
+                                    size={'md'}
+                                    ripple={'true'}>
+                                    <NavLink to={`/user/${friend.fromId === currentUser ? friend.toId : friend.fromId}`}>
+                                        View Profile
+                                    </NavLink>
+                                </Button>
+                                <UnfriendAction
+                                    fetchFriendRequest={fetchFriendRequest}
+                                    request={friend}
+                                />
+                            </div>
+                        );
+                    }
+                    )}
                 </div>
             </div>
         </>
