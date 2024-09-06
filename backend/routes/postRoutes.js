@@ -99,7 +99,7 @@ router.get('/posts', async (req, res) => {
         // 3. 그룹 게시글과 일반 게시글을 함께 가져오기
         const posts = await Post.find({
             $or: [
-                { private: false },  // 전체공개 게시물
+                { private: false, isGroupPost: false },  // 전체공개 게시물
                 { private: true, author: { $in: friendIds } },  // 친구공개 게시물 (로그인한 유저의 친구만)
                 { isGroupPost: true, groupId: { $in: userGroupIds } },  // 로그인한 사용자가 가입한 그룹의 게시물들
                 { author: userId }  // 본인이 작성한 게시물
