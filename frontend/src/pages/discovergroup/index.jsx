@@ -10,9 +10,11 @@ const DiscoverGroup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // 그룹을 가져오는 함수
     const fetchGroups = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/groups');
+        // 서버에서 'active' 상태인 그룹만 필터링해서 가져옴
+        const response = await fetch('http://localhost:3000/api/groups?status=active');
         const result = await response.json();
         setGroups(result);
       } catch (error) {
@@ -20,12 +22,13 @@ const DiscoverGroup = () => {
       }
     };
 
+    // 유저 정보를 가져오는 함수
     const fetchUser = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if (storedUser) {
         setUser(storedUser);
         fetchRequestedGroups(storedUser.email);
-        fetchJoinedGroups(storedUser.id); // 수정된 부분: 올바른 API 경로로 요청
+        fetchJoinedGroups(storedUser.id); // 올바른 API 경로로 요청
       }
     };
 

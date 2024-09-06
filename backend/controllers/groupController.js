@@ -164,15 +164,27 @@ export const rejectGroupRequest = async (req, res) => {
   }
 };
 
+// GroupController.js
+
 export const getGroups = async (req, res) => {
+  const { status } = req.query; // 쿼리에서 status 값을 가져옴
+
   try {
-    const groups = await Group.find();
+    let groups;
+    
+    // status 값이 'active'일 때만 필터링 적용
+    if (status === 'active') {
+      groups = await Group.find({ status: 'active' });
+    } else {
+      groups = await Group.find(); // status 필터가 없으면 모든 그룹 반환
+    }
+
     res.status(200).json(groups);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to fetch groups', error: err.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch groups', error: error.message });
   }
 };
+
 
 export const deleteGroup = async (req, res) => {
   try {
