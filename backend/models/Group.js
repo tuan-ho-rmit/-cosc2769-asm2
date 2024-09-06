@@ -15,13 +15,12 @@ const groupSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending","active", "inactive"],
     default: 'pending',
-    required: true
   },
   createdBy: {
-    type: String,
-    default: null,
+    type: mongoose.Schema.Types.ObjectId,  // ObjectId로 정의
+    ref: 'User',
+    required: true,
   },
   createdAt: {
     type: Date,

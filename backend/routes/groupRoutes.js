@@ -11,7 +11,7 @@ router.post('/create', createGroup);
 router.get('/', getGroups);
 
 // 그룹 삭제 라우트
-router.get('/list', verifyAdmin, getListGroup)
+router.get('/list', getListGroup)
 router.get('/member-groups', getGroupsForUser);
 router.get('/:groupName/members', getMembersOfGroup);
 router.post('/join-group', joinGroup);

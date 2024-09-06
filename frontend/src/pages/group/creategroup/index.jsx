@@ -44,7 +44,7 @@ const CreateGroup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (!user) {
+    if (!user || !user.id) {  // user.id로 변경
       alert('You need to log in to create a group.');
       return;
     }
@@ -52,9 +52,9 @@ const CreateGroup = () => {
     const groupData = {
       ...formData,
       status: 'pending',
-      createdBy: user.email, // 유저 세션에서 이메일 가져오기
+      createdBy: user.id,  // 유저의 오브젝트 아이디로 설정
       createdAt: new Date().toISOString(),
-      members: [user.id], // 유저의 오브젝트 아이디를 members 배열에 추가
+      members: [user.id],  // 유저 오브젝트 아이디를 members 배열에 추가
     };
   
     try {
@@ -64,13 +64,13 @@ const CreateGroup = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(groupData),
-        credentials: 'include', // 세션 쿠키 포함
+        credentials: 'include',  // 세션 쿠키 포함
       });
   
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 400) {
-          alert(errorData.message); // 그룹 이름이 이미 존재할 경우 경고 메시지 표시
+          alert(errorData.message);
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -79,12 +79,12 @@ const CreateGroup = () => {
   
       const result = await response.json();
       alert(`Your group: ${result.groupName} is successfully registered! Wait for system admin's approval.`);
-      console.log('Group created:', result);
-      navigate('/groups'); // 그룹 생성 후 /groups 경로로 리디렉션
+      navigate('/groups');  // 그룹 생성 후 /groups 경로로 리디렉션
     } catch (error) {
       console.error('Error creating group:', error.message);
     }
   };
+  
 
   return (
     <>

@@ -8,21 +8,23 @@ import {createNoti} from "../services/notiService.js";
 
 export const createGroup = async (req, res) => {
   try {
-    // 세션에 저장된 유저 정보 확인
+    console.log("Request body:", req.body);  // 요청 바디 확인
+
     if (!req.session.user) {
       return res.status(401).json({ message: 'User is not logged in' });
     }
 
-    const { groupName, description, avatar, visibility } = req.body;
+    const { groupName, description, avatar, visibility, createdBy } = req.body;
+    
+    console.log("Created by ID:", createdBy);  // createdBy가 제대로 전달되었는지 확인
 
-    // 동일한 이름의 그룹이 이미 존재하는지 확인
     const existingGroup = await Group.findOne({ groupName });
     if (existingGroup) {
       return res.status(400).json({ message: 'A group with this name already exists. Please choose a different name.' });
     }
 
-    // 유저 오브젝트 아이디 가져오기
-    const user = await User.findOne({ email: req.session.user.email });
+    // 유저 오브젝트 아이디를 createdBy로 사용
+    const user = await User.findById(createdBy);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -32,21 +34,12 @@ export const createGroup = async (req, res) => {
       description,
       avatar,
       status: 'pending',
-      createdBy: req.session.user.email,
+      createdBy: user._id,  // 오브젝트 아이디로 저장
       visibility,
-      members: [user._id], // 유저 오브젝트 아이디를 members 배열에 추가
+      members: [user._id],  // 유저 오브젝트 아이디를 members 배열에 추가
     });
 
     const savedGroup = await newGroup.save();
-
-    const adminUsers = await User.find({ role: "admin"})
-    createNoti(
-        'New Pending Group Creation Request',
-        [adminUsers.map((item) => item._id)],
-        'unread',
-        '/admin/groups'
-    )
-
     res.status(201).json(savedGroup);
   } catch (err) {
     console.error(err);
@@ -54,10 +47,10 @@ export const createGroup = async (req, res) => {
   }
 };
 
-// get List Group
+
 export const getListGroup = async (req, res) => {
   try {
-    let { page, limit, status, search, searchType } = req.query;
+    let { page, limit, status, search, searchType, role, createdBy } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
@@ -66,23 +59,22 @@ export const getListGroup = async (req, res) => {
     if (status) {
       filter.status = status;
     }
+    if (role) {
+      filter.role = role;
+    }
+    if (createdBy) {
+      filter.createdBy = createdBy;  // createdBy 필터 추가
+    }
     if (search) {
-      if (searchType === "createdBy") {
-        const userFilter = {
-          $or: [
-            { username: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-          ],
-        };
-        const users = await User.find(userFilter);
-        const userIds = users.map((user) => user._id);
-        filter.createdBy = { $in: userIds };
-      } else if (searchType === "groupName") {
-        const regex = new RegExp(search, "i");
-        filter.$or = [{ title: regex }, { groupName: regex }];
+      if (searchType === "groupName") {
+        filter.groupName = { $regex: search, $options: "i" };
+      } else if (searchType === "createdBy") {
+        filter.createdBy = { $regex: search, $options: "i" };
       } else {
-        const regex = new RegExp(search, "i");
-        filter.$or = [{ groupName: regex }];
+        filter.$or = [
+          { groupName: { $regex: search, $options: "i" } },
+          { createdBy: { $regex: search, $options: "i" } },
+        ];
       }
     }
 
@@ -90,8 +82,7 @@ export const getListGroup = async (req, res) => {
     const totalPages = (await Group.countDocuments(filter)) / limit;
     const groups = await Group.find(filter)
       .limit(limit)
-      .skip((page - 1) * limit)
-      ;
+      .skip((page - 1) * limit);
 
     res.status(200).json({
       success: true,
@@ -107,6 +98,8 @@ export const getListGroup = async (req, res) => {
     });
   }
 };
+
+
 
 // Approve group request
 export const approveGroupRequest = async (req, res) => {
