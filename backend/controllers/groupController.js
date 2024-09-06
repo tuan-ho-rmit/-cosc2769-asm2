@@ -50,7 +50,7 @@ export const createGroup = async (req, res) => {
 
 export const getListGroup = async (req, res) => {
   try {
-    let { page, limit, status, search, searchType, role, createdBy } = req.query;
+    let { page, limit, status, search, searchType } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
@@ -59,22 +59,23 @@ export const getListGroup = async (req, res) => {
     if (status) {
       filter.status = status;
     }
-    if (role) {
-      filter.role = role;
-    }
-    if (createdBy) {
-      filter.createdBy = createdBy;  // createdBy 필터 추가
-    }
     if (search) {
-      if (searchType === "groupName") {
-        filter.groupName = { $regex: search, $options: "i" };
-      } else if (searchType === "createdBy") {
-        filter.createdBy = { $regex: search, $options: "i" };
+      if (searchType === "createdBy") {
+        const userFilter = {
+          $or: [
+            { username: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        };
+        const users = await User.find(userFilter);
+        const userIds = users.map((user) => user._id);
+        filter.createdBy = { $in: userIds };
+      } else if (searchType === "groupName") {
+        const regex = new RegExp(search, "i");
+        filter.$or = [{ title: regex }, { groupName: regex }];
       } else {
-        filter.$or = [
-          { groupName: { $regex: search, $options: "i" } },
-          { createdBy: { $regex: search, $options: "i" } },
-        ];
+        const regex = new RegExp(search, "i");
+        filter.$or = [{ groupName: regex }];
       }
     }
 
@@ -84,7 +85,8 @@ export const getListGroup = async (req, res) => {
     const users = await Group.find(filter)
 
       .limit(limit)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      ;
 
     res.status(200).json({
       success: true,

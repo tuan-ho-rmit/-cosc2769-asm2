@@ -95,7 +95,7 @@ hr.solid {
     height: 150px; 
     border-radius: 70%;
     overflow: hidden;
-    margin-right: 30px;
+    /* margin-right: 30px; */
   }
   .profileImg {
     width: 100%;
