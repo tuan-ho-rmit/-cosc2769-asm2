@@ -1,7 +1,7 @@
-import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
+import { pushError, pushSuccess } from "../../../../components/Toast/index.jsx";
 import Button from "../../../../components/button/index.jsx";
 
-export default function FriendRequestActions({userId, currentUser, fetchFriendRequest, request}) {
+export default function FriendRequestActions({ userId, currentUser, fetchFriendRequest, request }) {
     // Condition to check if the profile belongs to the current user || the current's request different from user
     if (currentUser.id === userId) {
         return null; // disable these button when on your profile
@@ -35,7 +35,7 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
         }
     };
 
-// function to reject a friend request
+    // function to reject a friend request
     const rejectFriendRequest = async () => {
         try {
             const response = await fetch(`http://localhost:3000/api/friendrequest/${request._id}/delete`, {
@@ -52,7 +52,7 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
             }
 
             fetchFriendRequest(); // Refresh the request state
-            pushSuccess("Friend request deleted successfully");
+            pushSuccess("Cancel friend request successfully");
         } catch (error) {
             console.error('Error deleting friend request:', error.message);
             pushError(error.message);
@@ -62,13 +62,13 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
 
     return (
         <>
-            <div>
+            <div style={{ marginTop: "8px", display: "flex", flexDirection: "row", justifyContent: "flex-start", alignItems: "center", gap: "16px" }}>
                 <Button
                     onClick={acceptFriendRequest}
                     variant={'primary'}
                     size={'md'}
                     ripple={'true'}
-                    // className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
+                // className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
                 >
                     Confirm
                 </Button>
@@ -77,9 +77,9 @@ export default function FriendRequestActions({userId, currentUser, fetchFriendRe
                     variant={'outline-primary'}
                     size={'md'}
                     ripple={'true'}
-                    // className="mt-2 px-4 py-2 bg-red-400 text-white rounded-md cursor-pointer"
+                // className="mt-2 px-4 py-2 bg-red-400 text-white rounded-md cursor-pointer"
                 >
-                Cancel
+                    Cancel
                 </Button>
             </div>
         </>

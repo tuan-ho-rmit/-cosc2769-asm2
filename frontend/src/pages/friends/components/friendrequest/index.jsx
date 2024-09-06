@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import FriendRequestActions from "../actions/FriendRequestActions.jsx";
 
 export default function FriendRequest() {
@@ -34,7 +34,7 @@ export default function FriendRequest() {
                     credentials: 'include'
                 })
             if (!response.ok) {
-                throw new Error ('Failed to fetch all requests')
+                throw new Error('Failed to fetch all requests')
             }
 
             const data = await response.json();
@@ -56,7 +56,7 @@ export default function FriendRequest() {
 
             // Iterate over each request in acceptedRequests
             pendingRequestsForCurrentUser.forEach(request => {
-                const {fromId, toId} = request;
+                const { fromId, toId } = request;
 
                 // Create a unique key for the pair
                 const pairKey = fromId < toId ? `${fromId}-${toId}` : `${toId}-${fromId}`;
@@ -72,7 +72,7 @@ export default function FriendRequest() {
 
             // Fetch user details for each request
             const requestsWithUserDetails = await Promise.all(uniqueRequests.map(async (request) => {
-                const {fromId, toId} = request;
+                const { fromId, toId } = request;
 
                 // Fetch details for fromId
                 const fromUserResponse = await fetch(`http://localhost:3000/api/users/${fromId}`, {
@@ -131,25 +131,27 @@ export default function FriendRequest() {
 
     return (
         <>
-            <div>
+            {/* <div>
                 <h1>Friend Requests</h1>
-            </div>
-            {requests.length === 0 ? (
-                <p>No pending friend requests.</p>
-            ) : (
-                requests.map(request => (
-                    <div key={request.id} className="mb-4">
-                        <div className="border p-4 rounded-md shadow-md">
-                            {request.fromUser}
-                            <FriendRequestActions
-                                userId = {null}
-                            currentUser = {currentUser}
-                            fetchFriendRequest = {fetchPendingFriendRequest}
-                            request = {request}/>
-                        </div>
+            </div> */}
+            <div style={{ marginTop: "16px" }}>
+                {requests.length === 0 ? (
+                    <p>No pending friend requests.</p>
+                ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px", margin: "0px 16px" }}>
+                        {requests.map(request => (
+                            <div key={request.id} className="border p-4 rounded-md shadow-md">
+                                {request.fromUser}
+                                <FriendRequestActions
+                                    userId={null}
+                                    currentUser={currentUser}
+                                    fetchFriendRequest={fetchPendingFriendRequest}
+                                    request={request} />
+                            </div>
+                        ))}
                     </div>
-                ))
-            )}
+                )}
+            </div>
         </>
     )
 }
