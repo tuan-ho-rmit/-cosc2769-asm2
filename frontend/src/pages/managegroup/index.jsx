@@ -80,18 +80,54 @@ const ManageGroup = () => {
                   <h3 style={{ color: '#FFD369', margin: 0 }}>{group.groupName}</h3>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <button
-                    onClick={() => handleManageMembers(group.groupName)}
-                    style={{ padding: '0.7rem 1.2rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer', marginRight: '0.5rem' }}
-                  >
-                    Manage Members
-                  </button>
-                  <button
-                    onClick={() => handleManagePosts(group.groupName)}
-                    style={{ padding: '0.7rem 1.2rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer', marginRight: '0.5rem' }}
-                  >
-                    Manage Posts
-                  </button>
+                  {group.status === 'pending' ? (
+                    // 그룹 상태가 "pending"인 경우 "Pending" 버튼만 표시
+                    <button
+                      style={{
+                        padding: '0.7rem 1.2rem',
+                        backgroundColor: '#555',
+                        color: '#ccc',
+                        borderRadius: '0.25rem',
+                        border: 'none',
+                        cursor: 'not-allowed',
+                        marginRight: '0.5rem',
+                      }}
+                      disabled
+                    >
+                      Pending
+                    </button>
+                  ) : (
+                    // 그룹 상태가 "pending"이 아닌 경우 "Manage Members"와 "Manage Posts" 버튼 표시
+                    <>
+                      <button
+                        onClick={() => handleManageMembers(group.groupName)}
+                        style={{
+                          padding: '0.7rem 1.2rem',
+                          backgroundColor: '#FFD369',
+                          color: '#222831',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          cursor: 'pointer',
+                          marginRight: '0.5rem',
+                        }}
+                      >
+                        Manage Members
+                      </button>
+                      <button
+                        onClick={() => handleManagePosts(group.groupName)}
+                        style={{
+                          padding: '0.7rem 1.2rem',
+                          backgroundColor: '#FFD369',
+                          color: '#222831',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Manage Posts
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleDelete(group._id)}
                     style={{ padding: '0.7rem 1.2rem', backgroundColor: '#222831', color: '#EEEEEE', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
