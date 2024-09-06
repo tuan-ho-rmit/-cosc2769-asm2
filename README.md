@@ -33,3 +33,9 @@ Video Demonstration Link: [here]()
 ```bash
   npm run start
 ```
+
+#### Navigating in our project with admin role:
+
+email: ```siteadmin@gmail.com```
+
+password: ```123@```
