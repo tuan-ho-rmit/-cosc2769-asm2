@@ -26,3 +26,10 @@ Video Demonstration Link: [here]()
 
 ### How to install and run our project:
 
+```bash
+  npm run build
+```
+
+```bash
+  npm run start
+```
