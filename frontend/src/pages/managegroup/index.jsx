@@ -11,9 +11,9 @@ const ManageGroup = () => {
     const fetchUser = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if (storedUser) {
-        console.log("User ID:", storedUser.id); // user 객체에서 _id 확인
+        console.log("User ID:", storedUser.id); // user 객체에서 id 확인
         setUser(storedUser);
-        fetchGroups(storedUser.id);  // 유저 오브젝트 아이디를 기반으로 그룹 필터링
+        fetchGroups(storedUser.id);  // 오브젝트 아이디를 기반으로 그룹 필터링
       }
     };
 
