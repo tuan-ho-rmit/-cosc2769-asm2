@@ -4,6 +4,7 @@ import GroupJoinRequest from '../models/GroupJoinRequest.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 import {createNoti} from "../services/notiService.js";
+import Suspend from '../models/Suspend.js';
 
 
 export const createGroup = async (req, res) => {
@@ -486,5 +487,72 @@ export const createGroupPost = async (req, res) => {
   } catch (error) {
       console.error('Error creating group post:', error);
       res.status(500).json({ message: "Error creating group post", error });
+  }
+};
+
+// 멤버 서스펜드
+export const suspendMember = async (req, res) => {
+  const { groupId, userId, userEmail } = req.body;
+
+  try {
+    console.log('Group ID:', groupId);  // 로그 추가
+    console.log('User ID:', userId);    // 로그 추가
+    console.log('User Email:', userEmail);  // 로그 추가
+
+    const group = await Group.findById(groupId);
+    const user = await User.findById(userId);
+
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const existingSuspend = await Suspend.findOne({ group: groupId, userId });
+    if (existingSuspend) {
+      return res.status(400).json({ message: 'User is already suspended' });
+    }
+
+    const newSuspend = new Suspend({ group: groupId, userId, userEmail });
+    await newSuspend.save();
+
+    res.status(201).json({ message: 'User suspended successfully', suspend: newSuspend });
+  } catch (error) {
+    console.error('Error suspending member:', error);  // 서버 로그에서 오류 확인
+    res.status(500).json({ message: 'Failed to suspend member', error: error.message });
+  }
+};
+
+
+// 멤버 언서스펜드
+export const unsuspendMember = async (req, res) => {
+  const { groupId, userId } = req.params;
+
+  try {
+    const suspend = await Suspend.findOneAndDelete({ group: groupId, userId });
+
+    if (!suspend) {
+      return res.status(404).json({ message: 'Suspension record not found' });
+    }
+
+    res.status(200).json({ message: 'User unsuspended successfully' });
+  } catch (error) {
+    console.error('Error unsuspending member:', error);
+    res.status(500).json({ message: 'Failed to unsuspend member', error: error.message });
+  }
+};
+
+// 서스펜드된 유저 리스트 가져오기
+export const getSuspendedUsers = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    const suspendedUsers = await Suspend.find({ group: groupId });
+    res.status(200).json(suspendedUsers);
+  } catch (error) {
+    console.error('Error fetching suspended users:', error);
+    res.status(500).json({ message: 'Failed to fetch suspended users', error: error.message });
   }
 };
