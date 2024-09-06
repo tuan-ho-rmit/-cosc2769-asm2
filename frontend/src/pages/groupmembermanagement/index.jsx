@@ -152,6 +152,7 @@ const GroupMemberManagement = () => {
         throw new Error('Failed to remove member');
       }
 
+      // 멤버가 삭제된 후 바로 상태 반영
       setMembers(members.filter(member => member._id !== selectedId));
       setShowConfirmPopup(false);
     } catch (error) {
@@ -266,7 +267,7 @@ const GroupMemberManagement = () => {
             <h3 style={{ color: '#FFD369', marginBottom: '1.5rem' }}>Are you sure you want to {actionType.toLowerCase()} this member?</h3>
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
               <button
-                onClick={actionType === 'Suspend' ? handleSuspend : actionType === 'Unsuspend' ? handleUnsuspend : handleAcceptReject}
+                onClick={actionType === 'Suspend' ? handleSuspend : actionType === 'Unsuspend' ? handleUnsuspend : actionType === 'Expel' ? handleRemoveMember : handleAcceptReject}
                 style={{ padding: '0.5rem 1rem', backgroundColor: '#FF4E4E', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
               >
                 Yes
