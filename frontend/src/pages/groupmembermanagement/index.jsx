@@ -89,6 +89,9 @@ const GroupMemberManagement = () => {
           setRequests(requests.filter(r => r._id !== selectedId));
         }
         setShowConfirmPopup(false);
+
+        // 페이지를 새로고침하여 업데이트된 멤버 정보 반영
+        window.location.reload();  // 유저 추가 후 페이지 새로고침
       } else {
         throw new Error(`Failed to ${actionType.toLowerCase()} request`);
       }
