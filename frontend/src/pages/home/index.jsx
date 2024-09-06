@@ -20,18 +20,25 @@ export default function Home() {
           credentials: 'include',
         });
         if (!response.ok) {
+          console.error('Error fetching posts, status:', response.status);
           throw new Error('Error fetching posts');
         }
         const data = await response.json();
         console.log('Fetched posts:', data);
-        setPostList(data);
+        setPostList(prevPosts => {
+          const newPosts = [...data];
+          console.log('Updated post list after fetching:', newPosts);
+          return newPosts;
+        });
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
     };
-
+  
     fetchPosts();
   }, []);
+  
+  
 
   // 사용자 정보 불러오기
   useEffect(() => {
@@ -155,28 +162,41 @@ export default function Home() {
   function handleEditPost(id) {
     const updatedContent = prompt("Edit your post:");
     if (updatedContent !== null) {
-      console.log('Editing post with ID:', id);
+      console.log('Editing post with ID:', id, 'New content:', updatedContent);
+  
       fetch(`http://localhost:3000/api/posts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ content: updatedContent, images: [] }),  // 필요한 데이터를 함께 전송
+        body: JSON.stringify({ content: updatedContent, images: [] }), // 필요한 데이터를 함께 전송
       })
         .then(response => {
           if (!response.ok) {
+            console.error(`Error response from server, status: ${response.status}`);
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           return response.json();
         })
         .then(updatedPost => {
-          console.log('Updated post:', updatedPost);
-          setPostList(posts.map(post => post._id === id ? updatedPost : post));
+          console.log('Updated post returned from server:', updatedPost);
+          
+          // 즉시 상태를 업데이트하여 수정된 게시물이 반영되도록 함
+          setPostList(prevPosts => {
+            const updatedPosts = prevPosts.map(post => post._id === id ? updatedPost : post);
+            console.log('Updated post list:', updatedPosts);
+            return updatedPosts;
+          });
         })
-        .catch(error => console.error('Error updating post:', error));
+        .catch(error => {
+          console.error('Error updating post:', error);
+        });
     }
   }
+  
+  
+
 
   return (
     <div className="newFeedContent">
@@ -195,6 +215,7 @@ export default function Home() {
         onPostDelete={handleDeletePost}
         currentUserId={user ? user._id : null}
         user={user}
+        setPostList={setPostList}
       />
     </div>
   );
