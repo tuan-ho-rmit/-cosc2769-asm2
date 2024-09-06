@@ -48,10 +48,9 @@ export const createGroup = async (req, res) => {
 };
 
 
-// get List Group
 export const getListGroup = async (req, res) => {
   try {
-    let { page, limit, status, search, searchType, role } = req.query;
+    let { page, limit, status, search, searchType, role, createdBy } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
@@ -62,6 +61,9 @@ export const getListGroup = async (req, res) => {
     }
     if (role) {
       filter.role = role;
+    }
+    if (createdBy) {
+      filter.createdBy = createdBy;  // createdBy 필터 추가
     }
     if (search) {
       if (searchType === "groupName") {
@@ -78,7 +80,9 @@ export const getListGroup = async (req, res) => {
 
     const totalCount = await Group.countDocuments();
     const totalPages = (await Group.countDocuments(filter)) / limit;
+    const groups = await Group.find(filter)
     const users = await Group.find(filter)
+
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -87,7 +91,7 @@ export const getListGroup = async (req, res) => {
       totalPages: Math.ceil(totalPages),
       totalCount: totalCount,
       message: "Successfully fetched groups",
-      data: users,
+      data: groups,
     });
   } catch (err) {
     res.status(500).json({
@@ -96,6 +100,7 @@ export const getListGroup = async (req, res) => {
     });
   }
 };
+
 
 // Approve group request
 export const approveGroupRequest = async (req, res) => {
