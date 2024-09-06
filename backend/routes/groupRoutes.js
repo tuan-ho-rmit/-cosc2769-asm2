@@ -23,8 +23,8 @@ router.get('/', getGroupsForMember); // 멤버가 포함된 그룹 가져오기
 router.post('/remove-member', removeMemberFromGroup); // 그룹에서 멤버 제거
 router.get('/get-group-id/:groupName', getGroupByName);
 router.delete('/:id', deleteGroup);
-router.put('/approve/:groupId', verifyAdmin, approveGroupRequest)
-router.put('/reject/:groupId', verifyAdmin, rejectGroupRequest)
+router.put('/approve/:groupId',  approveGroupRequest)
+router.put('/reject/:groupId', rejectGroupRequest)
 router.get('/:id', getGroupById);
 // 특정 그룹의 모든 포스트 가져오기
 router.get('/:groupId/posts', getGroupPosts);
