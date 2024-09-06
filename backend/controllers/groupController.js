@@ -335,11 +335,12 @@ export const getGroupsForMember = async (req, res) => {
 export const removeMemberFromGroup = async (req, res) => {
   const { groupId, userId } = req.body;
 
-  try {
-    // Log to confirm data received
-    console.log('Received groupId:', groupId);
-    console.log('Received userId:', userId);
+  // ObjectId 유효성 확인
+  if (!mongoose.Types.ObjectId.isValid(groupId) || !mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: 'Invalid groupId or userId' });
+  }
 
+  try {
     const group = await Group.findById(groupId);
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
