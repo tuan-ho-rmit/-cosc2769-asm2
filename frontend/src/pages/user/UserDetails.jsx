@@ -73,21 +73,6 @@ export default function UserDetails() {
                 const userData = await userResponse.json();
                 setUser(userData.data);
 
-                // Fetch user posts
-                const postsResponse = await fetch(`http://localhost:3000/api/posts/user/${userId}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                if (!postsResponse.ok) {
-                    throw new Error('Error fetching posts');
-                }
-
-                const postsData = await postsResponse.json();
-                setPosts(postsData);
-
-                setLoading(false); // Set loading to false after data is fetched
-
                 // Fetch current user
                 const currentUserResponse = await fetch(`http://localhost:3000/api/auth/user`, {
                     method: 'GET',
@@ -100,76 +85,35 @@ export default function UserDetails() {
 
                 const currentUserData = await currentUserResponse.json();
                 setCurrentUser(currentUserData.user);
+
+                // Fetch user posts
+                const postsResponse = await fetch(`http://localhost:3000/api/posts/user/${userId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (!postsResponse.ok) {
+                    throw new Error('Error fetching posts');
+                }
+
+                const postsData = await postsResponse.json();
+
+                // Filter posts based on privacy settings and friendship status
+                const filteredPosts = postsData.filter(post => {
+                    return post.private ? areFriends : true; // 친구일 경우 비공개 포스트도 포함, 그렇지 않으면 전체 공개 포스트만 포함
+                });
+
+                setPosts(filteredPosts);
+
+                setLoading(false); // Set loading to false after data is fetched
             } catch (error) {
                 console.error('Error fetching data:', error);
                 setLoading(false); // Set loading to false in case of error
             }
-        }
+        };
 
-        fetchData()
-
-
-        // // 유저 정보를 가져옵니다.
-        // fetch(`http://localhost:3000/api/users/${userId}`, {
-        //     method: 'GET',
-        //     credentials: 'include',
-        // })
-        //     .then(response => {
-        //         console.log('Response status:', response.status); // 응답 상태 코드 확인
-        //         if (!response.ok) {
-        //             throw new Error('User not found');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         console.log('Fetched user data:', data); // 가져온 데이터 출력
-        //         setUser(data.data);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching user details:', error);
-        //         setLoading(false); // 에러 발생 시 로딩 상태 해제
-        //     });
-        //
-        // // 해당 유저가 작성한 포스트를 가져옵니다.
-        // fetch(`http://localhost:3000/api/posts/user/${userId}`, {
-        //     method: 'GET',
-        //     credentials: 'include',
-        // })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log('Fetched user posts:', data); // 가져온 게시물 데이터 출력
-        //         setPosts(data);
-        //         setLoading(false); // 로딩 상태 해제
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching user posts:', error);
-        //         setLoading(false); // 에러 발생 시 로딩 상태 해제
-        //     });
-        //
-        // // 현재 로그인한 사용자 정보를 가져옵니다. // Fetch the current logged-in user's information.
-        // fetch(`http://localhost:3000/api/auth/user`, {
-        //     method: 'GET',
-        //     credentials: 'include',
-        // })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log('Fetched current user', data.user)
-        //         setCurrentUser(data.user)
-        //     })
-        //     .catch(error => console.error('Error fetching current user:', error));
-
-        // if (currentUser && userId) {
-        //     fetchFriendRequest();
-        // }
-
-
-
-        // const intervalId = setInterval(() => {
-        //     fetchFriendRequest();
-        //     console.log('after 5 seconds:')
-        // }, 5000);
-        // return () => clearInterval(intervalId);
-    }, []);
+        fetchData();
+    }, [userId, areFriends]); // areFriends 상태가 변할 때마다 데이터 다시 로드
 
     useEffect(() => {
         fetchFriendRequest();

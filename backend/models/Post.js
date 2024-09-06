@@ -48,6 +48,10 @@ const postSchema = new mongoose.Schema({
         required: false
     },
     history: [historySchema],
+    private: {  // Make sure this is defined
+        type: Boolean,
+        default: false
+    }
 },
     { timestamps: true }
 );

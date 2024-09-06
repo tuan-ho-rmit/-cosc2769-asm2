@@ -2,49 +2,65 @@ import express from 'express';
 import Post from '../models/Post.js';
 import mongoose from 'mongoose';
 import Group from '../models/Group.js';
+import User from '../models/User.js';
+import { verifyAdmin } from '../util/verifyToken.js';
+
 
 const router = express.Router();
 
 // get post pagination
-router.get('/posts/list', async (req, res) => {
+router.get('/posts/list', verifyAdmin, async (req, res) => {
     try {
-        let { page, limit, status, search, searchType, role } = req.query;
+        let { page, limit, search, searchType } = req.query;
 
         page = parseInt(page);
         limit = parseInt(limit);
 
         const filter = {};
-        if (status) {
-            filter.status = status;
-        }
-        if (role) {
-            filter.role = role;
-        }
         if (search) {
-            if (searchType === "email") {
-                filter.email = { $regex: search, $options: "i" };
-            } else if (searchType === "username") {
-                filter.username = { $regex: search, $options: "i" };
+            if (searchType === "author") {
+                const userFilter = {
+                    $or: [
+                        { username: { $regex: search, $options: "i" } },
+                        { email: { $regex: search, $options: "i" } },
+                    ],
+                };
+                const users = await User.find(userFilter);
+                const userIds = users.map((user) => user._id);
+                filter.author = { $in: userIds };
+            } else if (searchType === "content") {
+                const regex = new RegExp(search, "i");
+                filter.$or = [{ title: regex }, { content: regex }];
+            } else if (searchType === "group") {
+                const groupFilter = {
+                    $or: [
+                        { groupName: { $regex: search, $options: "i" } },
+                    ],
+                };
+                const groups = await Group.find(groupFilter);
+                const groupIds = groups.map((user) => user._id);
+                filter.groupId = { $in: groupIds };
             } else {
-                filter.$or = [
-                    { username: { $regex: search, $options: "i" } },
-                    { email: { $regex: search, $options: "i" } },
-                ];
+                const regex = new RegExp(search, "i");
+                filter.$or = [{ title: regex }, { content: regex }];
             }
         }
 
         const totalCount = await Post.countDocuments();
         const totalPages = (await Post.countDocuments(filter)) / limit;
-        const users = await Post.find(filter)
+        const posts = await Post.find(filter)
             .limit(limit)
-            .skip((page - 1) * limit);
+            .skip((page - 1) * limit)
+            .populate("author", "email")
+            .populate("groupId", "groupName")
+            .exec();
 
         res.status(200).json({
             success: true,
             totalPages: Math.ceil(totalPages),
             totalCount: totalCount,
             message: "Successfully fetched posts",
-            data: users,
+            data: posts,
         });
     } catch (err) {
         res.status(500).json({
@@ -62,7 +78,7 @@ router.get('/posts/list', async (req, res) => {
 //             .sort({ date: -1 })  // 최신순으로 정렬
 //             .populate('author', 'firstName lastName avatar')  // author 필드를 User의 firstName, lastName, avatar로 채움
 //             .populate('userProfile', 'avatar');  // userProfile 필드도 필요하면 채움
-        
+
 //         res.status(200).json(posts);
 //     } catch (error) {
 //         console.error('Error fetching posts:', error);
@@ -71,6 +87,7 @@ router.get('/posts/list', async (req, res) => {
 // });
 // 모든 Posts 불러오기 (메인 화면용)
 
+// 모든 Posts 불러오기 (메인 화면용)
 router.get('/posts', async (req, res) => {
     try {
         if (!req.session.user) {
@@ -82,48 +99,62 @@ router.get('/posts', async (req, res) => {
         console.log(`Fetching posts for user ID: ${userId}`);
 
         // 1. 사용자가 가입한 그룹을 확인하기 위해 그룹 검색
-        // userId를 ObjectId로 변환하여 검색 조건으로 사용
         const groups = await Group.find({ members: new mongoose.Types.ObjectId(userId) });
-        console.log(`User is a member of groups: ${groups.map(group => group._id)}`);
+        const userGroupIds = groups.map(group => group._id);
 
-        const userGroupIds = groups.map(group => group._id); // 사용자가 가입한 그룹의 ID 목록
+        console.log(`User is a member of groups: ${userGroupIds}`);
 
-        // 2. 그룹 게시글과 일반 게시글을 함께 가져오기
+        // 2. 사용자와 친구인지 확인하기 위해 사용자 정보를 가져옴
+        const user = await User.findById(userId).select('friendIds');
+        const friendIds = user.friendIds.map(friendId => friendId.toString());
+
+        console.log(`User's friends: ${friendIds}`);
+
+        // 3. 그룹 게시글과 일반 게시글을 함께 가져오기
         const posts = await Post.find({
             $or: [
-                { isGroupPost: false }, // 그룹 게시글이 아닌 것들
-                { isGroupPost: true, groupId: { $in: userGroupIds } } // 로그인한 사용자가 가입한 그룹의 게시글들
+                { private: false, isGroupPost: false },  // 전체공개 게시물
+                { private: true, author: { $in: friendIds } },  // 친구공개 게시물 (로그인한 유저의 친구만)
+                { isGroupPost: true, groupId: { $in: userGroupIds } },  // 로그인한 사용자가 가입한 그룹의 게시물들
+                { author: userId }  // 본인이 작성한 게시물
             ]
         })
-        .sort({ date: -1 })  // 최신순으로 정렬
-        .populate('author', 'firstName lastName avatar')  // author 필드를 User의 firstName, lastName, avatar로 채움
-        .populate('userProfile', 'avatar');  // userProfile 필드도 필요하면 채움
-        
-        console.log(`Fetched ${posts.length} posts for the user including group and non-group posts.`);
+            .sort({ date: -1 })  // 최신순으로 정렬
+            .populate('author', 'firstName lastName avatar')  // author 필드를 User의 firstName, lastName, avatar로 채움
+            .populate('userProfile', 'avatar');  // userProfile 필드도 필요하면 채움
+
+        console.log(`Fetched ${posts.length} posts for the user including group, public, friend-only, and own posts.`);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: "Error fetching posts", error });
     }
 });
+
 // Create Post
 router.post('/posts', async (req, res) => {
     try {
-        // 세션에 저장된 유저 정보 확인
+        // Check if user is logged in
         if (!req.session.user) {
             return res.status(401).json({ message: 'User is not logged in' });
         }
 
-        const { content, images } = req.body;
+        // 디버깅 로그 추가
+        console.log('Request body for new post:', req.body);
+
+        const { content, images, private: isPrivate } = req.body;  // Extract the private field
+
+        console.log('isPrivate received on server:', isPrivate);
 
         const newPost = new Post({
             content,
-            userProfile: req.session.user.id, // 유저의 ID를 세션에서 가져옴
-            userId: req.session.user.id, // userId 필드에 유저의 ID 추가
-            author: req.session.user.id, // author 필드에 유저의 ID 추가
-            images,  // Base64 인코딩된 이미지 배열
+            userProfile: req.session.user.id,
+            userId: req.session.user.id,
+            author: req.session.user.id,
+            images,
             date: new Date(),
-            isGroupPost: false, // 홈에서 생성된 포스트이므로 false로 설정
+            isGroupPost: false,
+            private: isPrivate  // Assign it correctly here
         });
 
         await newPost.save();
@@ -134,19 +165,21 @@ router.post('/posts', async (req, res) => {
     }
 });
 
+
+
 // Get a specific post by ID with populated user data
 router.get('/posts/:id', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id)
-        .populate('author', 'firstName lastName avatar')
-        .populate('userProfile', 'avatar');
-      res.status(200).json(post);
+        const post = await Post.findById(req.params.id)
+            .populate('author', 'firstName lastName avatar')
+            .populate('userProfile', 'avatar');
+        res.status(200).json(post);
     } catch (error) {
-      console.error('Error fetching post:', error);
-      res.status(500).json({ message: "Error fetching post", error });
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: "Error fetching post", error });
     }
-  });
-  
+});
+
 
 // 특정 포스트의 모든 reaction 가져오기
 router.get('/posts/:postId/reactions/count', async (req, res) => {
