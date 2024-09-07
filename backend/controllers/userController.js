@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Group from "../models/Group.js";
 import mongoose from 'mongoose';
 // get List User
 export const getListUser = async (req, res) => {
@@ -46,6 +47,24 @@ export const getListUser = async (req, res) => {
             success: false,
             message: "Internal Server Error. Please try again.",
         });
+    }
+};
+
+export const getUserGroups = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // 유저가 속한 그룹을 찾기
+        const groups = await Group.find({ members: userId }).select('groupName avatar');
+        
+        if (!groups.length) {
+            return res.status(404).json({ message: "No groups found for the user" });
+        }
+
+        res.status(200).json({ groups });
+    } catch (error) {
+        console.error('Error fetching user groups:', error);
+        res.status(500).json({ message: "Error fetching user groups", error });
     }
 };
 
@@ -122,11 +141,8 @@ export const updateUserProfile = async (req, res) => {
         res.status(500).json({ message: 'Failed to update profile', error: error.message });
     }
 };
-
 export const getUserDetails = async (req, res) => {
-    const { userId } = req.params; // URL 파라미터에서 userId 추출
-
-    console.log('Requested userId on server:', userId); // 서버에서 요청된 userId 출력
+    const { userId } = req.params;
 
     try {
         // ObjectId 형식이 유효한지 확인
@@ -138,8 +154,10 @@ export const getUserDetails = async (req, res) => {
             });
         }
 
-        // userId로 사용자 찾기 and populate friendIds
-        const user = await User.findById(userId).populate('friendIds', 'firstName lastName')
+        // userId로 사용자 찾기 and populate friendIds + select avatar
+        const user = await User.findById(userId)
+            .populate('friendIds', 'firstName lastName avatar') // 친구 목록의 firstName, lastName, avatar 가져오기
+            .select('firstName lastName avatar email');   // 필요한 사용자 필드만 선택
 
         // 사용자가 존재하지 않을 경우
         if (!user) {
@@ -166,4 +184,3 @@ export const getUserDetails = async (req, res) => {
         });
     }
 };
-

@@ -350,14 +350,14 @@ router.get('/posts/:id', async (req, res) => {
 });
 
 
-// Get posts by a specific user
+// 사용자의 모든 게시물을 가져오는 API
 router.get('/posts/user/:userId', async (req, res) => {
     try {
         const posts = await Post.find({ author: req.params.userId })
-            .populate('author', 'firstName lastName avatar')
-            .populate('userProfile', 'avatar')
-            .populate('groupId', 'groupName avatar') // 그룹 정보
-            .sort({ date: -1 });
+            .populate('author', 'firstName lastName avatar') // 작성자의 firstName, lastName, avatar 가져오기
+            .populate('groupId', 'groupName avatar members')  // 그룹 정보 가져오기 (groupName, avatar, members)
+            .populate('userProfile', 'avatar') // userProfile 아바타도 포함
+            .sort({ date: -1 });  // 날짜별로 정렬
 
         res.status(200).json(posts);
     } catch (error) {
@@ -366,7 +366,7 @@ router.get('/posts/user/:userId', async (req, res) => {
     }
 });
 
-// group
+
 
 
 export default router;

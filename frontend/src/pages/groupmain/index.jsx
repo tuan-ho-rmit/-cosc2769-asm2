@@ -83,6 +83,8 @@ const GroupMain = () => {
             reader.readAsDataURL(file);
         }
     }
+
+    // 게시글 추가 처리
     function handleAddPost() {
         if (!user) {
             alert('You need to log in to post.');
@@ -122,10 +124,12 @@ const GroupMain = () => {
     }
 
 
+    // 게시글 내용 변경 시 처리
     function handleInput(newPost) {
         setContent(newPost);
     }
 
+    // 게시글 삭제 처리
     function handleDeletePost(id) {
         if (window.confirm("Are you sure you want to delete this post?")) {
             fetch(`http://localhost:3000/api/posts/${id}`, {
@@ -142,6 +146,7 @@ const GroupMain = () => {
         }
     }
 
+    // 게시글 수정 처리
     function handleEditPost(id) {
         const updatedContent = prompt("Edit your post:");
         if (updatedContent !== null) {
@@ -153,18 +158,21 @@ const GroupMain = () => {
                 credentials: 'include',
                 body: JSON.stringify({ content: updatedContent, images: [] }),
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(updatedPost => {
-                    setPostList(posts.map(post => post._id === id ? updatedPost : post));
-                })
-                .catch(error => console.error('Error updating post:', error));
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(async updatedPost => {
+                // 업데이트된 게시글을 가져오지 않고 현재 상태를 바로 업데이트
+                const updatedPostList = posts.map(post => post._id === id ? { ...post, content: updatedContent } : post);
+                setPostList(updatedPostList);
+            })
+            .catch(error => console.error('Error updating post:', error));
         }
     }
+    
 
     return (
         <div className="groupMainContent">
@@ -193,6 +201,7 @@ const GroupMain = () => {
                 onPostDelete={handleDeletePost}
                 currentUserId={user ? user._id : null}
                 user={user}
+                setPostList={setPostList}  // 수정된 사항을 반영할 수 있도록 setPostList 전달
             />
         </div>
     );
