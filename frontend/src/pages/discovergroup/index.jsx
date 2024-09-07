@@ -92,7 +92,7 @@ const DiscoverGroup = () => {
 
   const handleView = (group) => {
     if (group.visibility === 'private') {
-      alert('The visibility of this group is private, and you cannot view it. Please join the group to gain access.');
+      alert('The content of this group is private. To gain access and view its details, please request to join the group.');
       return;
     }
     navigate(`/groupmain/${group._id}`);
