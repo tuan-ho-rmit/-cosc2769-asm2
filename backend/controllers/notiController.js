@@ -42,7 +42,7 @@ export const getAllNoti = async (req, res) => {
         } else {
             const userId = req.session?.user?.id || null; // Get the user ID from session
             // Find notifications where `userIds` array contains the `userId`
-            const notifications = await Notification.find({ userIds: userId });
+            const notifications = await Notification.find({ userIds: userId }).sort({ createdAt: -1 });
 
             if (notifications.length === 0) {
                 // Handle the case where no notifications are found

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Groupnav from '../../components/groupnav';
+import { useAuth } from '../../provider/AuthProvider';
 
 const Group = () => {
+  const { user } = useAuth()
   const [groups, setGroups] = useState([]);
   const [userId, setUserId] = useState(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false); // 팝업 상태
@@ -12,10 +14,9 @@ const Group = () => {
   useEffect(() => {
     // 유저 세션에서 사용자 오브젝트 아이디 가져오기
     const fetchUser = () => {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser && storedUser.id) {
-        setUserId(storedUser.id);
-        fetchGroups(storedUser.id);
+      if (user && user.id) {
+        setUserId(user.id);
+        fetchGroups(user.id);
       } else {
         console.error('No user data found in session or User ID is undefined.');
       }

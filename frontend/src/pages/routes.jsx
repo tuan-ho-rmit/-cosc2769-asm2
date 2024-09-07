@@ -17,7 +17,6 @@ import AdminPosts from "./admin/components/posts";
 import DiscoverGroup from "./discovergroup";
 import GroupMemberManagement from "./groupmembermanagement";
 import GroupMain from "./groupmain";
-import ProtectedRoute from "../components/protectedRoute";
 import Friends from "./friends/index.jsx";
 import FriendList from "./friends/components/friendlist/index.jsx";
 import FriendRequest from "./friends/components/friendrequest/index.jsx";
@@ -30,26 +29,26 @@ export const router = createBrowserRouter([
     path: '/',
     element: <PrivateLayout />,
     children: [
-      { index: true, element: <ProtectedRoute element={<Home />} /> },
-      { path: 'groups', element: <ProtectedRoute element={<Group />} /> },
-      { path: 'creategroup', element: <ProtectedRoute element={<CreateGroup />} /> },
-      { path: 'managegroup', element: <ProtectedRoute element={<ManageGroup />} /> },
-      { path: 'discovergroup', element: <ProtectedRoute element={<DiscoverGroup />} /> },
-      { path: 'groupmembermanagement/:groupName', element: <ProtectedRoute element={<GroupMemberManagement />} /> },
-      { path: 'groupmain/:groupId', element: <ProtectedRoute element={<GroupMain />} /> },
-      { path: 'post/:id', element: <ProtectedRoute element={<PostDetail />} /> },
-      { path: "post/:id/history", element: <ProtectedRoute element={<PostHistory />} /> },
-      { path: "comment/:commentId/history", element: <ProtectedRoute element={<CommentHistory />} /> },
-      { path: 'mydetail', element: <ProtectedRoute element={<MyDetails />} /> },
-      { path: 'user/:userId', element: <ProtectedRoute element={<UserDetails />} /> },
-      { path: 'config', element: <ProtectedRoute element={<ConfigPage />} /> },
+      { index: true, element: <Home /> },
+      { path: 'groups', element: <Group /> },
+      { path: 'creategroup', element: <CreateGroup /> },
+      { path: 'managegroup', element: <ManageGroup /> },
+      { path: 'discovergroup', element: <DiscoverGroup /> },
+      { path: 'groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
+      { path: 'groupmain/:groupId', element: <GroupMain /> },
+      { path: 'post/:id', element: <PostDetail /> },
+      { path: "post/:id/history", element: <PostHistory /> },
+      { path: "comment/:commentId/history", element: <CommentHistory /> },
+      { path: 'mydetail', element: <MyDetails /> },
+      { path: 'user/:userId', element: <UserDetails /> },
+      { path: 'config', element: <ConfigPage /> },
       {
         path: "/admin",
-        element: <ProtectedRoute element={<Navigate to="/admin/users" />} />,
+        element: <Navigate to="/admin/users" />,
       },
       {
         path: 'admin',
-        element: <ProtectedRoute element={<Admin />} />,
+        element: <Admin />,
         children: [
           { path: "users", element: <AdminUsers />, name: "Users" },
           { path: "groups", element: <AdminGroups />, name: "Groups" },
@@ -58,7 +57,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/friends",
-        element: <ProtectedRoute element={<Navigate to="/friends/friendlist" />} />,
+        element: <Navigate to="/friends/friendlist" />,
       },
       {
         path: '/friends',

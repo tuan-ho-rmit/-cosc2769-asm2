@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import 'animate.css';
+import { useAuth } from '../../../provider/AuthProvider';
 
 export function PostWithReactions({ postId, onReactionUpdate }) {
   const [showPostReactionBar, setShowPostReactionBar] = useState(false);
   const [selectedPostReaction, setSelectedPostReaction] = useState(null);
   const [hoveredReaction, setHoveredReaction] = useState(null);
-
+  const {user} = useAuth()
   const reactions = [
     { type: 'Like', emoji: '👍' },
     { type: 'Love', emoji: '❤️' },
@@ -13,7 +14,7 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
     { type: 'Angry', emoji: '😡' },
   ];
 
-  const currentUserId = JSON.parse(localStorage.getItem('user')).id;
+  const currentUserId = user?.id;
 
   // 이전 상태 저장 변수 추가
   const [lastFetchedPostId, setLastFetchedPostId] = useState(null);

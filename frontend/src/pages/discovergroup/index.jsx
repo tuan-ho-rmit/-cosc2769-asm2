@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Groupnav from '../../components/groupnav';
+import { useAuth } from '../../provider/AuthProvider';
 
 const DiscoverGroup = () => {
+  const {user} = useAuth()
   const [groups, setGroups] = useState([]);
-  const [user, setUser] = useState(null);
   const [requestedGroups, setRequestedGroups] = useState([]);
   const [joinedGroups, setJoinedGroups] = useState([]); // 빈 배열로 초기화
   const navigate = useNavigate();
@@ -24,12 +25,8 @@ const DiscoverGroup = () => {
 
     // 유저 정보를 가져오는 함수
     const fetchUser = () => {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        setUser(storedUser);
-        fetchRequestedGroups(storedUser.email);
-        fetchJoinedGroups(storedUser.id); // 올바른 API 경로로 요청
-      }
+        fetchRequestedGroups(user.email);
+        fetchJoinedGroups(user.id);
     };
 
     const fetchRequestedGroups = async (email) => {

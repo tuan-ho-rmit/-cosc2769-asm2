@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import 'animate.css';
+import { useAuth } from '../../../provider/AuthProvider';
 
 export function CommentWithReactions({ commentId, onReactionUpdate }) {
   const [showCommentReactionBar, setShowCommentReactionBar] = useState(false);
   const [selectedCommentReaction, setSelectedCommentReaction] = useState(null);
   const [hoveredReaction, setHoveredReaction] = useState(null);
   const [reactionCounts, setReactionCounts] = useState({});
+  const {user} = useAuth()
 
   const reactions = [
     { type: 'Like', emoji: '👍' },
@@ -14,7 +16,7 @@ export function CommentWithReactions({ commentId, onReactionUpdate }) {
     { type: 'Angry', emoji: '😡' },
   ];
 
-  const currentUserId = JSON.parse(localStorage.getItem('user')).id;
+  const currentUserId = user.id
 
   useEffect(() => {
     if (commentId) {

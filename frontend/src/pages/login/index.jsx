@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { pushError } from '../../components/Toast';
-
+import { useAuth } from '../../provider/AuthProvider'
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { user, setUser } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', 
+      const response = await axios.post('http://localhost:3000/api/auth/login',
         { email, password },
         { withCredentials: true });
       if (response.status === 200) {
@@ -28,9 +29,7 @@ const Login = () => {
           pushError("User is deactivated. Please contact admin to activate your account");
           return;
         }
-        localStorage.setItem('user', JSON.stringify(userResponse.data.user)); // Save user to localStorage
-        console.log('User information fetched:', userResponse.data.user);
-
+        setUser(userResponse.data.user)
         // Redirect to main page after setting the user
         navigate('/');
         // window.location.reload(); // Reload to ensure that the header updates immediately
@@ -42,6 +41,12 @@ const Login = () => {
       alert('Failed to log in. Please try again later.');
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">

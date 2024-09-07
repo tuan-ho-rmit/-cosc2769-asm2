@@ -2,24 +2,23 @@ import React, { useState, useEffect } from "react";
 import CreatePost from '../post/components/CreatePost';
 import ListOfPosts from '../post/components/ListOfPosts';
 import './UserDetails.css';
+import { useAuth } from "../../provider/AuthProvider";
 
 export default function MyDetails() {
+    const {user} = useAuth()
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [userId, setUserId] = useState(null);
     const [posts, setPosts] = useState([]);
     const [content, setContent] = useState("");
-    const [user, setUser] = useState(null);
 
     // Fetch user details from localStorage
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser) {
-            setName(`${storedUser.firstName} ${storedUser.lastName}`);
-            setAvatar(storedUser.avatar || "/Images/default-avatar.png");
-            setUserId(storedUser.id);
-            setUser(storedUser);
+        if (user) {
+            setName(`${user.firstName} ${user.lastName}`);
+            setAvatar(user.avatar || "/Images/default-avatar.png");
+            setUserId(user.id);
         }
     }, []);
 

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Groupnav from '../../components/groupnav';
+import { useAuth } from '../../provider/AuthProvider';
 
 const GroupMemberManagement = () => {
+  const {user} = useAuth()
   const [requests, setRequests] = useState([]);
   const [members, setMembers] = useState([]);
   const [suspendedUsers, setSuspendedUsers] = useState([]); // 빈 배열로 초기화
@@ -17,10 +19,8 @@ const GroupMemberManagement = () => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        // 유저 세션에서 사용자 오브젝트 아이디 가져오기
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser && storedUser.id) {
-          setUserId(storedUser.id);
+        if (user && user.id) {
+          setUserId(user.id);
         } else {
           console.error('No user data found in session or User ID is undefined.');
         }

@@ -96,8 +96,6 @@ router.get('/posts', async (req, res) => {
 
         const userId = req.session.user.id;
 
-        console.log(`Fetching posts for user ID: ${userId}`);
-
         // 1. 사용자가 가입한 그룹을 확인하기 위해 그룹 검색
         const groups = await Group.find({ members: new mongoose.Types.ObjectId(userId) });
         const userGroupIds = groups.map(group => group._id);

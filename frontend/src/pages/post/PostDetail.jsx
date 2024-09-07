@@ -9,23 +9,19 @@ import DropDowns from './components/DropDowns';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './PostDetail.css';
+import { useAuth } from '../../provider/AuthProvider';
 
 export default function PostDetail() {
+  const {user} = useAuth()
   const { id: postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
-  const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
   const [editedImages, setEditedImages] = useState([]);
   const [reactionCounts, setReactionCounts] = useState({}); // reaction 개수 상태 추가
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-
     fetchPostDetails(postId);
     fetchComments(postId);
     fetchReactionCounts(postId); // 리액션 개수 가져오기
