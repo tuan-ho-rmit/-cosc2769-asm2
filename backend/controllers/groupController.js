@@ -460,6 +460,31 @@ export const getGroupPosts = async (req, res) => {
         res.status(500).json({ message: "Error fetching group posts", error });
     }
 };
+// controllers/groupController.js
+export const getManageGroupPosts = async (req, res) => {
+  try {
+      const { groupName } = req.params;
+
+      // groupName으로 그룹을 찾음
+      const group = await Group.findOne({ groupName: groupName });
+      if (!group) {
+          return res.status(404).json({ message: 'Group not found' });
+      }
+
+      // 찾은 그룹의 _id로 게시물 검색
+      const posts = await Post.find({ groupId: group._id })
+          .sort({ date: -1 })
+          .populate('author', 'firstName lastName avatar')
+          .populate('userProfile', 'avatar')
+          .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
+
+      res.status(200).json(posts);
+  } catch (error) {
+      console.error('Error fetching group posts for management:', error);
+      res.status(500).json({ message: "Error fetching group posts for management", error });
+  }
+};
+
 
 export const createGroupPost = async (req, res) => {
   try {
@@ -561,5 +586,20 @@ export const getSuspendedUsers = async (req, res) => {
   } catch (error) {
     console.error('Error fetching suspended users:', error);
     res.status(500).json({ message: 'Failed to fetch suspended users', error: error.message });
+  }
+};
+
+// 기존의 Post 삭제 라우트 그대로 활용
+export const deletePost = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const deletedPost = await Post.findByIdAndDelete(id);
+      if (!deletedPost) {
+          return res.status(404).json({ message: 'Post not found' });
+      }
+      res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Failed to delete post', error: err.message });
   }
 };

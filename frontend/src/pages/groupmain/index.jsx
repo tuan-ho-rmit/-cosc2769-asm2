@@ -11,6 +11,8 @@ const GroupMain = () => {
     const [images, setImages] = useState([]);
     const [user, setUser] = useState(null);
     const [groupName, setGroupName] = useState('');
+    const [groupDescription, setGroupDescription] = useState('');  // 그룹 설명 추가
+    const [groupAvatar, setGroupAvatar] = useState('');  // 그룹 이미지 추가
 
     // 그룹 정보 및 게시글 불러오기
     useEffect(() => {
@@ -22,7 +24,9 @@ const GroupMain = () => {
                 }
                 const groupData = await groupResponse.json();
                 setGroupName(groupData.groupName);  // 그룹 이름 설정
-                
+                setGroupDescription(groupData.description);  // 그룹 설명 설정
+                setGroupAvatar(groupData.avatar);  // 그룹 이미지 설정
+
                 const postResponse = await fetch(`http://localhost:3000/api/groups/${groupId}/posts`);
                 if (!postResponse.ok) {
                     throw new Error('Failed to fetch group posts');
@@ -86,7 +90,7 @@ const GroupMain = () => {
             alert('You need to log in to post.');
             return;
         }
-    
+
         const newPostData = {
             userProfile: user._id,
             userId: user._id,
@@ -95,7 +99,7 @@ const GroupMain = () => {
             images: images,
             groupId: groupId  // 그룹 ID 추가
         };
-    
+
         fetch(`http://localhost:3000/api/groups/${groupId}/posts`, {
             method: 'POST',
             headers: {
@@ -104,20 +108,21 @@ const GroupMain = () => {
             credentials: 'include',
             body: JSON.stringify(newPostData),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(newPost => {
-            // 새로 생성된 포스트를 다시 불러와 populate된 데이터를 상태에 반영
-            setPostList([newPost, ...posts]); // 상태 업데이트
-            setContent("");
-            setImages([]); // 이미지 목록 초기화
-        })
-        .catch(error => console.error('Error creating post:', error));
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(newPost => {
+                // 새로 생성된 포스트를 다시 불러와 populate된 데이터를 상태에 반영
+                setPostList([newPost, ...posts]); // 상태 업데이트
+                setContent("");
+                setImages([]); // 이미지 목록 초기화
+            })
+            .catch(error => console.error('Error creating post:', error));
     }
+
 
     // 게시글 내용 변경 시 처리
     function handleInput(newPost) {
@@ -131,13 +136,13 @@ const GroupMain = () => {
                 method: 'DELETE',
                 credentials: 'include',
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                setPostList(posts.filter(post => post._id !== id));
-            })
-            .catch(error => console.error('Error deleting post:', error));
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    setPostList(posts.filter(post => post._id !== id));
+                })
+                .catch(error => console.error('Error deleting post:', error));
         }
     }
 
@@ -171,7 +176,17 @@ const GroupMain = () => {
 
     return (
         <div className="groupMainContent">
-            <h1>{groupName}</h1>
+            {/* 상단에 그룹 정보 섹션 추가 */}
+            <div style={{ backgroundColor: '#393E46', padding: '1.5rem', borderRadius: '0.5rem', marginBottom: '2rem', textAlign: 'center', color: '#EEEEEE' }}>
+                <img
+                    src={groupAvatar}
+                    alt={groupName}
+                    style={{ width: '120px', height: '120px', borderRadius: '50%', margin: '0 auto 1.5rem auto', display: 'block' }}  // 이미지 가운데 정렬
+                />
+                <h1 style={{ color: '#FFD369', fontSize: '2rem' }}>{groupName}</h1>  {/* 글씨 크기 조금 키움 */}
+                <p style={{ fontSize: '1.2rem' }}>{groupDescription}</p>  {/* 설명 글씨 크기 조금 키움 */}
+            </div>
+
             <CreatePost
                 text={content}
                 onAdd={handleAddPost}

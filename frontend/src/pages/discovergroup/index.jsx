@@ -90,8 +90,12 @@ const DiscoverGroup = () => {
     }
   };
 
-  const handleView = (groupId) => {
-    navigate(`/group/${groupId}`);
+  const handleView = (group) => {
+    if (group.visibility === 'private') {
+      alert('The content of this group is private. To gain access and view its details, please request to join the group.');
+      return;
+    }
+    navigate(`/groupmain/${group._id}`);
   };
 
   return (
@@ -112,7 +116,7 @@ const DiscoverGroup = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button
-                  onClick={() => handleView(group._id)}
+                  onClick={() => handleView(group)}
                   style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                 >
                   View
