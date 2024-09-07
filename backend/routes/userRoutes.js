@@ -6,6 +6,7 @@ import {
     getListUser,
     updateUserProfile,
     getUserDetails,
+    getUserGroups
 } from "../controllers/userController.js";
 import { verifyAdmin } from "../util/verifyToken.js";
 // import {verifyAdmin} from "../util/verifyToken.js"
@@ -18,4 +19,5 @@ router.put("/activate/:id", verifyAdmin, activateUser);
 router.put("/deactivate/:id", verifyAdmin, deactivateUser);
 router.put('/profile', updateUserProfile);
 router.get('/:userId', getUserDetails);
+router.get('/:userId/groups', getUserGroups);
 export default router;
