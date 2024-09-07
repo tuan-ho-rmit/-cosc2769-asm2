@@ -79,8 +79,6 @@ const GroupMain = () => {
             reader.readAsDataURL(file);
         }
     }
-
-    // 게시글 추가하기
     function handleAddPost() {
         if (!user) {
             alert('You need to log in to post.');
@@ -111,20 +109,14 @@ const GroupMain = () => {
             return response.json();
         })
         .then(newPost => {
-            // 서버에서 새로 생성된 포스트를 다시 불러와 populate를 적용
-            return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-        })
-        .then(response => response.json())
-        .then(populatedPost => {
-            setPostList([populatedPost, ...posts]); // 상태 업데이트
+            // 새로 생성된 포스트를 다시 불러와 populate된 데이터를 상태에 반영
+            setPostList([newPost, ...posts]); // 상태 업데이트
             setContent("");
             setImages([]); // 이미지 목록 초기화
         })
         .catch(error => console.error('Error creating post:', error));
     }
+    
 
     function handleInput(newPost) {
         setContent(newPost);
@@ -179,6 +171,7 @@ const GroupMain = () => {
                 onPostChange={handleInput}
                 onImageUpload={handleImageUpload}
                 user={user}
+                showPrivacyToggle={false}
             />
             <ListOfPosts
                 posts={posts}

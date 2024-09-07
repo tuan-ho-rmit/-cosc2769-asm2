@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import CreatePost from '../post/components/CreatePost'; // CreatePost 컴포넌트 임포트
-import ListOfPosts from '../post/components/ListOfPosts'; // ListOfPosts 컴포넌트 임포트
+import CreatePost from '../post/components/CreatePost';
+import ListOfPosts from '../post/components/ListOfPosts';
 import './UserDetails.css';
 
 export default function MyDetails() {
@@ -18,53 +18,54 @@ export default function MyDetails() {
         if (storedUser) {
             setName(`${storedUser.firstName} ${storedUser.lastName}`);
             setAvatar(storedUser.avatar || "/Images/default-avatar.png");
-            setUserId(storedUser.id); // 유저 ID 설정
-            setUser(storedUser); // 유저 정보 설정
+            setUserId(storedUser.id);
+            setUser(storedUser);
         }
     }, []);
 
-    // Fetch user's posts
+    // Fetch user's posts, including group post data
     useEffect(() => {
         if (userId) {
+            console.log('Fetching posts for user:', userId);
+            
             fetch(`http://localhost:3000/api/posts/user/${userId}`, {
                 method: 'GET',
                 credentials: 'include',
             })
-            .then(response => response.json())
-            .then(data => setPosts(data))
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Fetched posts data:', data); // 데이터 확인
+                setPosts(data); // Ensure groupId is populated here
+            })
             .catch(error => console.error('Error fetching user posts:', error));
         }
     }, [userId]);
-
-    const handleInput = (newPost) => setContent(newPost);
+    
 
     const handleAddPost = () => {
         if (!user) return;
-    
+
         const newPostData = {
-            userProfile: user._id, // 사용자 프로필 ID
-            userId: user._id, // 사용자 ID
-            author: user._id, // 작성자 ID
+            userProfile: user._id,
+            userId: user._id,
+            author: user._id,
             content: content,
-            images: [], // 이미지 배열
+            images: [],
         };
-    
+
         fetch('http://localhost:3000/api/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include', // 세션 쿠키를 포함하여 보냅니다.
+            credentials: 'include',
             body: JSON.stringify(newPostData),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error creating post');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(post => {
-            // 새로 추가된 포스트에 대해 서버로부터 데이터를 다시 받아옵니다.
             fetch(`http://localhost:3000/api/posts/${post._id}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -72,16 +73,36 @@ export default function MyDetails() {
             .then(response => response.json())
             .then(updatedPost => {
                 setPosts([updatedPost, ...posts]);
-                setContent(""); // 포스트 작성 후 입력 필드 초기화
+                setContent("");
             })
             .catch(error => console.error('Error fetching updated post:', error));
         })
         .catch(error => console.error('Error creating post:', error));
     };
-    
 
-    const handleEditPost = (id) => {
-        // 포스트 편집 로직을 여기에 추가
+    const handleEditPost = (id, updatedContent) => {
+        fetch(`http://localhost:3000/api/posts/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ content: updatedContent }),
+        })
+        .then(response => response.json())
+        .then(updatedPost => {
+            // Fetch the updated post to ensure group data is included
+            fetch(`http://localhost:3000/api/posts/${updatedPost._id}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            .then(response => response.json())
+            .then(freshPost => {
+                setPosts(posts.map(post => post._id === id ? freshPost : post));
+            })
+            .catch(error => console.error('Error fetching updated post:', error));
+        })
+        .catch(error => console.error('Error updating post:', error));
     };
 
     const handleDeletePost = (id) => {
@@ -113,7 +134,7 @@ export default function MyDetails() {
                             <input
                                 type="text"
                                 value={name}
-                                onChange={handleNameChange}
+                                onChange={(e) => setName(e.target.value)}
                                 className="nameInput"
                             />
                         ) : (
@@ -141,11 +162,17 @@ export default function MyDetails() {
                 <CreatePost
                     text={content}
                     onAdd={handleAddPost}
-                    onPostChange={handleInput}
+                    onPostChange={setContent}
                     onImageUpload={() => {}} // 이미지 업로드 핸들러
-                    user={user} // 현재 로그인된 유저 정보를 전달
+                    user={user}
                 />
-                <ListOfPosts posts={posts} onPostEdit={handleEditPost} onPostDelete={handleDeletePost} user={user} />
+                <ListOfPosts 
+                    posts={posts} 
+                    onPostEdit={handleEditPost} 
+                    onPostDelete={handleDeletePost} 
+                    user={user} 
+                    setPostList={setPosts} // 그룹 포스트 업데이트 후 반영
+                />
             </div>
         </div>
     );

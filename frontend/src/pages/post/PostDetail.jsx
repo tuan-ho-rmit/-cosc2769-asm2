@@ -33,23 +33,41 @@ export default function PostDetail() {
 
   const fetchPostDetails = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+        const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+            method: 'GET',
+            credentials: 'include',
+        });
 
-      if (!response.ok) {
-        throw new Error('Error fetching the post');
-      }
+        if (!response.ok) {
+            throw new Error('Error fetching the post');
+        }
 
-      const data = await response.json();
-      setPost(data);
-      setEditedContent(data.content);
-      setEditedImages(data.images);
+        const data = await response.json();
+        console.log("Fetched post details:", data);
+
+        // groupId가 문자열인지 확인
+        if (typeof data.groupId === 'string') {
+            console.log("Group ID is still a string:", data.groupId);
+
+            // 문자열로 되어 있을 경우, 그룹 정보를 다시 요청
+            const groupResponse = await fetch(`http://localhost:3000/api/groups/${data.groupId}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            const groupData = await groupResponse.json();
+            data.groupId = groupData;  // groupId를 객체로 교체
+        }
+
+        setPost(data);
+        setEditedContent(data.content);
+        setEditedImages(data.images);
     } catch (error) {
-      console.error('Error fetching the post:', error);
+        console.error('Error fetching the post:', error);
     }
-  };
+};
+
+
 
   const fetchComments = async (postId) => {
     try {
@@ -123,11 +141,13 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
+        // 업데이트된 포스트 다시 가져오기
         fetchPostDetails(postId); // 업데이트 후 다시 데이터 불러오기
         setIsEditing(false);
       })
       .catch(error => console.error('Error updating post:', error));
   };
+  
 
   const handleDeletePost = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -172,6 +192,21 @@ export default function PostDetail() {
 
   return (
     <div className="postDetailContainer">
+        {/* 그룹 포스트인 경우 그룹 정보 렌더링 */}
+  {post.groupId && (
+    <div className="groupInfo">
+      <div className="groupAvatar">
+        <img 
+          src={post.groupId.avatar || 'default-group-avatar-url.jpg'} 
+          alt="Group Avatar" 
+          className="w-10 h-10 rounded-full" 
+        />
+      </div>
+      <div className="groupName">
+        <p>{post.groupId.groupName}</p>
+      </div>
+    </div>
+  )}
       <div className="postHeader">
         <div className="imgContainer">
           <div className='mx-4'>
@@ -190,6 +225,7 @@ export default function PostDetail() {
             <p>{new Date(post.date).toLocaleString()}</p>
           </div>
         </div>
+        
         {user && user.id === post.author?._id && (
           <div className="dropDown">
             <DropDowns

@@ -392,3 +392,77 @@
 .reactionButton:hover {
   background-color: #FFD369;
 }
+
+
+.editInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  color: black;
+}
+
+.saveButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* .removeButton {
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+} */
+
+.editBtnContainer {
+  display: flex;
+  justify-content: space-between; /* 버튼을 양 끝에 배치 */
+  width: 100%; /* 부모 요소의 전체 너비 사용 */
+  margin-top: 15px;
+}
+
+.fileSelectButton, .saveButton {
+  margin-top: 15px;
+  float: right;
+  background-color: #222831;
+  border: none;
+  color: #FFD369;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  width:170px;
+}
+
+
+.groupInfo {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+
+}
+
+.groupAvatar {
+  margin-right: 10px;
+}
+
+.groupName p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: bold;
+  color: #f9c66a;
+  /* width: 140px; */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow : ellipsis;
+}

@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import User from "../models/User.js";
 import mongoose from 'mongoose';
 // get List User
 export const getListUser = async (req, res) => {

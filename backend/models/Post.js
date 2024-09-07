@@ -45,7 +45,7 @@ const postSchema = new mongoose.Schema({
     groupId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group',
-        required: false
+        required: false,
     },
     history: [historySchema],
     private: {  // Make sure this is defined

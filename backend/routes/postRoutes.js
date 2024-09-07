@@ -121,7 +121,8 @@ router.get('/posts', async (req, res) => {
         })
             .sort({ date: -1 })  // 최신순으로 정렬
             .populate('author', 'firstName lastName avatar')  // author 필드를 User의 firstName, lastName, avatar로 채움
-            .populate('userProfile', 'avatar');  // userProfile 필드도 필요하면 채움
+            .populate('userProfile', 'avatar')  // userProfile 필드도 필요하면 채움
+            .populate('groupId', 'groupName avatar');  // 그룹 정보 추가
 
         console.log(`Fetched ${posts.length} posts for the user including group, public, friend-only, and own posts.`);
         res.status(200).json(posts);
@@ -256,13 +257,14 @@ router.delete('/posts/:id', async (req, res) => {
 //     }
 // });
 // Update Post
+// Update Post
 router.put('/posts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
         const { content, images } = req.body;
-        const userId = req.session.user.id; // 현재 사용자의 ID 가져오기
+        const userId = req.session.user.id;
 
-        // ObjectId가 유효한지 확인
+        // ObjectId 유효성 체크
         if (!mongoose.Types.ObjectId.isValid(postId)) {
             return res.status(400).json({ message: "Invalid post ID" });
         }
@@ -272,11 +274,7 @@ router.put('/posts/:id', async (req, res) => {
             return res.status(404).json({ message: "Post not found" });
         }
 
-        // history 배열 초기화 또는 추가
-        if (!post.history) {
-            post.history = [];
-        }
-
+        // history 추가
         post.history.push({
             modifiedBy: userId,
             modifiedAt: new Date(),
@@ -291,13 +289,17 @@ router.put('/posts/:id', async (req, res) => {
 
         await post.save();
 
-        res.status(200).json(post);
+        // 업데이트된 포스트를 groupId 정보까지 포함해서 다시 불러오기
+        const updatedPost = await Post.findById(postId)
+            .populate('author', 'firstName lastName avatar')  // 작성자 정보
+            .populate('groupId', 'groupName avatar');  // 그룹 정보 populate 추가
+
+        res.status(200).json(updatedPost);  // populate된 데이터 반환
     } catch (error) {
         console.error('Error updating post:', error);
         res.status(500).json({ message: "Error updating post", error });
     }
 });
-
 
 // Get Post History
 router.get('/posts/:id/history', async (req, res) => {
@@ -320,6 +322,7 @@ router.get('/posts/:id/history', async (req, res) => {
 });
 
 // Read a Post
+// Read a Post
 router.get('/posts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
@@ -330,11 +333,14 @@ router.get('/posts/:id', async (req, res) => {
         }
 
         const post = await Post.findById(postId)
-            .populate('author', 'firstName lastName avatar');  // 작성자의 firstName, lastName, avatar 포함
+            .populate('author', 'firstName lastName avatar')  // 작성자의 firstName, lastName, avatar 포함
+            .populate('groupId', 'groupName avatar');  // groupId 필드에 대해 populate 추가
 
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
+
+        console.log("Fetched post with populated groupId:", post); // 디버깅용 로그 추가
 
         res.status(200).json(post);
     } catch (error) {
@@ -343,12 +349,14 @@ router.get('/posts/:id', async (req, res) => {
     }
 });
 
+
 // Get posts by a specific user
 router.get('/posts/user/:userId', async (req, res) => {
     try {
         const posts = await Post.find({ author: req.params.userId })
             .populate('author', 'firstName lastName avatar')
             .populate('userProfile', 'avatar')
+            .populate('groupId', 'groupName avatar') // 그룹 정보
             .sort({ date: -1 });
 
         res.status(200).json(posts);

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import DropDowns from "./DropDowns";
 import { Link } from 'react-router-dom';
 import CreateComment from "../../comment/components/CreateComment";
 import ListOfComments from "../../comment/components/ListOfComments";
 import { PostWithReactions } from "./PostWithReactions";
+import '../../../components/button/index.css';
+// import Button from "../../../../components/button/index.jsx";
 
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, setPostList }) {
     const currentUserId = user ? user.id : null;
@@ -12,6 +14,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
     const [updatedContent, setUpdatedContent] = useState("");
     const [updatedImages, setUpdatedImages] = useState([]);
     const [reactionCounts, setReactionCounts] = useState({});
+    const fileInputRef = useRef(null); // fileInputRef 정의
 
     useEffect(() => {
         if (posts.length > 0) {
@@ -124,18 +127,27 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
             body: JSON.stringify({ content: updatedContent, images: updatedImages })
         })
         .then(response => response.json())
-        .then(() => {
-            fetch(`http://localhost:3000/api/posts/${postId}`, {
+        .then(async () => {
+            const updatedPost = await fetch(`http://localhost:3000/api/posts/${postId}`, {
                 method: 'GET',
                 credentials: 'include',
-            })
-            .then(response => response.json())
-            .then(updatedPost => {
-                setEditingPostId(null);
-                setPostList(prevPosts => 
-                    prevPosts.map(post => post._id === postId ? updatedPost : post)
-                );
-            });
+            }).then(response => response.json());
+
+            if (typeof updatedPost.groupId === 'string') {
+                const groupResponse = await fetch(`http://localhost:3000/api/groups/${updatedPost.groupId}`);
+                const groupData = await groupResponse.json();
+                updatedPost.groupId = groupData;
+            }
+
+            if (updatedPost.groupId && updatedPost.groupId.groupName) {
+                console.log('Group Name:', updatedPost.groupId.groupName);
+                console.log('Group Avatar:', updatedPost.groupId.avatar);
+            }
+
+            setEditingPostId(null);
+            setPostList(prevPosts => 
+                prevPosts.map(post => post._id === postId ? updatedPost : post)
+            );
         })
         .catch(error => console.error('Error updating post:', error));
     };
@@ -168,16 +180,31 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
     };
 
     const postItems = posts.map((each) => {
+        const isGroupPost = each.isGroupPost;
+        const groupName = isGroupPost && each.groupId && each.groupId.groupName ? each.groupId.groupName : 'Unknown Group';
+        const groupAvatar = isGroupPost && each.groupId && each.groupId.avatar ? each.groupId.avatar : 'default-group-avatar-url.jpg';
+
         const displayImages = each.images.slice(0, 3);
         const remainingImagesCount = each.images.length - 3;
         const isAuthor = currentUserId === each.author._id;
 
-        const commentsToShow = (commentsByPost[each._id] || []).slice(0, 3); // 최대 3개의 댓글만 보여줌
+        const commentsToShow = (commentsByPost[each._id] || []).slice(0, 3);
         const hasMoreComments = (commentsByPost[each._id] || []).length > 3;
 
         return (
             <div key={each._id} className="postContainer">
+            {isGroupPost && (
+                <div className="groupInfo">
+                    <div className="groupAvatar">
+                        <img src={groupAvatar} alt="Group Avatar" className="w-8 h-8 rounded-full" />
+                    </div>
+                    <div className="groupName">
+                        <p>{groupName}</p>
+                    </div>
+                </div>
+            )}
                 <div className="postHeader">
+                    
                     <div className="imgContainer">
                         <Link to={currentUserId === each.author._id ? '/mydetail' : `/user/${each.author._id}`}>
                             <div className='mx-4'>
@@ -198,6 +225,11 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                         <div className="postDate">
                             <p>{new Date(each.date).toLocaleString()}</p>
                         </div>
+            {each.private && (
+                <div className="privacyBadge">
+                    <p>Friends Only</p>
+                </div>
+            )}
                     </div>
                     {isAuthor && (
                         <div className="dropDown">
@@ -215,17 +247,34 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                             type="text" 
                             value={updatedContent} 
                             onChange={(e) => setUpdatedContent(e.target.value)} 
+                            className="editInput"
                         />
                         <div>
                             {updatedImages.map((image, idx) => (
                                 <div key={idx} className="imageWrapper">
                                     <img src={image} alt={`Post image ${idx}`} className="postImage" />
-                                    <button onClick={() => handleRemoveImage(idx)}>Remove</button>
+                                    <button type="button" onClick={() => handleRemoveImage(idx)}
+                                        class="ripple-button flex items-center justify-center rounded-full relative overflow-hidden font-normal transition bg-danger text-white hover:bg-darkDanger py-2 px-4 text-md  active:opacity-[0.85]">Remove</button>
                                 </div>
                             ))}
                         </div>
-                        <input type="file" onChange={handleImageChange} multiple />
-                        <button onClick={() => handleSaveEditPost(each._id)}>Save</button>
+                        <div className="editBtnContainer">
+                            <button className="fileSelectButton" onClick={() => fileInputRef.current.click()}>
+                                Select File
+                            </button>
+                            <input 
+                                type="file" 
+                                onChange={handleImageChange} 
+                                multiple 
+                                className="imageUploadInput" 
+                                ref={fileInputRef} 
+                                style={{ display: 'none' }} 
+                            />
+                            
+                            <button onClick={() => handleSaveEditPost(each._id)} className="saveButton">
+                                Save
+                            </button>
+                        </div>
                     </div>
                 ) : (
                     <Link to={`/post/${each._id}`}>
@@ -249,13 +298,12 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
 
                 <div className="reactionCounts">
                     {Object.entries(reactionCounts[each._id] || {}).map(([type, count]) => (
-                        <div key={type} className="reactionCount">
+                        <div key={type} className="reactionCount" style={{ color: 'black' }}>
                             {type}: {count}
                         </div>
                     ))}
                 </div>
 
-                {/* Modified Button - 작성자에게만 표시 */}
                 {isAuthor && each.history && each.history.length > 0 && (
                     <div className="modifiedSection">
                         <Link to={`/post/${each._id}/history`}>
@@ -277,7 +325,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 <div className="commentsSection">
                     <ListOfComments 
                         postId={each._id} 
-                        comments={commentsToShow} // 최대 3개 댓글만 표시
+                        comments={commentsToShow} 
                         onEditComment={handleEditComment} 
                         onDeleteComment={handleDeleteComment} 
                         currentUserId={currentUserId}

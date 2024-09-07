@@ -451,7 +451,8 @@ export const getGroupPosts = async (req, res) => {
         const posts = await Post.find({ groupId })
             .sort({ date: -1 })
             .populate('author', 'firstName lastName avatar')
-            .populate('userProfile', 'avatar');
+            .populate('userProfile', 'avatar')
+            .populate('groupId', 'groupName avatar');  // 그룹 정보 추가
         
         res.status(200).json(posts);
     } catch (error) {
@@ -460,7 +461,6 @@ export const getGroupPosts = async (req, res) => {
     }
 };
 
-// 특정 그룹에 포스트 추가하기
 export const createGroupPost = async (req, res) => {
   try {
       const { groupId } = req.params;
@@ -483,7 +483,14 @@ export const createGroupPost = async (req, res) => {
       });
 
       await newPost.save();
-      res.status(201).json(newPost);
+
+      // 새로 생성된 포스트를 다시 불러와 groupName과 avatar를 포함해서 반환
+      const populatedPost = await Post.findById(newPost._id)
+          .populate('author', 'firstName lastName avatar')
+          .populate('userProfile', 'avatar')
+          .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
+
+      res.status(201).json(populatedPost);
   } catch (error) {
       console.error('Error creating group post:', error);
       res.status(500).json({ message: "Error creating group post", error });

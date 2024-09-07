@@ -7,7 +7,8 @@ export default function CreatePost({
     onImageUpload,
     user,
     isPrivate,
-    setIsPrivate
+    setIsPrivate,
+    showPrivacyToggle = true  // 기본값을 true로 설정
 }) {
     const fileInputRef = useRef(null);
     const [previewImages, setPreviewImages] = useState([]);
@@ -83,9 +84,13 @@ export default function CreatePost({
                 />
                 <button className="submitImg" onClick={handleImageUploadClick}>Add Image</button>
                 <button className="submitBtn" onClick={handleAddPost}>Post</button>
-                <button className="togglePrivacyBtn" onClick={handleTogglePrivacy}>
-                    {isPrivate ? 'Friends Only' : 'Public'}
-                </button>
+
+                {/* showPrivacyToggle이 true일 때만 버튼을 렌더링 */}
+                {showPrivacyToggle && (
+                    <button className="togglePrivacyBtn" onClick={handleTogglePrivacy}>
+                        {isPrivate ? 'Friends Only' : 'Public'}
+                    </button>
+                )}
             </div>
         </div>
     );
