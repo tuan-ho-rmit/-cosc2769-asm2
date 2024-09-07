@@ -162,7 +162,7 @@ export default function ManageGroupPosts({ user }) {
                     ))}
                 </div>
 
-                <hr />
+                {/* <hr />
                 <div className="commentsSection">
                     <ListOfComments postId={post._id} comments={commentsToShow} />
                     {hasMoreComments && (
@@ -171,7 +171,7 @@ export default function ManageGroupPosts({ user }) {
                         </Link>
                     )}
                     <CreateComment onAddComment={(text) => handleAddComment(post._id, text)} user={user} />
-                </div>
+                </div> */}
             </div>
         );
     });

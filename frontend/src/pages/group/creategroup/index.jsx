@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultAvatar from './defaultAvatar.png';
 import Groupnav from '../../../components/groupnav';
+import { useAuth } from '../../../provider/AuthProvider';
 
 const CreateGroup = () => {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     groupName: '',
     description: '',

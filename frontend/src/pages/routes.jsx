@@ -34,6 +34,7 @@ export const router = createBrowserRouter([
       { path: 'groups', element: <Group /> },
       { path: 'creategroup', element: <CreateGroup /> },
       { path: 'managegroup', element: <ManageGroup /> },
+      { path: 'manage-group-posts/:groupName', element:  <ManageGroupPosts />  },
       { path: 'discovergroup', element: <DiscoverGroup /> },
       { path: 'groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
       { path: 'groupmain/:groupId', element: <GroupMain /> },
