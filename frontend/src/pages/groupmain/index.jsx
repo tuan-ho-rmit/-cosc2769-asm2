@@ -172,7 +172,7 @@ const GroupMain = () => {
 
     return (
         <div className="groupMainContent">
-            <h1>{groupName}</h1>
+            {/* <h1>{groupName}</h1> */}
             <CreatePost
                 text={content}
                 onAdd={handleAddPost}

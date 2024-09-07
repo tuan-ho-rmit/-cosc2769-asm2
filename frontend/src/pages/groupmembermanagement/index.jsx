@@ -5,26 +5,50 @@ import Groupnav from '../../components/groupnav';
 const GroupMemberManagement = () => {
   const [requests, setRequests] = useState([]);
   const [members, setMembers] = useState([]);
-  const { groupName } = useParams();  // groupName을 URL에서 가져옵니다.
-  const [currentGroupId, setCurrentGroupId] = useState(null);  // groupId를 상태로 관리합니다.
+  const [suspendedUsers, setSuspendedUsers] = useState([]); // 빈 배열로 초기화
+  const { groupName } = useParams();
+  const [currentGroupId, setCurrentGroupId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [actionType, setActionType] = useState('');
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedEmail, setSelectedEmail] = useState('');
 
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        // Fetch group ID by group name
+        // 유저 세션에서 사용자 오브젝트 아이디 가져오기
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (storedUser && storedUser.id) {
+          setUserId(storedUser.id);
+        } else {
+          console.error('No user data found in session or User ID is undefined.');
+        }
+
+        // 그룹 ID 가져오기
         const responseGroupId = await fetch(`http://localhost:3000/api/groups/get-group-id/${groupName}`);
         const groupIdData = await responseGroupId.json();
-        setCurrentGroupId(groupIdData._id);  // 현재 그룹의 ID를 설정합니다.
+        setCurrentGroupId(groupIdData._id);
 
-        // 그룹 조인 요청을 가져옵니다.
+        // 그룹 조인 요청 가져오기
         const responseJoinRequests = await fetch(`http://localhost:3000/api/groups/join-requests?groupName=${groupName}`);
         const resultJoinRequests = await responseJoinRequests.json();
         setRequests(resultJoinRequests);
 
-        // 그룹 멤버를 가져옵니다.
+        // 그룹 멤버 가져오기
         const responseMembers = await fetch(`http://localhost:3000/api/groups/${groupName}/members`);
         const resultMembers = await responseMembers.json();
         setMembers(resultMembers);
+
+        // 서스펜드된 유저 가져오기
+        const responseSuspendedUsers = await fetch(`http://localhost:3000/api/groups/suspended-users/${groupIdData._id}`);
+        const resultSuspendedUsers = await responseSuspendedUsers.json();
+        // 서스펜드된 유저가 배열인지 확인 후 설정
+        if (Array.isArray(resultSuspendedUsers)) {
+          setSuspendedUsers(resultSuspendedUsers);
+        } else {
+          setSuspendedUsers([]);  // 배열이 아닌 경우 빈 배열로 초기화
+        }
       } catch (error) {
         console.error('Error fetching group data:', error);
       }
@@ -33,63 +57,115 @@ const GroupMemberManagement = () => {
     fetchGroupData();
   }, [groupName]);
 
-  const handleAccept = async (request) => {
+  // 팝업을 띄우는 함수 (Accept, Reject, Expel, Suspend 등)
+  const handleActionClick = (action, id, email = '') => {
+    setActionType(action);
+    setSelectedId(id);
+    setSelectedEmail(email);
+    setShowConfirmPopup(true);
+  };
+
+  // Accept, Reject 요청 처리
+  const handleAcceptReject = async () => {
+    const endpoint = actionType === 'Accept' ? 'accept-member' : `join-requests/${selectedId}`;
+    const method = actionType === 'Accept' ? 'POST' : 'DELETE';
+    const body = actionType === 'Accept' ? JSON.stringify({ groupName, userEmail: selectedEmail }) : null;
+
     try {
-      const response = await fetch('http://localhost:3000/api/groups/accept-member', {
+      const response = await fetch(`http://localhost:3000/api/groups/${endpoint}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+
+      if (response.ok) {
+        if (actionType === 'Accept') {
+          const acceptedRequest = requests.find(r => r._id === selectedId);
+          setRequests(requests.filter(r => r._id !== selectedId));
+          setMembers([...members, { email: acceptedRequest.userEmail, _id: acceptedRequest.userId }]);
+        } else {
+          setRequests(requests.filter(r => r._id !== selectedId));
+        }
+        setShowConfirmPopup(false);
+
+        // 페이지를 새로고침하여 업데이트된 멤버 정보 반영
+        window.location.reload();  // 유저 추가 후 페이지 새로고침
+      } else {
+        throw new Error(`Failed to ${actionType.toLowerCase()} request`);
+      }
+    } catch (error) {
+      console.error(`Error ${actionType.toLowerCase()} request:`, error);
+    }
+  };
+
+  // 서스펜드 요청 처리
+  const handleSuspend = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/groups/suspend-member', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ groupName, userEmail: request.userEmail }),
+        body: JSON.stringify({ groupId: currentGroupId, userId: selectedId, userEmail: selectedEmail }),
       });
-  
+
       if (response.ok) {
-        setRequests(requests.filter(r => r._id !== request._id));
-        setMembers([...members, { email: request.userEmail, _id: request.userId }]);
+        setSuspendedUsers([...suspendedUsers, { userId: selectedId, userEmail: selectedEmail }]);
+        setShowConfirmPopup(false);
       } else {
-        throw new Error('Failed to accept member');
+        throw new Error('Failed to suspend member');
       }
     } catch (error) {
-      console.error('Error accepting member:', error);
+      console.error('Error suspending member:', error);
     }
   };
 
-  const handleReject = async (requestId) => {
+  // 서스펜드 해제 요청 처리
+  const handleUnsuspend = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/groups/join-requests/${requestId}`, {
+      const response = await fetch(`http://localhost:3000/api/groups/unsuspend-member/${currentGroupId}/${selectedId}`, {
         method: 'DELETE',
       });
-  
+
       if (response.ok) {
-        setRequests(requests.filter(request => request._id !== requestId));
+        setSuspendedUsers(suspendedUsers.filter(user => user.userId !== selectedId));
+        setShowConfirmPopup(false);
       } else {
-        throw new Error('Failed to reject request');
+        throw new Error('Failed to unsuspend member');
       }
     } catch (error) {
-      console.error('Error rejecting request:', error);
+      console.error('Error unsuspending member:', error);
     }
   };
-  
-  const handleRemoveMember = async (memberId) => {
+
+  // 멤버 제거 처리
+  const handleRemoveMember = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/groups/remove-member', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ groupId: currentGroupId, userId: memberId }),  // currentGroupId를 사용합니다.
+        body: JSON.stringify({ groupId: currentGroupId, userId: selectedId }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to remove member');
       }
-  
-      alert('Member removed successfully');
-      setMembers(members.filter(member => member._id !== memberId));  // 상태를 업데이트하여 멤버 제거를 반영합니다.
+
+      // 멤버가 삭제된 후 바로 상태 반영
+      setMembers(members.filter(member => member._id !== selectedId));
+      setShowConfirmPopup(false);
     } catch (error) {
       console.error('Error removing member:', error);
-      alert('Failed to remove member');
     }
+  };
+
+  // 팝업 닫기 핸들러
+  const handleClosePopup = () => {
+    setShowConfirmPopup(false);
   };
 
   return (
@@ -107,13 +183,13 @@ const GroupMemberManagement = () => {
                   <h3 style={{ color: '#FFD369', margin: 0 }}>{request.userEmail}</h3>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button
-                      onClick={() => handleReject(request._id)}
+                      onClick={() => handleActionClick('Reject', request._id)}
                       style={{ padding: '0.5rem 1rem', backgroundColor: '#FF4E4E', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                     >
                       Reject
                     </button>
                     <button
-                      onClick={() => handleAccept(request)}
+                      onClick={() => handleActionClick('Accept', request._id, request.userEmail)}
                       style={{ padding: '0.5rem 1rem', backgroundColor: '#4CAF50', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                     >
                       Accept
@@ -133,18 +209,47 @@ const GroupMemberManagement = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#FFD369', margin: 0 }}>{member.email}</h3>
                   <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button
-                      onClick={() => handleRemoveMember(member._id)}
-                      style={{ padding: '0.5rem 1rem', backgroundColor: '#FF4E4E', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
-                    >
-                      Expel
-                    </button>
-                    <button
-                      onClick={() => alert('Suspend feature is coming soon!')}
-                      style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
-                    >
-                      Suspend
-                    </button>
+                    {member._id === userId ? (
+                      <button
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#555',
+                          color: '#ccc',
+                          borderRadius: '0.25rem',
+                          border: 'none',
+                          cursor: 'not-allowed',
+                        }}
+                        disabled
+                      >
+                        Owner
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleActionClick('Expel', member._id)}
+                          style={{ padding: '0.5rem 1rem', backgroundColor: '#FF4E4E', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+                        >
+                          Expel
+                        </button>
+
+                        {/* 서스펜드된 유저인지 확인 */}
+                        {suspendedUsers.some(suspended => suspended.userId === member._id) ? (
+                          <button
+                            onClick={() => handleActionClick('Unsuspend', member._id)}
+                            style={{ padding: '0.5rem 1rem', backgroundColor: '#4CAF50', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+                          >
+                            Unsuspend
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleActionClick('Suspend', member._id, member.email)}
+                            style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+                          >
+                            Suspend
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -152,6 +257,34 @@ const GroupMemberManagement = () => {
           </div>
         </div>
       </div>
+
+      {showConfirmPopup && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center'
+        }}>
+          <div style={{
+            backgroundColor: '#393E46', padding: '2rem', borderRadius: '0.5rem',
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', textAlign: 'center', width: '400px'
+          }}>
+            <h3 style={{ color: '#FFD369', marginBottom: '1.5rem' }}>Are you sure you want to {actionType.toLowerCase()} this member?</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+              <button
+                onClick={actionType === 'Suspend' ? handleSuspend : actionType === 'Unsuspend' ? handleUnsuspend : actionType === 'Expel' ? handleRemoveMember : handleAcceptReject}
+                style={{ padding: '0.5rem 1rem', backgroundColor: '#FF4E4E', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+              >
+                Yes
+              </button>
+              <button
+                onClick={handleClosePopup}
+                style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
