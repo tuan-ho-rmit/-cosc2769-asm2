@@ -11,9 +11,12 @@ import notiRoutes from './routes/notiRoutes.js'
 import friendRequestRoutes from './routes/friendRequestRoutes.js'
 import commentRoutes from './routes/commentRoutes.js'
 import reactionRoutes from './routes/reactionRoutes.js';
+import cookieParser from "cookie-parser";
+import MongoStore from 'connect-mongo';
 
 dotenv.config();
 const mongoURI = process.env.MONGODB_URI;
+const sessionSecret = process.env.SESSION_SECRET
 const app = express();
 
 const corsOptions = {
@@ -27,7 +30,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB connection
 const connect = async () => {
-  try {
+  try {  
     await mongoose.connect(mongoURI, {});
     console.log("MongoDB is connected");
   } catch (err) {
@@ -37,18 +40,24 @@ const connect = async () => {
 
 // Session middleware setup
 app.use(session({
-  secret: 'your-secret-key',  // 비밀 키
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: mongoURI,
+    collectionName: 'sessions',
+    ttl: 24 * 60 * 60,
+  }),
   cookie: {
-    secure: false,  // HTTPS를 사용하는 경우 true로 설정
-    sameSite: 'lax',  // 세션 쿠키를 보호하기 위한 설정
-  }
+    maxAge: 24 * 60 * 60 * 1000, 
+    httpOnly: true, 
+  },
 }));
 
 
 // Middleware
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // Routes
 app.get('/', (req, res) => {

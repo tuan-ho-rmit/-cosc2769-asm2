@@ -4,6 +4,7 @@ import defaultAvatar from './defaultAvatar.png';
 import Groupnav from '../../../components/groupnav';
 
 const CreateGroup = () => {
+  const { user } = useAuth()
   const [formData, setFormData] = useState({
     groupName: '',
     description: '',
@@ -11,16 +12,8 @@ const CreateGroup = () => {
     visibility: 'public',
   });
 
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // 유저 세션 정보를 로컬 스토리지에서 불러오기
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -43,12 +36,12 @@ const CreateGroup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!user || !user.id) {  // user.id로 변경
       alert('You need to log in to create a group.');
       return;
     }
-  
+
     const groupData = {
       ...formData,
       status: 'pending',
@@ -56,7 +49,7 @@ const CreateGroup = () => {
       createdAt: new Date().toISOString(),
       members: [user.id],  // 유저 오브젝트 아이디를 members 배열에 추가
     };
-  
+
     try {
       const response = await fetch('http://localhost:3000/api/groups/create', {
         method: 'POST',
@@ -66,7 +59,7 @@ const CreateGroup = () => {
         body: JSON.stringify(groupData),
         credentials: 'include',  // 세션 쿠키 포함
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 400) {
@@ -76,7 +69,7 @@ const CreateGroup = () => {
         }
         return;
       }
-  
+
       const result = await response.json();
       alert(`Your group: ${result.groupName} is successfully registered! Wait for system admin's approval.`);
       navigate('/groups');  // 그룹 생성 후 /groups 경로로 리디렉션
@@ -84,7 +77,7 @@ const CreateGroup = () => {
       console.error('Error creating group:', error.message);
     }
   };
-  
+
 
   return (
     <>

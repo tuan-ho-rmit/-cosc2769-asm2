@@ -70,7 +70,7 @@ export default function FriendRequestActions({ userId, currentUser, fetchFriendR
                     ripple={'true'}
                 // className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
                 >
-                    Confirm
+                    Confirm 
                 </Button>
                 <Button
                     onClick={rejectFriendRequest}

@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Groupnav from '../../components/groupnav';
+import { useAuth } from '../../provider/AuthProvider';
 
 const ManageGroup = () => {
+  const { user } = useAuth()
   const [groups, setGroups] = useState([]);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUser = () => {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        console.log("User ID:", storedUser.id); // user 객체에서 id 확인
-        setUser(storedUser);
-        fetchGroups(storedUser.id);  // 오브젝트 아이디를 기반으로 그룹 필터링
-      }
-    };
-
     const fetchGroups = async (userId) => {
       if (!userId) {
         console.error("User ID is undefined.");
@@ -33,8 +25,7 @@ const ManageGroup = () => {
         setGroups([]);  // 에러가 발생하면 빈 배열 설정
       }
     };
-
-    fetchUser();
+    fetchGroups(user.id);  // 오브젝트 아이디를 기반으로 그룹 필터링
   }, []);
 
   const handleManageMembers = (groupName) => {

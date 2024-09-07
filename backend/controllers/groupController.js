@@ -3,8 +3,7 @@ import Group from '../models/Group.js';
 import GroupJoinRequest from '../models/GroupJoinRequest.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
-import {createNoti} from "../services/notiService.js";
-import Suspend from '../models/Suspend.js';
+import { createNoti } from "../services/notiService.js";
 
 
 export const createGroup = async (req, res) => {
@@ -16,7 +15,7 @@ export const createGroup = async (req, res) => {
     }
 
     const { groupName, description, avatar, visibility, createdBy } = req.body;
-    
+
     console.log("Created by ID:", createdBy);  // createdBy가 제대로 전달되었는지 확인
 
     const existingGroup = await Group.findOne({ groupName });
@@ -59,9 +58,6 @@ export const getListGroup = async (req, res) => {
     const filter = {};
     if (status) {
       filter.status = status;
-    }
-    if (role) {
-      filter.role = role;
     }
     if (createdBy) {
       filter.createdBy = createdBy;  // createdBy 필터 추가
@@ -121,15 +117,12 @@ export const approveGroupRequest = async (req, res) => {
       data: updatedGroup,
     });
 
-    const userEmail = Group.findOne({id: id}, 'createdBy')
-    console.log (userEmail)
-    const user = await User.findOne({ email: userEmail }); // TODO: not functional for now.
-    console.log(user)
+    const userId = Group.findOne({ id: id }, 'createdBy')
     createNoti(
-        'Your Group Creation Request has been approved',
-        [user._id],
-        'unread',
-        '/'
+      'Your Group Creation Request has been approved',
+      [userId],
+      'unread',
+      '/'
     )
 
   } catch (err) {
@@ -228,12 +221,12 @@ export const joinGroup = async (req, res) => {
     res.status(201).json({ message: 'Group join request submitted successfully', request: savedRequest });
 
     // notifying the group owner on new group join rq TODO: unfinished
-    const groupOwner = Group.findOne({createdBy: userEmail})
+    const groupOwner = Group.findOne({ createdBy: userEmail })
     createNoti(
-        'You received a New Group Join Request',
-        [groupOwner.createdBy],
-        'unread',
-        '/'
+      'You received a New Group Join Request',
+      [groupOwner.createdBy],
+      'unread',
+      '/'
     )
 
   } catch (error) {
@@ -302,10 +295,10 @@ export const acceptMember = async (req, res) => {
     }
 
     createNoti(
-        'You have successfully joined a group',
-        [],
-        'unread',
-        '/'
+      'You have successfully joined a group',
+      [],
+      'unread',
+      '/'
     )
 
     res.status(200).json({ message: 'Member accepted and added to group' });
@@ -444,21 +437,20 @@ export const getGroupByName = async (req, res) => {
 // group post
 // 특정 그룹의 모든 포스트 가져오기
 export const getGroupPosts = async (req, res) => {
-    try {
-        const { groupId } = req.params;
-        
-        // 그룹 ID로 포스트 검색
-        const posts = await Post.find({ groupId })
-            .sort({ date: -1 })
-            .populate('author', 'firstName lastName avatar')
-            .populate('userProfile', 'avatar')
-            .populate('groupId', 'groupName avatar');  // 그룹 정보 추가
-        
-        res.status(200).json(posts);
-    } catch (error) {
-        console.error('Error fetching group posts:', error);
-        res.status(500).json({ message: "Error fetching group posts", error });
-    }
+  try {
+    const { groupId } = req.params;
+
+    // 그룹 ID로 포스트 검색
+    const posts = await Post.find({ groupId })
+      .sort({ date: -1 })
+      .populate('author', 'firstName lastName avatar')
+      .populate('userProfile', 'avatar');
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error('Error fetching group posts:', error);
+    res.status(500).json({ message: "Error fetching group posts", error });
+  }
 };
 // controllers/groupController.js
 export const getManageGroupPosts = async (req, res) => {
@@ -488,37 +480,30 @@ export const getManageGroupPosts = async (req, res) => {
 
 export const createGroupPost = async (req, res) => {
   try {
-      const { groupId } = req.params;
-      const { content, images } = req.body;
+    const { groupId } = req.params;
+    const { content, images } = req.body;
 
-      // 세션에 저장된 유저 정보 확인
-      if (!req.session.user) {
-          return res.status(401).json({ message: 'User is not logged in' });
-      }
+    // 세션에 저장된 유저 정보 확인
+    if (!req.session.user) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
 
-      const newPost = new Post({
-          content,
-          userProfile: req.session.user.id,
-          userId: req.session.user.id,
-          author: req.session.user.id,
-          images,
-          date: new Date(),
-          groupId,  // 그룹 ID 추가
-          isGroupPost: true,  // 그룹 게시물로 설정
-      });
+    const newPost = new Post({
+      content,
+      userProfile: req.session.user.id,
+      userId: req.session.user.id,
+      author: req.session.user.id,
+      images,
+      date: new Date(),
+      groupId,  // 그룹 ID 추가
+      isGroupPost: true,  // 그룹 게시물로 설정
+    });
 
-      await newPost.save();
-
-      // 새로 생성된 포스트를 다시 불러와 groupName과 avatar를 포함해서 반환
-      const populatedPost = await Post.findById(newPost._id)
-          .populate('author', 'firstName lastName avatar')
-          .populate('userProfile', 'avatar')
-          .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
-
-      res.status(201).json(populatedPost);
+    await newPost.save();
+    res.status(201).json(newPost);
   } catch (error) {
-      console.error('Error creating group post:', error);
-      res.status(500).json({ message: "Error creating group post", error });
+    console.error('Error creating group post:', error);
+    res.status(500).json({ message: "Error creating group post", error });
   }
 };
 

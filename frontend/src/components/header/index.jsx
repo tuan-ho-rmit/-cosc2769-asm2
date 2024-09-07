@@ -1,18 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { NotificationsContext } from '../right-side-bar/NotificationsContext';
-
+import {useAuth} from '../../provider/AuthProvider'
 export default function Header() {
-  const [user, setUser] = useState(null);
   const { notifications, setOpen, open } = useContext(NotificationsContext);
   const unreadCount = notifications.filter((notification) => notification.status === 'unread').length;
-
-  // Fetch user details from localStorage if user exists
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
+  const {user} = useAuth()
 
   const handleAvatarClick = () => {
     if (user) {

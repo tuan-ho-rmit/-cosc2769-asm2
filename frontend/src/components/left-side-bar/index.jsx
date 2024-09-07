@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../../provider/AuthProvider';
 
 const items = [
     {
@@ -54,22 +55,20 @@ const items = [
 export default function LeftSideBar() {
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth()
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        console.log("🚀 ~ useEffect ~ storedUser:", storedUser)
-        if (storedUser?.role === 'admin') {
+        if (user?.role === 'admin') {
             setIsAdmin(true);
         }
-    }, []);
+    }, [user])
+
+
 
     const handleLogOut = async () => {
         try {
             // Send logout request to the server
             await axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
-
-            // Remove client session
-            localStorage.removeItem('user');
 
             // Redirect to the login page
             navigate('/login');

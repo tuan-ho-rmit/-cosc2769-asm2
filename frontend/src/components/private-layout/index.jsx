@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../header';
 import LeftSideBar from '../left-side-bar';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import RightSideBar from "../right-side-bar";
 import NotificationsProvider from "../right-side-bar/NotificationsContext.jsx";
+import { useAuth } from '../../provider/AuthProvider.jsx';
 
 export default function PrivateLayout() {
+    const { user, isFetchedUser } = useAuth()
+    const navigate = useNavigate()
+    useEffect(() => {
+        console.log("🚀 ~ useEffect ~ isFetchedUser:", isFetchedUser)
+        if (isFetchedUser && !user) {
+            navigate("/login");
+        }
+    }, [user, isFetchedUser])
+
     return (
         <>
             <NotificationsProvider>
@@ -13,7 +23,7 @@ export default function PrivateLayout() {
                     <div className='h-auto'>
                         <Header />
                     </div>
-                    <div className='flex flex-row w-[100%] overflow-hidden' style={{minHeight:"calc(100vh - 50px)"}}>
+                    <div className='flex flex-row w-[100%] overflow-hidden' style={{ minHeight: "calc(100vh - 50px)" }}>
                         <LeftSideBar />
                         <div className='flex-1 overflow-auto'>
                             <Outlet />
