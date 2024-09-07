@@ -1,6 +1,6 @@
 import express from 'express';
 import { approveGroupRequest, createGroup, getListGroup, rejectGroupRequest } from '../controllers/groupController.js';
-import { getGroups, deleteGroup, joinGroup, getRequestedGroups, getJoinRequests, acceptMember, rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost, suspendMember, unsuspendMember, getSuspendedUsers } from '../controllers/groupController.js';
+import { getGroups, deleteGroup, joinGroup, getRequestedGroups, getJoinRequests, acceptMember, rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost, suspendMember, unsuspendMember, getSuspendedUsers, deletePost, getManageGroupPosts } from '../controllers/groupController.js';
 import { verifyAdmin } from '../util/verifyToken.js';
 
 const router = express.Router();
@@ -30,7 +30,9 @@ router.put('/approve/:groupId',  approveGroupRequest)
 router.put('/reject/:groupId', verifyAdmin, rejectGroupRequest)
 router.get('/:id', getGroupById);
 // 특정 그룹의 모든 포스트 가져오기
-router.get('/:groupId/posts', getGroupPosts);
+router.get('/:groupId/posts', getGroupPosts);   // 기존 groupId 기반 경로
+router.get('/manage-group-posts/:groupName', getManageGroupPosts);
+router.delete('/posts/:id', deletePost);
 // 특정 그룹에 포스트 추가하기
 router.post('/:groupId/posts', createGroupPost);
 

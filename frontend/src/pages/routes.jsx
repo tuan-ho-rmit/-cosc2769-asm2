@@ -10,6 +10,7 @@ import UserDetails from "./user/UserDetails";
 import ConfigPage from "./config-page";
 import CreateGroup from "./group/creategroup";
 import ManageGroup from "./managegroup";
+import ManageGroupPosts from "./managegroupposts";
 import Admin from "./admin";
 import AdminUsers from "./admin/components/users";
 import AdminGroups from "./admin/components/groups";

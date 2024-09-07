@@ -33,8 +33,8 @@ const ManageGroup = () => {
   };
 
   const handleManagePosts = (groupName) => {
-    navigate(`/group/manage-posts/${groupName}`);
-  };
+    navigate(`/manage-group-posts/${groupName}`);
+  };  
 
   const handleDelete = async (groupId) => {
     if (window.confirm('Are you sure you want to delete this group?')) {

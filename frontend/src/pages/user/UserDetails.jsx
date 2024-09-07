@@ -34,7 +34,6 @@ export default function UserDetails() {
             }
 
             const result = await response.json();
-            console.log('Fetch friend request:', result);
 
             if (result?.status === 'accepted') {
                 setAreFriends(true);
@@ -50,91 +49,76 @@ export default function UserDetails() {
         }
     };
 
-    const fetchUserGroups = async () => {
-        try {
-            // Fetch the groups the current user has joined
-            const response = await fetch(`http://localhost:3000/api/users/${currentUser.id}/groups`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                throw new Error('Error fetching user groups');
-            }
-
-            const data = await response.json();
-            setUserGroups(data.groups); // 그룹 목록 저장
-        } catch (error) {
-            console.error('Error fetching user groups:', error);
-        }
-    };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch user data
+                // 유저 데이터 가져오기
                 const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-
-                if (!userResponse.ok) {
-                    throw new Error('User not found');
-                }
-
+    
+                // 유저 데이터를 불러올 수 있는지 확인
+                if (!userResponse.ok) throw new Error('User not found');
                 const userData = await userResponse.json();
+                console.log('Fetched user data:', userData); // 디버깅: 사용자 데이터 확인
                 setUser(userData.data);
-
-                // Fetch current user
+                
+    
+                // 현재 로그인한 사용자 정보 가져오기
                 const currentUserResponse = await fetch(`http://localhost:3000/api/auth/user`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-
-                if (!currentUserResponse.ok) {
-                    throw new Error('Error fetching current user');
-                }
-
+    
+                // 현재 로그인한 사용자 정보를 불러올 수 있는지 확인
+                if (!currentUserResponse.ok) throw new Error('Error fetching current user');
                 const currentUserData = await currentUserResponse.json();
+                console.log('Fetched current user:', currentUserData); // 디버깅: 로그인한 사용자 정보 확인
                 setCurrentUser(currentUserData.user);
-
-                // Fetch user posts
+    
+                // 사용자의 게시물 가져오기
                 const postsResponse = await fetch(`http://localhost:3000/api/posts/user/${userId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-
-                if (!postsResponse.ok) {
-                    throw new Error('Error fetching posts');
-                }
-
+    
+                // 게시물 데이터를 불러올 수 있는지 확인
+                if (!postsResponse.ok) throw new Error('Error fetching posts');
                 const postsData = await postsResponse.json();
-
-                // Filter posts based on privacy settings, friendship status, and group membership
+                console.log('Fetched posts data:', postsData); // 디버깅: 게시물 데이터 확인
+    
                 const filteredPosts = postsData.filter(post => {
+                    console.log('Checking post:', post); // 디버깅: 각 포스트 확인
                     if (post.isGroupPost) {
-                        // 그룹 게시물일 경우 해당 그룹에 사용자가 가입했는지 확인
-                        return userGroups.includes(post.groupId);
+                        console.log('Post is a group post. Group ID:', post.groupId);
+    
+                        // 그룹 포스트일 때 groupId와 members 필드, 그리고 currentUser 정보 확인
+                        if (post.groupId && post.groupId.members && currentUser && currentUser.id) {
+                            const isInGroup = post.groupId.members.includes(currentUser.id);
+                            console.log(`Is current user in this group? ${isInGroup}`); // 디버깅: 그룹 여부 확인
+                            return isInGroup;
+                        }
+                        console.log('Group ID or members are missing, skipping post.');
+                        return false;
                     } else {
-                        // 비공개 게시물은 친구일 경우 포함
+                        console.log(`Post is not a group post. Private: ${post.private}, Are friends: ${areFriends}`);
                         return post.private ? areFriends : true;
                     }
                 });
-
+    
+                console.log('Filtered posts:', filteredPosts); // 디버깅: 필터링된 포스트 확인
                 setPosts(filteredPosts);
-                setLoading(false); // 데이터 로드 완료 후 로딩 상태 변경
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching data:', error);
-                setLoading(false); // 에러 발생 시 로딩 상태 변경
+                console.error('Error fetching data:', error); // 디버깅: 에러 메시지 출력
+                setLoading(false); 
             }
         };
-
-        if (currentUser) {
-            fetchUserGroups(); // 현재 유저가 가입한 그룹 목록을 먼저 불러옴
-        }
-
+    
         fetchData();
-    }, [userId, areFriends, currentUser, userGroups]); // 의존성 추가: 그룹 목록과 친구 상태가 변경될 때마다 데이터 새로 불러오기
+    }, [userId, areFriends, currentUser]);
+    
 
     useEffect(() => {
         if (currentUser) {
@@ -142,17 +126,19 @@ export default function UserDetails() {
         }
     }, [currentUser]);
 
-    if (loading) return <div>Loading user details...</div>; // 로딩 상태 체크
 
-    if (!user) return <div>User not found</div>; // 유저 정보가 없는 경우 메시지 출력
+
+    if (loading) return <div>Loading user details...</div>; 
+
+    if (!user) return <div>User not found</div>; 
 
     return (
         <div>
             <div className="mainContent">
                 <div className="userProfileContainer">
                     <span className="profileImgContainer">
-                        <img src={user.avatar || '/Images/default-avatar.png'} alt="User Avatar"
-                             className="profileImg"/>
+                    <img src={user.avatar || '/Images/default-avatar.png'} alt="User Avatar" className="profileImg"/>
+
                     </span>
                     <span className="userName">
                         {user.firstName} {user.lastName}

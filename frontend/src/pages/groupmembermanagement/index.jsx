@@ -233,7 +233,7 @@ const GroupMemberManagement = () => {
                         </button>
 
                         {/* 서스펜드된 유저인지 확인 */}
-                        {suspendedUsers.some(suspended => suspended.userId === member._id) ? (
+                        {/* {suspendedUsers.some(suspended => suspended.userId === member._id) ? (
                           <button
                             onClick={() => handleActionClick('Unsuspend', member._id)}
                             style={{ padding: '0.5rem 1rem', backgroundColor: '#4CAF50', color: '#FFFFFF', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
@@ -247,7 +247,7 @@ const GroupMemberManagement = () => {
                           >
                             Suspend
                           </button>
-                        )}
+                        )} */}
                       </>
                     )}
                   </div>
