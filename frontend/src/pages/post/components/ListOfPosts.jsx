@@ -5,8 +5,8 @@ import CreateComment from "../../comment/components/CreateComment";
 import ListOfComments from "../../comment/components/ListOfComments";
 import { PostWithReactions } from "./PostWithReactions";
 
-export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
-    const currentUserId = user ? user.id : null; 
+export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, setPostList }) {
+    const currentUserId = user ? user.id : null;
     const [commentsByPost, setCommentsByPost] = useState({});
     const [editingPostId, setEditingPostId] = useState(null);
     const [updatedContent, setUpdatedContent] = useState("");
@@ -14,7 +14,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
     const [reactionCounts, setReactionCounts] = useState({});
 
     useEffect(() => {
-        // 로컬 상태 초기화 및 데이터 가져오기
         if (posts.length > 0) {
             const fetchData = async () => {
                 await Promise.all(posts.map(async (post) => {
@@ -133,7 +132,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
             .then(response => response.json())
             .then(updatedPost => {
                 setEditingPostId(null);
-                setLocalPosts(prevPosts => 
+                setPostList(prevPosts => 
                     prevPosts.map(post => post._id === postId ? updatedPost : post)
                 );
             });
@@ -172,6 +171,9 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
         const displayImages = each.images.slice(0, 3);
         const remainingImagesCount = each.images.length - 3;
         const isAuthor = currentUserId === each.author._id;
+
+        const commentsToShow = (commentsByPost[each._id] || []).slice(0, 3); // 최대 3개의 댓글만 보여줌
+        const hasMoreComments = (commentsByPost[each._id] || []).length > 3;
 
         return (
             <div key={each._id} className="postContainer">
@@ -275,11 +277,16 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user }) {
                 <div className="commentsSection">
                     <ListOfComments 
                         postId={each._id} 
-                        comments={commentsByPost[each._id] || []} 
+                        comments={commentsToShow} // 최대 3개 댓글만 표시
                         onEditComment={handleEditComment} 
                         onDeleteComment={handleDeleteComment} 
                         currentUserId={currentUserId}
                     />
+                    {hasMoreComments && (
+                        <Link to={`/post/${each._id}`}>
+                            <button className="seeMoreComments">See more comments</button>
+                        </Link>
+                    )}
                     <CreateComment onAddComment={(text) => handleAddComment(each._id, text)} user={user} />
                 </div>
             </div>

@@ -212,6 +212,7 @@ export default function PostDetail() {
           <p>{post.content}</p>
         )}
       </div>
+      
       <div className="reactionCounts">
         {Object.entries(reactionCounts).map(([type, count]) => (
           <div key={type} className="reactionCount">
@@ -247,7 +248,7 @@ export default function PostDetail() {
         </div>
       )}
 
-      <hr className="solidPostForDetail"></hr>
+      <hr className="solidPost"></hr>
       <div className="likeAndComment">
         <span className="likeBtn">
           <PostWithReactions postId={postId} onReactionUpdate={updateReactionCounts} />
@@ -256,7 +257,7 @@ export default function PostDetail() {
           <button>Comment</button>
         </span>
       </div>
-      <hr className="solidPostForDetail"></hr>
+      <hr className="solidPost"></hr>
       
       {/* 댓글 섹션 추가 */}
       <div className="commentsSection">
