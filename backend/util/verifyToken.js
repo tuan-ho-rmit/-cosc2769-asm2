@@ -23,7 +23,6 @@ export const verifyUser = async (req, res, next) => {
 
 export const verifyAdmin = async (req, res, next) => {
     const token = req.session || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
-    console.log("🚀 ~ verifyAdmin ~ token:", token)
     if (token?.user?.role === "admin" && token?.user?.status === "active") {
         next();
     } else {

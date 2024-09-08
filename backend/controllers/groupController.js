@@ -56,22 +56,23 @@ export const getListGroup = async (req, res) => {
     limit = parseInt(limit);
 
     const filter = {};
-    if (status) {
-      filter.status = status;
-    }
-    if (createdBy) {
-      filter.createdBy = createdBy;  // createdBy 필터 추가
-    }
     if (search) {
-      if (searchType === "groupName") {
-        filter.groupName = { $regex: search, $options: "i" };
-      } else if (searchType === "createdBy") {
-        filter.createdBy = { $regex: search, $options: "i" };
+      if (searchType === "createdBy") {
+        const userFilter = {
+          $or: [
+            { username: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        };
+        const users = await User.find(userFilter);
+        const userIds = users.map((user) => user._id);
+        filter.createdBy = { $in: userIds };
+      } else if (searchType === "groupName") {
+        const regex = new RegExp(search, "i");
+        filter.$or = [{ groupName: regex }];
       } else {
-        filter.$or = [
-          { groupName: { $regex: search, $options: "i" } },
-          { createdBy: { $regex: search, $options: "i" } },
-        ];
+        const regex = new RegExp(search, "i");
+        filter.$or = [{ groupName: regex }];
       }
     }
 
@@ -79,7 +80,9 @@ export const getListGroup = async (req, res) => {
     const totalPages = (await Group.countDocuments(filter)) / limit;
     const groups = await Group.find(filter)
       .limit(limit)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 })
+      ;
 
     res.status(200).json({
       success: true,
@@ -117,12 +120,11 @@ export const approveGroupRequest = async (req, res) => {
       data: updatedGroup,
     });
 
-    const userId = Group.findOne({ id: id }, 'createdBy')
     createNoti(
       'Your Group Creation Request has been approved',
-      [userId],
+      [updatedGroup.createdBy],
       'unread',
-      '/'
+      `/groupmain${id}`
     )
 
   } catch (err) {
@@ -165,7 +167,7 @@ export const getGroups = async (req, res) => {
 
   try {
     let groups;
-    
+
     // status 값이 'active'일 때만 필터링 적용
     if (status === 'active') {
       groups = await Group.find({ status: 'active' });
@@ -221,12 +223,13 @@ export const joinGroup = async (req, res) => {
     res.status(201).json({ message: 'Group join request submitted successfully', request: savedRequest });
 
     // notifying the group owner on new group join rq TODO: unfinished
-    const groupOwner = Group.findOne({ createdBy: userEmail })
+    const group = await Group.findOne({ groupName: groupName })
+    console.log("🚀 ~ joinGroup ~ group:", group)
     createNoti(
       'You received a New Group Join Request',
-      [groupOwner.createdBy],
+      [group.createdBy],
       'unread',
-      '/'
+      `/groupmembermanagement/${groupName}`
     )
 
   } catch (error) {
@@ -283,6 +286,14 @@ export const acceptMember = async (req, res) => {
     // 중복되지 않게 유저 오브젝트 아이디 추가
     if (!group.members.includes(user._id)) {
       group.members.push(user._id);
+
+      createNoti(
+          'You have successfully joined a group',
+          [user._id],
+          'unread',
+          `/api/groups/${groupId}`
+      )
+      
       await group.save();
     } else {
       return res.status(400).json({ message: 'User is already a member of the group' });
@@ -296,9 +307,9 @@ export const acceptMember = async (req, res) => {
 
     createNoti(
       'You have successfully joined a group',
-      [],
+      [user._id],
       'unread',
-      '/'
+      `/groupmain/${group.id}`
     )
 
     res.status(200).json({ message: 'Member accepted and added to group' });
@@ -438,80 +449,80 @@ export const getGroupByName = async (req, res) => {
 // 특정 그룹의 모든 포스트 가져오기
 export const getGroupPosts = async (req, res) => {
   try {
-      const { groupId } = req.params;
-      
-      // 그룹 ID로 포스트 검색
-      const posts = await Post.find({ groupId })
-          .sort({ date: -1 })
-          .populate('author', 'firstName lastName avatar')
-          .populate('userProfile', 'avatar')
-          .populate('groupId', 'groupName avatar');  // 그룹 정보 추가
-      
-      res.status(200).json(posts);
+    const { groupId } = req.params;
+
+    // 그룹 ID로 포스트 검색
+    const posts = await Post.find({ groupId })
+      .sort({ date: -1 })
+      .populate('author', 'firstName lastName avatar')
+      .populate('userProfile', 'avatar')
+      .populate('groupId', 'groupName avatar');  // 그룹 정보 추가
+
+    res.status(200).json(posts);
   } catch (error) {
-      console.error('Error fetching group posts:', error);
-      res.status(500).json({ message: "Error fetching group posts", error });
+    console.error('Error fetching group posts:', error);
+    res.status(500).json({ message: "Error fetching group posts", error });
   }
 };
 // controllers/groupController.js
 export const getManageGroupPosts = async (req, res) => {
   try {
-      const { groupName } = req.params;
+    const { groupName } = req.params;
 
-      // groupName으로 그룹을 찾음
-      const group = await Group.findOne({ groupName: groupName });
-      if (!group) {
-          return res.status(404).json({ message: 'Group not found' });
-      }
+    // groupName으로 그룹을 찾음
+    const group = await Group.findOne({ groupName: groupName });
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
 
-      // 찾은 그룹의 _id로 게시물 검색
-      const posts = await Post.find({ groupId: group._id })
-          .sort({ date: -1 })
-          .populate('author', 'firstName lastName avatar')
-          .populate('userProfile', 'avatar')
-          .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
+    // 찾은 그룹의 _id로 게시물 검색
+    const posts = await Post.find({ groupId: group._id })
+      .sort({ date: -1 })
+      .populate('author', 'firstName lastName avatar')
+      .populate('userProfile', 'avatar')
+      .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
 
-      res.status(200).json(posts);
+    res.status(200).json(posts);
   } catch (error) {
-      console.error('Error fetching group posts for management:', error);
-      res.status(500).json({ message: "Error fetching group posts for management", error });
+    console.error('Error fetching group posts for management:', error);
+    res.status(500).json({ message: "Error fetching group posts for management", error });
   }
 };
 
 
 export const createGroupPost = async (req, res) => {
   try {
-      const { groupId } = req.params;
-      const { content, images } = req.body;
+    const { groupId } = req.params;
+    const { content, images } = req.body;
 
-      // 세션에 저장된 유저 정보 확인
-      if (!req.session.user) {
-          return res.status(401).json({ message: 'User is not logged in' });
-      }
+    // 세션에 저장된 유저 정보 확인
+    if (!req.session.user) {
+      return res.status(401).json({ message: 'User is not logged in' });
+    }
 
-      const newPost = new Post({
-          content,
-          userProfile: req.session.user.id,
-          userId: req.session.user.id,
-          author: req.session.user.id,
-          images,
-          date: new Date(),
-          groupId,  
-          isGroupPost: true,  // set as group post
-      });
+    const newPost = new Post({
+      content,
+      userProfile: req.session.user.id,
+      userId: req.session.user.id,
+      author: req.session.user.id,
+      images,
+      date: new Date(),
+      groupId,
+      isGroupPost: true,  // set as group post
+    });
 
-      await newPost.save();
+    await newPost.save();
 
-      // 새로 생성된 포스트를 다시 불러와 groupName과 avatar를 포함해서 반환
-      const populatedPost = await Post.findById(newPost._id)
-          .populate('author', 'firstName lastName avatar')
-          .populate('userProfile', 'avatar')
-          .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
+    // 새로 생성된 포스트를 다시 불러와 groupName과 avatar를 포함해서 반환
+    const populatedPost = await Post.findById(newPost._id)
+      .populate('author', 'firstName lastName avatar')
+      .populate('userProfile', 'avatar')
+      .populate('groupId', 'groupName avatar');  // 그룹 정보 포함
 
-      res.status(201).json(populatedPost);
+    res.status(201).json(populatedPost);
   } catch (error) {
-      console.error('Error creating group post:', error);
-      res.status(500).json({ message: "Error creating group post", error });
+    console.error('Error creating group post:', error);
+    res.status(500).json({ message: "Error creating group post", error });
   }
 };
 
@@ -585,15 +596,15 @@ export const getSuspendedUsers = async (req, res) => {
 // 기존의 Post 삭제 라우트 그대로 활용
 export const deletePost = async (req, res) => {
   try {
-      const { id } = req.params;
-      const deletedPost = await Post.findByIdAndDelete(id);
-      if (!deletedPost) {
-          return res.status(404).json({ message: 'Post not found' });
-      }
-      res.status(200).json({ message: 'Post deleted successfully' });
+    const { id } = req.params;
+    const deletedPost = await Post.findByIdAndDelete(id);
+    if (!deletedPost) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    res.status(200).json({ message: 'Post deleted successfully' });
   } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Failed to delete post', error: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete post', error: err.message });
   }
 };
 
