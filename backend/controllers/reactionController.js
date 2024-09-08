@@ -86,10 +86,10 @@ export const addOrUpdateReaction = async (req, res) => {
       // Send a notification to the post author about the new reaction
       const existedPost = await Post.findById(postId).populate('author');
       await createNoti(
-          'New comment on your post',
+          'New reaction on your post',
           [existedPost.author._id],
           'unread',
-          `/user/${existedPost.userId}`
+          `/post/${existedPost.id}`
       );
 
       res.status(200).json({ message: 'Reaction added or updated successfully', reactions: post.reactions });
@@ -190,6 +190,12 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       }
   
       await comment.save();
+      await createNoti(
+        'New reaction on your comment',
+        [comment.author._id],
+        'unread',
+        `/post/${comment.postId}`
+    );
       res.status(200).json(comment.reactions);
     } catch (error) {
       console.error('Error adding or updating comment reaction:', error);
