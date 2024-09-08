@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DropDowns from "./DropDowns";
 import { Link } from 'react-router-dom';
 import CreateComment from "../../comment/components/CreateComment";
@@ -8,27 +8,28 @@ import '../../../components/button/index.css';
 // import Button from "../../../../components/button/index.jsx";
 
 export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, setPostList }) {
-    const currentUserId = user ? user.id : null;
-    const [commentsByPost, setCommentsByPost] = useState({});
-    const [editingPostId, setEditingPostId] = useState(null);
-    const [updatedContent, setUpdatedContent] = useState("");
-    const [updatedImages, setUpdatedImages] = useState([]);
-    const [reactionCounts, setReactionCounts] = useState({});
-    const fileInputRef = useRef(null); // fileInputRef 정의
+    const currentUserId = user ? user.id : null;  // Retrieves the current user's ID, or null if not logged in
+    const [commentsByPost, setCommentsByPost] = useState({});  // State to store comments for each post
+    const [editingPostId, setEditingPostId] = useState(null);  // State to track which post is being edited
+    const [updatedContent, setUpdatedContent] = useState("");  // State to store the updated post content during editing
+    const [updatedImages, setUpdatedImages] = useState([]);  // State to store updated images during post editing
+    const [reactionCounts, setReactionCounts] = useState({});  // State to store reaction counts for each post
+    const fileInputRef = useRef(null);  // Reference for file input to upload images
 
     useEffect(() => {
         if (posts.length > 0) {
             const fetchData = async () => {
                 await Promise.all(posts.map(async (post) => {
-                    await fetchComments(post._id);
-                    await fetchReactionCounts(post._id);
+                    await fetchComments(post._id);  // Fetch comments for each post
+                    await fetchReactionCounts(post._id);  // Fetch reaction counts for each post
                 }));
             };
 
             fetchData();
         }
-    }, [posts]);
+    }, [posts]);  // Run when the list of posts changes
 
+    // Fetch comments for a specific post
     const fetchComments = async (postId) => {
         try {
             const response = await fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
@@ -39,12 +40,13 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 throw new Error('Error fetching comments');
             }
             const data = await response.json();
-            setCommentsByPost(prev => ({ ...prev, [postId]: data }));
+            setCommentsByPost(prev => ({ ...prev, [postId]: data }));  // Update the commentsByPost state for this post
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
     };
 
+    // Fetch reaction counts for a specific post
     const fetchReactionCounts = async (postId) => {
         try {
             const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions/count`, {
@@ -55,17 +57,18 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 throw new Error('Error fetching reaction counts');
             }
             const data = await response.json();
-            setReactionCounts(prev => ({ ...prev, [postId]: data }));
+            setReactionCounts(prev => ({ ...prev, [postId]: data }));  // Update the reaction counts for this post
         } catch (error) {
             console.error('Error fetching reaction counts:', error);
         }
     };
 
+    // Handle adding a new comment
     const handleAddComment = (postId, newCommentText) => {
-        const newComment = { content: newCommentText, id: Date.now(), author: user };
+        const newComment = { content: newCommentText, id: Date.now(), author: user };  // Create a new comment object
         setCommentsByPost(prevComments => ({
             ...prevComments,
-            [postId]: [...(prevComments[postId] || []), newComment]
+            [postId]: [...(prevComments[postId] || []), newComment]  // Add the new comment to the post's comment list
         }));
 
         fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
@@ -74,15 +77,16 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify(newComment)
+            body: JSON.stringify(newComment)  // Send the new comment to the server
         })
         .then(response => response.json())
         .then(() => {
-            fetchComments(postId);
+            fetchComments(postId);  // Fetch updated comments for the post
         })
         .catch(error => console.error('Error adding comment:', error));
     };
 
+    // Handle editing a comment
     const handleEditComment = (postId, commentId, newContent) => {
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'PUT',
@@ -90,33 +94,36 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ content: newContent })
+            body: JSON.stringify({ content: newContent })  // Send the updated comment content to the server
         })
         .then(response => response.json())
         .then(() => {
-            fetchComments(postId);
+            fetchComments(postId);  // Fetch updated comments after editing
         })
         .catch(error => console.error('Error editing comment:', error));
     };
 
+    // Handle deleting a comment
     const handleDeleteComment = (postId, commentId) => {
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'DELETE',
             credentials: 'include',
         })
         .then(() => {
-            fetchComments(postId);
+            fetchComments(postId);  // Fetch updated comments after deletion
         })
         .catch(error => console.error('Error deleting comment:', error));
     };
 
+    // Handle editing a post
     const handleEditPost = (postId) => {
-        setEditingPostId(postId);
-        const postToEdit = posts.find(post => post._id === postId);
-        setUpdatedContent(postToEdit.content);
-        setUpdatedImages(postToEdit.images);
+        setEditingPostId(postId);  // Set the ID of the post being edited
+        const postToEdit = posts.find(post => post._id === postId);  // Find the post to edit
+        setUpdatedContent(postToEdit.content);  // Set the current content to edit
+        setUpdatedImages(postToEdit.images);  // Set the current images to edit
     };
 
+    // Save the edited post
     const handleSaveEditPost = (postId) => {
         fetch(`http://localhost:3000/api/posts/${postId}`, {
             method: 'PUT',
@@ -124,7 +131,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ content: updatedContent, images: updatedImages })
+            body: JSON.stringify({ content: updatedContent, images: updatedImages })  // Send the updated post data to the server
         })
         .then(response => response.json())
         .then(async () => {
@@ -133,25 +140,21 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 credentials: 'include',
             }).then(response => response.json());
 
-            if (typeof updatedPost.groupId === 'string') {
+            if (typeof updatedPost.groupId === 'string') {  // If the groupId is a string, fetch group data
                 const groupResponse = await fetch(`http://localhost:3000/api/groups/${updatedPost.groupId}`);
                 const groupData = await groupResponse.json();
-                updatedPost.groupId = groupData;
+                updatedPost.groupId = groupData;  // Set the group data in the updated post
             }
 
-            if (updatedPost.groupId && updatedPost.groupId.groupName) {
-                console.log('Group Name:', updatedPost.groupId.groupName);
-                console.log('Group Avatar:', updatedPost.groupId.avatar);
-            }
-
-            setEditingPostId(null);
+            setEditingPostId(null);  // Exit editing mode
             setPostList(prevPosts => 
-                prevPosts.map(post => post._id === postId ? updatedPost : post)
+                prevPosts.map(post => post._id === postId ? updatedPost : post)  // Update the post list with the edited post
             );
         })
         .catch(error => console.error('Error updating post:', error));
     };
 
+    // Handle image upload for a post being edited
     const handleImageChange = (event) => {
         const files = event.target.files;
         const images = [];
@@ -161,9 +164,9 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                images.push(e.target.result);
+                images.push(e.target.result);  // Add the image preview
                 if (images.length === files.length) {
-                    setUpdatedImages(images);
+                    setUpdatedImages(images);  // Update the state with all the selected images
                 }
             };
 
@@ -171,25 +174,28 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
         }
     };
 
+    // Handle removing an image from the edit list
     const handleRemoveImage = (imageIndex) => {
-        setUpdatedImages(updatedImages.filter((_, idx) => idx !== imageIndex));
+        setUpdatedImages(updatedImages.filter((_, idx) => idx !== imageIndex));  // Remove the image at the specified index
     };
 
+    // Refresh reaction counts when a reaction is updated
     const updateReactionCounts = (postId) => {
-        fetchReactionCounts(postId);
+        fetchReactionCounts(postId);  // Fetch updated reaction counts
     };
 
+    // Render each post with the relevant information
     const postItems = posts.map((each) => {
-        const isGroupPost = each.isGroupPost;
-        const groupName = isGroupPost && each.groupId && each.groupId.groupName ? each.groupId.groupName : 'Unknown Group';
-        const groupAvatar = isGroupPost && each.groupId && each.groupId.avatar ? each.groupId.avatar : 'default-group-avatar-url.jpg';
+        const isGroupPost = each.isGroupPost;  // Check if the post is a group post
+        const groupName = isGroupPost && each.groupId && each.groupId.groupName ? each.groupId.groupName : 'Unknown Group';  // Get group name or set default
+        const groupAvatar = isGroupPost && each.groupId && each.groupId.avatar ? each.groupId.avatar : 'default-group-avatar-url.jpg';  // Get group avatar or set default
 
-        const displayImages = each.images.slice(0, 3);
-        const remainingImagesCount = each.images.length - 3;
-        const isAuthor = currentUserId === each.author._id;
+        const displayImages = each.images.slice(0, 3);  // Limit images to display only the first 3
+        const remainingImagesCount = each.images.length - 3;  // Calculate the number of remaining images not displayed
+        const isAuthor = currentUserId === each.author._id;  // Check if the current user is the author of the post
 
-        const commentsToShow = (commentsByPost[each._id] || []).slice(0, 3);
-        const hasMoreComments = (commentsByPost[each._id] || []).length > 3;
+        const commentsToShow = (commentsByPost[each._id] || []).slice(0, 3);  // Show the first 3 comments
+        const hasMoreComments = (commentsByPost[each._id] || []).length > 3;  // Check if there are more than 3 comments
 
         return (
             <div key={each._id} className="postContainer">
@@ -204,7 +210,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 </div>
             )}
                 <div className="postHeader">
-                    
                     <div className="imgContainer">
                         <Link to={currentUserId === each.author._id ? '/mydetail' : `/user/${each.author._id}`}>
                             <div className='mx-4'>
@@ -234,14 +239,14 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                     {isAuthor && (
                         <div className="dropDown">
                             <DropDowns
-                                onEdit={() => handleEditPost(each._id)}
-                                onDelete={() => onPostDelete(each._id)}
+                                onEdit={() => handleEditPost(each._id)}  // Trigger post editing
+                                onDelete={() => onPostDelete(each._id)}  // Trigger post deletion
                             />
                         </div>
                     )}
                 </div>
                 
-                {editingPostId === each._id ? (
+                {editingPostId === each._id ? (  // Render post edit form if the post is being edited
                     <div>
                         <input 
                             type="text" 
@@ -270,7 +275,6 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                                 ref={fileInputRef} 
                                 style={{ display: 'none' }} 
                             />
-                            
                             <button onClick={() => handleSaveEditPost(each._id)} className="saveButton">
                                 Save
                             </button>
@@ -279,7 +283,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 ) : (
                     <Link to={`/post/${each._id}`}>
                         <div className="postContent">
-                            {each.content}
+                            {each.content}  {/* Display the post content */}
                         </div>
                         <div className="postContentImg">
                             {displayImages.map((image, idx) => (
@@ -287,7 +291,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                                     <img src={image} alt={`Post image ${idx}`} className="postImage" />
                                     {idx === 2 && remainingImagesCount > 0 && (
                                         <div className="imageOverlay">
-                                            +{remainingImagesCount} Pictures
+                                            +{remainingImagesCount} Pictures  {/* Display the number of additional images */}
                                         </div>
                                     )}
                                 </div>
@@ -299,7 +303,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 <div className="reactionCounts">
                     {Object.entries(reactionCounts[each._id] || {}).map(([type, count]) => (
                         <div key={type} className="reactionCount" style={{ color: 'black' }}>
-                            {type}: {count}
+                            {type}: {count}  {/* Display the reaction counts */}
                         </div>
                     ))}
                 </div>
@@ -315,10 +319,10 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                 <hr className="solidPost"></hr>
                 <div className="likeAndComment">
                     <span className="likeBtn">
-                        <PostWithReactions postId={each._id} onReactionUpdate={() => updateReactionCounts(each._id)} />
+                        <PostWithReactions postId={each._id} onReactionUpdate={() => updateReactionCounts(each._id)} />  {/* Component to handle post reactions */}
                     </span>
                     <span className="commentBtn">
-                        <button>Comment</button>
+                        <button>Comment</button>  {/* Button to open the comment section */}
                     </span>
                 </div>
                 <hr className="solidPost"></hr>
@@ -332,10 +336,10 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
                     />
                     {hasMoreComments && (
                         <Link to={`/post/${each._id}`}>
-                            <button className="seeMoreComments">See more comments</button>
+                            <button className="seeMoreComments">See more comments</button>  {/* Button to view more comments */}
                         </Link>
                     )}
-                    <CreateComment onAddComment={(text) => handleAddComment(each._id, text)} user={user} />
+                    <CreateComment onAddComment={(text) => handleAddComment(each._id, text)} user={user} />  {/* Component to add a new comment */}
                 </div>
             </div>
         );
@@ -343,7 +347,7 @@ export default function ListOfPosts({ posts, onPostEdit, onPostDelete, user, set
 
     return (
         <div className="postListContainer">
-            {postItems}
+            {postItems}  {/* Render the list of posts */}
         </div>
     );
 }
