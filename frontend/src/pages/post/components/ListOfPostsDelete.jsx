@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import DropDowns from "./DropDowns";
 import { Link } from 'react-router-dom';
 import CreateComment from "../../comment/components/CreateComment";
 import ListOfCommentsDelete from "../../comment/components/ListOfCommentsDelete";
@@ -6,7 +7,7 @@ import { PostWithReactions } from "./PostWithReactions";
 import '../../../components/button/index.css';
 // import Button from "../../../../components/button/index.jsx";
 
-export default function ListOfPosts({ posts, onPostDelete, user, setPostList }) {
+export default function ListOfPostsDelete({ posts, onPostEdit, onPostDelete, user, setPostList }) {
     const currentUserId = user ? user.id : null;
     const [commentsByPost, setCommentsByPost] = useState({});
     const [editingPostId, setEditingPostId] = useState(null);
@@ -60,28 +61,28 @@ export default function ListOfPosts({ posts, onPostDelete, user, setPostList }) 
         }
     };
 
-    const handleDeletePost = (postId) => {
-        if (window.confirm("Are you sure you want to delete this post?")) {
-            fetch(`http://localhost:3000/api/posts/${postId}`, {
-                method: 'DELETE',
-                credentials: 'include',
-            })
-                .then(() => {
-                    setPostList(prevPosts => prevPosts.filter(post => post._id !== postId));
-                })
-                .catch(error => console.error('Error deleting post:', error));
-        }
-    };
-    const handleDeleteComment = (postId, commentId) => {
-        fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
-            method: 'DELETE',
+    const handleAddComment = (postId, newCommentText) => {
+        const newComment = { content: newCommentText, id: Date.now(), author: user };
+        setCommentsByPost(prevComments => ({
+            ...prevComments,
+            [postId]: [...(prevComments[postId] || []), newComment]
+        }));
+
+        fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
+            body: JSON.stringify(newComment)
         })
+            .then(response => response.json())
             .then(() => {
                 fetchComments(postId);
             })
-            .catch(error => console.error('Error deleting comment:', error));
+            .catch(error => console.error('Error adding comment:', error));
     };
+
     const handleEditComment = (postId, commentId, newContent) => {
         fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
             method: 'PUT',
@@ -97,6 +98,29 @@ export default function ListOfPosts({ posts, onPostDelete, user, setPostList }) 
             })
             .catch(error => console.error('Error editing comment:', error));
     };
+    const handleDeletePost = (postId) => {
+        if (window.confirm("Are you sure you want to delete this post?")) {
+            fetch(`http://localhost:3000/api/posts/${postId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            .then(() => {
+                setPostList(prevPosts => prevPosts.filter(post => post._id !== postId));
+            })
+            .catch(error => console.error('Error deleting post:', error));
+        }
+    };
+    const handleDeleteComment = (postId, commentId) => {
+        fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        })
+            .then(() => {
+                fetchComments(postId);
+            })
+            .catch(error => console.error('Error deleting comment:', error));
+    };
+
     const handleEditPost = (postId) => {
         setEditingPostId(postId);
         const postToEdit = posts.find(post => post._id === postId);
@@ -191,6 +215,7 @@ export default function ListOfPosts({ posts, onPostDelete, user, setPostList }) 
                     </div>
                 )}
                 <div className="postHeader">
+
                     <div className="imgContainer">
                         <Link to={currentUserId === each.author._id ? '/mydetail' : `/user/${each.author._id}`}>
                             <div className='mx-4'>
@@ -217,8 +242,6 @@ export default function ListOfPosts({ posts, onPostDelete, user, setPostList }) 
                             </div>
                         )}
                     </div>
-
-                    {/* 기존 드롭다운 대신 누구나 삭제할 수 있는 Delete 버튼 추가 */}
                     <div className="deleteButton" style={{ marginLeft: 'auto' }}>
                         <button
                             onClick={() => handleDeletePost(each._id)}
