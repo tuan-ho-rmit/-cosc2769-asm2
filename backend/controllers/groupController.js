@@ -117,12 +117,12 @@ export const approveGroupRequest = async (req, res) => {
       data: updatedGroup,
     });
 
-    const userId = Group.findOne({ id: id }, 'createdBy')
+    const userId = Group.findById(id)
     createNoti(
       'Your Group Creation Request has been approved',
-      [userId],
+      [userId.createdBy],
       'unread',
-      '/'
+      `/api/groups/${id}`
     )
 
   } catch (err) {
@@ -226,7 +226,7 @@ export const joinGroup = async (req, res) => {
       'You received a New Group Join Request',
       [groupOwner.createdBy],
       'unread',
-      '/'
+      `/api/groups/join-requests?groupName=${groupName}`
     )
 
   } catch (error) {
@@ -283,6 +283,14 @@ export const acceptMember = async (req, res) => {
     // 중복되지 않게 유저 오브젝트 아이디 추가
     if (!group.members.includes(user._id)) {
       group.members.push(user._id);
+
+      createNoti(
+          'You have successfully joined a group',
+          [user._id],
+          'unread',
+          `/api/groups/${groupId}`
+      )
+      
       await group.save();
     } else {
       return res.status(400).json({ message: 'User is already a member of the group' });
@@ -294,12 +302,7 @@ export const acceptMember = async (req, res) => {
       return res.status(404).json({ message: 'Join request not found' });
     }
 
-    createNoti(
-      'You have successfully joined a group',
-      [],
-      'unread',
-      '/'
-    )
+
 
     res.status(200).json({ message: 'Member accepted and added to group' });
   } catch (error) {
