@@ -1,6 +1,6 @@
 import React from "react";
 import { CommentWithReactions } from "./CommentWithReactions";
-import { Link } from "react-router-dom"; // Link import 추가
+import { Link } from "react-router-dom"; 
 
 export default function ListOfComments({ comments, onDeleteComment, currentUserId }) {
     if (!comments) {
@@ -31,7 +31,7 @@ export default function ListOfComments({ comments, onDeleteComment, currentUserI
                                 </div>
                             </div>
 
-                            {/* 모든 사용자가 삭제할 수 있는 Delete 버튼을 오른쪽에 배치 */}
+                            {/* move delete button to the right site */}
                             <div className="deleteButton" style={{ marginLeft: 'auto' }}>
                                 <button
                                     onClick={() => onDeleteComment(comment.postId, comment._id)}
@@ -55,7 +55,7 @@ export default function ListOfComments({ comments, onDeleteComment, currentUserI
                             <CommentWithReactions commentId={comment._id} onReactionUpdate={() => {}} />
                         </div>
 
-                        {/* 댓글 수정 이력 보기 버튼 - 작성자에게만 표시 */}
+                        {/* see edited comment(only for person who wrote that comment) */}
                         {currentUserId === comment.author._id && comment.history && comment.history.length > 0 && (
                             <div className="modifiedSection">
                                 <Link to={`/comment/${comment._id}/history`}>

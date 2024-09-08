@@ -34,7 +34,7 @@ export default function ListOfComments({ comments, reactionCounts = {} }) {
                             {comment.content}
                         </div>
 
-                        {/* 감정표현 보여주기 */}
+                        {/* show reations */}
                         <div className="reactionCounts">
                             {reactionCounts[comment._id] && 
                                 Object.entries(reactionCounts[comment._id]).map(([reactionType, count]) => (
@@ -45,7 +45,7 @@ export default function ListOfComments({ comments, reactionCounts = {} }) {
                             }
                         </div>
 
-                        {/* 댓글 이력 보기 버튼 */}
+                        {/* display comment history */}
                         {comment.history && comment.history.length > 0 && (
                             <div className="modifiedSection">
                                 <Link to={`/comment/${comment._id}/history`}>

@@ -64,7 +64,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Email or password is incorrect' });
     }
 
-    // req.session이 정의되어 있는지 확인
+    // req.session
     if (req.session) {
       req.session.user = {
         id: user._id,
@@ -97,7 +97,7 @@ export const checkAuth = (req, res) => {
 };
 
 
-// Logout (세션 제거)
+// Logout (remove session)
 export const logoutUser = (req, res) => {
   req.session.destroy(err => {
     if (err) {
