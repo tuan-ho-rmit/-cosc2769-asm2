@@ -111,7 +111,7 @@ const Group = () => {
                     onClick={() => handleVisit(group._id)}
                     style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                   >
-                    Visit
+                    Go to Group
                   </button>
                 )}
                 {group.createdBy === userId ? (

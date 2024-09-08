@@ -32,8 +32,8 @@ const ManageGroup = () => {
     navigate(`/groupmembermanagement/${groupName}`);
   };
 
-  const handleManagePosts = (groupName) => {
-    navigate(`/manage-group-posts/${groupName}`);
+  const handleManagePosts = (groupId) => {
+    navigate(`/manage-group-posts/${groupId}`);
   };  
 
   const handleDelete = async (groupId) => {
@@ -58,7 +58,7 @@ const ManageGroup = () => {
       <Groupnav />
       <div style={{ padding: '2rem' }}>
         <h2 style={{ color: '#EEEEEE', marginBottom: '1rem' }}>Manage My Groups</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(364px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(410px, 1fr))', gap: '1rem' }}>
           {groups.length > 0 ? (
             groups.map(group => (
               <div key={group._id} style={{ backgroundColor: '#393E46', padding: '1.3rem', borderRadius: '0.5rem', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}>
@@ -105,7 +105,7 @@ const ManageGroup = () => {
                         Manage Members
                       </button>
                       <button
-                        onClick={() => handleManagePosts(group.groupName)}
+                        onClick={() => handleManagePosts(group._id)}
                         style={{
                           padding: '0.7rem 1.2rem',
                           backgroundColor: '#FFD369',
@@ -113,9 +113,10 @@ const ManageGroup = () => {
                           borderRadius: '0.25rem',
                           border: 'none',
                           cursor: 'pointer',
+                          marginRight: '0.5rem'
                         }}
                       >
-                        Manage Posts
+                        Manage Posts & Comments
                       </button>
                     </>
                   )}

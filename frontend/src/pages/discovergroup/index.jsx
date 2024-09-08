@@ -4,7 +4,7 @@ import Groupnav from '../../components/groupnav';
 import { useAuth } from '../../provider/AuthProvider';
 
 const DiscoverGroup = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [groups, setGroups] = useState([]);
   const [requestedGroups, setRequestedGroups] = useState([]);
   const [joinedGroups, setJoinedGroups] = useState([]); // 빈 배열로 초기화
@@ -24,8 +24,8 @@ const DiscoverGroup = () => {
 
     // 유저 정보를 가져오는 함수
     const fetchUser = () => {
-        fetchRequestedGroups(user.email);
-        fetchJoinedGroups(user.id);
+      fetchRequestedGroups(user.email);
+      fetchJoinedGroups(user.id);
     };
 
     const fetchRequestedGroups = async (email) => {
@@ -43,7 +43,7 @@ const DiscoverGroup = () => {
         const response = await fetch(`http://localhost:3000/api/groups/member-groups?memberId=${memberId}`);
         const joinedGroups = await response.json();
         if (Array.isArray(joinedGroups)) {
-          setJoinedGroups(joinedGroups.map(group => group.groupName));
+          setJoinedGroups(joinedGroups.map(group => group._id));
         } else {
           console.error('Unexpected response format for joined groups:', joinedGroups);
         }
@@ -86,13 +86,13 @@ const DiscoverGroup = () => {
     }
   };
 
-  const handleView = (groupName, visibility) => {
+  const handleView = (groupId, visibility) => {
     if (visibility === 'private') {
       alert('The content of this group is private. To gain access and view its details, please request to join the group.');
       return;
     }
-    // 그룹 이름을 사용하여 네비게이션
-    navigate(`/groupmainvisit/${groupName}`);
+    // 그룹 ID를 사용하여 네비게이션
+    navigate(`/groupmainvisit/${groupId}`);
   };
 
   return (
@@ -113,12 +113,12 @@ const DiscoverGroup = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button
-                  onClick={() => handleView(group.groupName, group.visibility)}  
+                  onClick={() => handleView(group._id, group.visibility)}  // 그룹 ID로 변경
                   style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                 >
-                  View
+                  Visit
                 </button>
-                {joinedGroups.includes(group.groupName) ? (
+                {joinedGroups.includes(group._id) ? (  // 그룹 이름 대신 ID 확인
                   <button
                     style={{
                       padding: '0.5rem 1rem',
