@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';  // 그룹 ID를 가져오기 위해 사용
+import { useParams, useNavigate } from 'react-router-dom';  // 그룹 ID와 경로 이동을 위해 사용
 import CreatePost from '../post/components/CreatePost';
 import ListOfPosts from '../post/components/ListOfPosts';
 import '../home/Home.css';
+import { useAuth } from '../../provider/AuthProvider';
 
 const GroupMain = () => {
     const { groupId } = useParams();  // URL에서 그룹 ID를 가져옵니다
     const [posts, setPostList] = useState([]);
     const [content, setContent] = useState("");
     const [images, setImages] = useState([]);
-    const [user, setUser] = useState(null);
+    const { user } = useAuth();  // 세션 대신 useAuth를 사용하여 유저 정보 가져오기
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');  // 그룹 설명 추가
     const [groupAvatar, setGroupAvatar] = useState('');  // 그룹 이미지 추가
+    const navigate = useNavigate();  // View Members 버튼 클릭 시 사용할 navigate
 
     // 그룹 정보 및 게시글 불러오기
     useEffect(() => {
@@ -83,6 +85,10 @@ const GroupMain = () => {
             reader.readAsDataURL(file);
         }
     }
+    // View Members 버튼 클릭 시 처리
+    const handleViewMembers = () => {
+        navigate(`/viewmembers/${groupId}`);  // viewmembers 경로로 이동
+    };
 
     // 게시글 추가 처리
     function handleAddPost() {
@@ -185,6 +191,14 @@ const GroupMain = () => {
                 />
                 <h1 style={{ color: '#FFD369', fontSize: '2rem' }}>{groupName}</h1>  {/* 글씨 크기 조금 키움 */}
                 <p style={{ fontSize: '1.2rem' }}>{groupDescription}</p>  {/* 설명 글씨 크기 조금 키움 */}
+
+                {/* View Members 버튼 추가 */}
+                <button 
+                    onClick={handleViewMembers} 
+                    style={{ padding: '0.7rem 1.2rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
+                >
+                    View Members
+                </button>
             </div>
 
             <CreatePost
@@ -197,8 +211,8 @@ const GroupMain = () => {
             />
             <ListOfPosts
                 posts={posts}
-                onPostEdit={handleEditPost}
-                onPostDelete={handleDeletePost}
+                onPostEdit={(id) => handleEditPost(id)}
+                onPostDelete={(id) => handleDeletePost(id)}
                 currentUserId={user ? user._id : null}
                 user={user}
                 setPostList={setPostList}  // 수정된 사항을 반영할 수 있도록 setPostList 전달

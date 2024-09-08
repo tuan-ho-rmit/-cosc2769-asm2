@@ -24,6 +24,7 @@ import FriendList from "./friends/components/friendlist/index.jsx";
 import FriendRequest from "./friends/components/friendrequest/index.jsx";
 import PostHistory from "./post/postHistory";
 import CommentHistory from "./comment/CommentHistory";
+import ViewMembers from "./viewmembers/index.jsx";
 
 export const router = createBrowserRouter([
   { path: "*", element: <Navigate to="/" /> },
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { path: 'managegroup', element: <ManageGroup /> },
       { path: 'manage-group-posts/:groupName', element:  <ManageGroupPosts />  },
       { path: 'discovergroup', element: <DiscoverGroup /> },
+      { path: '/viewmembers/:groupId', element: <ViewMembers />},
       { path: 'groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
       { path: 'groupmain/:groupId', element: <GroupMain /> },
       { path: 'groupmainvisit/:groupName', element: <GroupMainVisit /> },

@@ -1,6 +1,6 @@
 import express from 'express';
 import { approveGroupRequest, createGroup, getListGroup, rejectGroupRequest } from '../controllers/groupController.js';
-import { getGroups, deleteGroup, joinGroup, getRequestedGroups, getJoinRequests, acceptMember, rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost, suspendMember, unsuspendMember, getSuspendedUsers, deletePost, getManageGroupPosts } from '../controllers/groupController.js';
+import { getGroups, deleteGroup, joinGroup, getRequestedGroups, getJoinRequests, acceptMember, rejectMember, getGroupsForMember, removeMemberFromGroup, getGroupById, getGroupsForUser, getMembersOfGroup, getGroupByName, getGroupPosts, createGroupPost, suspendMember, unsuspendMember, getSuspendedUsers, deletePost, getManageGroupPosts, getGroupMembers  } from '../controllers/groupController.js';
 import { verifyAdmin } from '../util/verifyToken.js';
 
 const router = express.Router();
@@ -14,6 +14,7 @@ router.get('/', getGroups);
 router.get('/list', getListGroup)
 router.get('/member-groups', getGroupsForUser);
 router.get('/:groupName/members', getMembersOfGroup);
+router.get('/members/:groupId', getGroupMembers);
 router.post('/join-group', joinGroup);
 router.get('/requested-groups', getRequestedGroups);
 router.post('/suspend-member', suspendMember);   // 멤버 서스펜드

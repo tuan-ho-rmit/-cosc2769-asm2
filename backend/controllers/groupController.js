@@ -596,3 +596,44 @@ export const deletePost = async (req, res) => {
       res.status(500).json({ message: 'Failed to delete post', error: err.message });
   }
 };
+
+
+export const getGroupMembers = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    // 그룹을 찾아서 멤버 ID 배열을 가져옴
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // members 배열에 있는 각 멤버 ID로 유저 정보를 가져옴
+    const memberDetails = await Promise.all(
+      group.members.map(async (memberId) => {
+        const user = await User.findById(memberId, 'firstName lastName email avatar'); // avatar 필드 추가
+        if (user) {
+          return {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatar: user.avatar,  // avatar 정보 포함
+            email: user.email,    // email 포함
+            _id: user._id         // 유저 ID 포함 (프로필 이동에 필요)
+          };
+        } else {
+          return null;  // 유저가 없을 경우 null 반환
+        }
+      })
+    );
+
+    // 유효한 유저들만 필터링
+    const validMembers = memberDetails.filter(member => member !== null);
+
+    // 멤버 정보 반환
+    res.status(200).json(validMembers);
+  } catch (error) {
+    console.error('Error fetching group members:', error);
+    res.status(500).json({ message: 'Error fetching group members' });
+  }
+};
