@@ -1,6 +1,7 @@
 import {NavLink} from "react-router-dom";
 import Tooltip from '../../../components/tooltip'
 
+//define navigation bar items with paths, titles and icons
 const navBarItems = [
     {
         path: 'friendlist',
@@ -24,7 +25,6 @@ const navBarItems = [
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
             </svg>
-
     }
 ]
 
@@ -36,13 +36,14 @@ export default function NavigationBar() {
                     <div className="flex justify-center items-center space-x-4">
                         {navBarItems.map((item, i) => (
                             <Tooltip text={item.title} position='bottom'>
+                                {/*wrap navlink with tooltip to hover text*/}
                                 <NavLink to={item.path}
                                          key={i}
                                          className={({isActive}) =>
-                                isActive
-                                    ? "flex items-center px-5 py-3 text-sm font-medium text-primary border-b-2 border-primary"
-                                    : "flex items-center px-5 py-3 text-sm font-medium text-white"
-                                }
+                                             isActive
+                                                 ? "flex items-center px-5 py-3 text-sm font-medium text-primary border-b-2 border-primary"
+                                                 : "flex items-center px-5 py-3 text-sm font-medium text-white"
+                                         }
                                          style={({isActive}) => {
                                              return {
                                                  color: isActive && "#FFD369"

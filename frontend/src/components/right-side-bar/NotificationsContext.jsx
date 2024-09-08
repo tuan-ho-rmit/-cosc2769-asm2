@@ -1,9 +1,8 @@
-import { createContext, useEffect, useState } from "react";
+import {createContext, useEffect, useState} from "react";
 
 const NotificationsContext = createContext();
 
-const NotificationsProvider = ({ children }) => {
-
+const NotificationsProvider = ({children}) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
     const [open, setOpen] = useState(false)
@@ -25,23 +24,12 @@ const NotificationsProvider = ({ children }) => {
             const notificationsData = await response1.json();
             console.log('Fetched result for notificationsData from notificationsContext: ', notificationsData);
 
-            // // filter notification that belong to the current user
-            // const filteredNotifications = notificationsData.filter(notification =>
-            //     notification.userIds.includes(currentUserId)
-            // )
-
-            // TODO: update unread notifications count
-            // setUnreadNotifications(prevUnread => prevUnread + result.filter(notifications))
-
             // set notifications
             setNotifications(notificationsData);
-
-
         } catch (error) {
             console.error('Error fetching notifications:', error.message);
         }
     }
-
 
     // Function to mark a notification as read
     const markAsRead = async (notificationId) => {
@@ -65,23 +53,20 @@ const NotificationsProvider = ({ children }) => {
             const updatedNotification = await response.json();
             console.log('Notification marked as read:', updatedNotification);
             fetchNotification()
-            // Update the unread count
-            // setUnreadNotifications((prevUnread) => prevUnread - 1);
         } catch (error) {
             console.error("Error marking notification as read:", error.message);
         }
     }
-
 
     useEffect(() => {
         fetchNotification()
         const intervalId = setInterval(() => {
             fetchNotification()
             console.log('after 60 seconds:')
-        }, 5000); // Pulling every 60 seconds
+        }, 5000); // fetch notifications every 5 seconds
         return () => clearInterval(intervalId); // Cleanup on component unmount
 
-    }, []); // re-fetch if url changes
+    }, []);
 
     const value = {
         notifications,
@@ -98,6 +83,5 @@ const NotificationsProvider = ({ children }) => {
     )
 }
 
-
 export default NotificationsProvider;
-export { NotificationsContext };
+export {NotificationsContext};

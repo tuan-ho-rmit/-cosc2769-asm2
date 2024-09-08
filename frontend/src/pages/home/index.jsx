@@ -4,12 +4,14 @@ import ListOfPosts from '../post/components/ListOfPosts';
 import './Home.css';
 
 export default function Home() {
-  const [posts, setPostList] = useState([]);
-  const [content, setContent] = useState("");
-  const [images, setImages] = useState([]);
-  const [user, setUser] = useState(null);
-  const [isPrivate, setIsPrivate] = useState(false);
+  // Define state variables
+  const [posts, setPostList] = useState([]); // List of posts
+  const [content, setContent] = useState(""); // Post content
+  const [images, setImages] = useState([]); // Images attached to a post
+  const [user, setUser] = useState(null); // Current logged-in user
+  const [isPrivate, setIsPrivate] = useState(false); // Privacy setting for posts
 
+  // Fetch posts when the component is mounted
   useEffect(() => {
     const fetchPosts = async () => {
         try {
@@ -23,16 +25,16 @@ export default function Home() {
                 throw new Error('Error fetching posts');
             }
             const data = await response.json();
-            setPostList(data); // posts 상태를 업데이트
+            setPostList(data); // Update posts state
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
     };
 
     fetchPosts();
-}, []); // 빈 배열 의존성: 처음 마운트 될 때만 실행
-  
-  // 사용자 정보 불러오기
+  }, []); // Run only on component mount
+
+  // Fetch user information when the component is mounted
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -42,7 +44,7 @@ export default function Home() {
         });
         const data = await response.json();
         if (data && data.user) {
-          setUser(data.user);
+          setUser(data.user); // Update user state with user data
         } else {
           console.error('User data is missing from the response.');
         }
@@ -54,6 +56,7 @@ export default function Home() {
     fetchUser();
   }, []);
 
+  // Handle image upload by reading the selected files
   function handleImageUpload(event) {
     const files = event.target.files;
     const images = [];
@@ -63,42 +66,46 @@ export default function Home() {
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        images.push(e.target.result);
+        images.push(e.target.result); // Push base64 encoded image to the images array
         if (images.length === files.length) {
-          setImages(images);
+          setImages(images); // Set the uploaded images once all files are processed
         }
       };
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read file content as base64
     }
   }
 
+  // Handle adding a new post
   function handleAddPost() {
     if (!user) {
         alert('You need to log in to post.');
         return;
     }
 
+    // Prepare new post data
     const newPostData = {
         userProfile: user._id,
         userId: user._id,
         author: user._id,
         content: content,
         images: images,
-        isGroupPost: false,
-        private: isPrivate 
+        isGroupPost: false, // Flag for group posts, which is false here
+        private: isPrivate // Privacy setting
     };
 
+    // Make a POST request to create the post
     fetch('http://localhost:3000/api/posts', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(newPostData),
+        body: JSON.stringify(newPostData), // Send the post data as JSON
     })
     .then(response => response.json())
     .then(newPost => {
+        // Fetch the newly created post to ensure data consistency
         return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
             method: 'GET',
             credentials: 'include',
@@ -106,42 +113,47 @@ export default function Home() {
     })
     .then(response => response.json())
     .then(populatedPost => {
-        setPostList([populatedPost, ...posts]);
-        setContent("");
-        setImages([]);
+        setPostList([populatedPost, ...posts]); // Add new post to the top of the post list
+        setContent(""); // Clear the content input field
+        setImages([]); // Clear the images input
     })
     .catch(error => console.error('Error creating post:', error));
   }
 
+  // Handle deleting a post
   function handleDeletePost(id) {
     if (window.confirm("Are you sure you want to delete this post?")) {
+      // Make a DELETE request to remove the post by ID
       fetch(`http://localhost:3000/api/posts/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       })
-        .then(() => setPostList(posts.filter(post => post._id !== id)))
+        .then(() => setPostList(posts.filter(post => post._id !== id))) // Filter out the deleted post
         .catch(error => console.error('Error deleting post:', error));
     }
   }
 
+  // Handle editing a post
   function handleEditPost(id, updatedContent) {
+    // Make a PUT request to update the post content
     fetch(`http://localhost:3000/api/posts/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ content: updatedContent }),
+      body: JSON.stringify({ content: updatedContent }), // Send the updated content as JSON
     })
     .then(response => response.json())
     .then(updatedPost => {
-      setPostList(posts.map(post => post._id === id ? updatedPost : post));
+      setPostList(posts.map(post => post._id === id ? updatedPost : post)); // Replace the old post with the updated one
     })
     .catch(error => console.error('Error updating post:', error));
   }
 
   return (
     <div className="newFeedContent">
+      {/* CreatePost component for creating a new post */}
       <CreatePost
         text={content}
         onAdd={handleAddPost}
@@ -151,6 +163,8 @@ export default function Home() {
         isPrivate={isPrivate}
         setIsPrivate={setIsPrivate}
       />
+
+      {/* ListOfPosts component for displaying the list of posts */}
       <ListOfPosts
         posts={posts}
         onPostEdit={handleEditPost}

@@ -1,7 +1,7 @@
-import { pushError, pushSuccess } from "../../../../components/Toast/index.jsx";
+import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
 import Button from "../../../../components/button/index.jsx";
 
-export default function FriendRequestActions({ userId, currentUser, fetchFriendRequest, request }) {
+export default function FriendRequestActions({userId, currentUser, fetchFriendRequest, request}) {
     // Condition to check if the profile belongs to the current user || the current's request different from user
     if (currentUser.id === userId) {
         return null; // disable these button when on your profile
@@ -62,22 +62,27 @@ export default function FriendRequestActions({ userId, currentUser, fetchFriendR
 
     return (
         <>
-            <div style={{ marginTop: "8px", display: "flex", flexDirection: "row", justifyContent: "flex-start", alignItems: "center", gap: "16px" }}>
+            <div style={{
+                marginTop: "8px",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                gap: "16px"
+            }}>
                 <Button
                     onClick={acceptFriendRequest}
                     variant={'primary'}
                     size={'md'}
                     ripple={'true'}
-                // className="mt-2 px-4 py-2 bg-green-400 text-white rounded-md cursor-pointer"
                 >
-                    Confirm 
+                    Confirm
                 </Button>
                 <Button
                     onClick={rejectFriendRequest}
                     variant={'outline-primary'}
                     size={'md'}
                     ripple={'true'}
-                // className="mt-2 px-4 py-2 bg-red-400 text-white rounded-md cursor-pointer"
                 >
                     Cancel
                 </Button>

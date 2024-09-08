@@ -38,7 +38,7 @@ const CreateGroup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user || !user.id) {  // user.id로 변경
+    if (!user || !user.id) {  
       alert('You need to log in to create a group.');
       return;
     }
@@ -46,9 +46,9 @@ const CreateGroup = () => {
     const groupData = {
       ...formData,
       status: 'pending',
-      createdBy: user.id,  // 유저의 오브젝트 아이디로 설정
+      createdBy: user.id,  // users obj Id
       createdAt: new Date().toISOString(),
-      members: [user.id],  // 유저 오브젝트 아이디를 members 배열에 추가
+      members: [user.id],  // add users obj Id to members array
     };
 
     try {
@@ -58,7 +58,7 @@ const CreateGroup = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(groupData),
-        credentials: 'include',  // 세션 쿠키 포함
+        credentials: 'include',  
       });
 
       if (!response.ok) {
@@ -73,7 +73,7 @@ const CreateGroup = () => {
 
       const result = await response.json();
       alert(`Your group: ${result.groupName} is successfully registered! Wait for system admin's approval.`);
-      navigate('/groups');  // 그룹 생성 후 /groups 경로로 리디렉션
+      navigate('/groups');  // after creating group, redirect to /groups path
     } catch (error) {
       console.error('Error creating group:', error.message);
     }

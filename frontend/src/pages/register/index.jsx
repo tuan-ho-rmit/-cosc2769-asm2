@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // 추가된 부분
+import { useNavigate } from 'react-router-dom';  
 
 // default img url
 import defaultAvatar from './defaultAvatar.png'; 
@@ -13,10 +13,10 @@ const Register = () => {
     confirmPassword: '',
     dateOfBirth: '',
     gender: '',
-    avatar: defaultAvatar, // default img.
+    avatar: defaultAvatar, // default img
   });
 
-  const navigate = useNavigate(); // 추가된 부분
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -25,7 +25,7 @@ const Register = () => {
       reader.onloadend = () => {
         setFormData({
           ...formData,
-          avatar: reader.result, // replace it to uploaded img.
+          avatar: reader.result, 
         });
       };
       reader.readAsDataURL(files[0]);
@@ -61,7 +61,7 @@ const Register = () => {
       const result = await response.json();
       console.log('User registered:', result);
 
-      navigate('/login'); // 회원가입 성공 시 /login으로 리디렉트
+      navigate('/login'); // when successful register, redirect to /login
     } catch (error) {
       console.error('Error registering user:', error.message);
     }

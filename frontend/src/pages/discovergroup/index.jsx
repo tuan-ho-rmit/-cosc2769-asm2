@@ -11,7 +11,7 @@ const DiscoverGroup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 그룹을 가져오는 함수
+    // function to get groups
     const fetchGroups = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/groups?status=active');
@@ -22,7 +22,7 @@ const DiscoverGroup = () => {
       }
     };
 
-    // 유저 정보를 가져오는 함수
+    // function to return user data
     const fetchUser = () => {
       fetchRequestedGroups(user.email);
       fetchJoinedGroups(user.id);
@@ -91,7 +91,7 @@ const DiscoverGroup = () => {
       alert('The content of this group is private. To gain access and view its details, please request to join the group.');
       return;
     }
-    // 그룹 ID를 사용하여 네비게이션
+    // navigate using group Id
     navigate(`/groupmainvisit/${groupId}`);
   };
 
@@ -113,12 +113,12 @@ const DiscoverGroup = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button
-                  onClick={() => handleView(group._id, group.visibility)}  // 그룹 ID로 변경
+                  onClick={() => handleView(group._id, group.visibility)}  
                   style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                 >
                   Visit
                 </button>
-                {joinedGroups.includes(group._id) ? (  // 그룹 이름 대신 ID 확인
+                {joinedGroups.includes(group._id) ? (  
                   <button
                     style={{
                       padding: '0.5rem 1rem',

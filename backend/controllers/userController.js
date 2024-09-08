@@ -54,7 +54,7 @@ export const getUserGroups = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        // 유저가 속한 그룹을 찾기
+        // find the group that user is participating
         const groups = await Group.find({ members: userId }).select('groupName avatar');
         
         if (!groups.length) {
@@ -123,18 +123,18 @@ export const updateUserProfile = async (req, res) => {
     try {
         const { id, firstName, lastName, avatar } = req.body;
 
-        // 사용자 ID로 사용자 정보 찾기 및 업데이트
+        // find and update user info using user Id
         const updatedUser = await User.findByIdAndUpdate(
             id,
             { firstName, lastName, avatar },
-            { new: true } // 업데이트된 정보를 반환하도록 설정
+            { new: true } // return updated user info
         );
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 성공적으로 업데이트된 정보를 반환
+        // when success
         res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (error) {
         console.error('Error updating profile:', error);
@@ -145,7 +145,7 @@ export const getUserDetails = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        // ObjectId 형식이 유효한지 확인
+        // check if its object Id 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             console.error('Invalid user ID format');
             return res.status(400).json({
@@ -154,12 +154,12 @@ export const getUserDetails = async (req, res) => {
             });
         }
 
-        // userId로 사용자 찾기 and populate friendIds + select avatar
+        // find user by userId and populate friendIds + select avatar
         const user = await User.findById(userId)
             .populate('friendIds', 'firstName lastName avatar') // 친구 목록의 firstName, lastName, avatar 가져오기
             .select('firstName lastName avatar email');   // 필요한 사용자 필드만 선택
 
-        // 사용자가 존재하지 않을 경우
+        // if user doesn't excists
         if (!user) {
             console.error('User not found in database');
             return res.status(404).json({
@@ -168,14 +168,14 @@ export const getUserDetails = async (req, res) => {
             });
         }
 
-        // 성공적으로 사용자 정보를 가져온 경우
+        // when success
         res.status(200).json({
             success: true,
             message: "Successfully fetched user details",
             data: user,
         });
     } catch (error) {
-        // 오류 발생 시
+        // when unsuccess
         console.error('Error fetching user details:', error);
         res.status(500).json({
             success: false,

@@ -18,14 +18,14 @@ const ManageGroup = () => {
       try {
         const response = await fetch(`http://localhost:3000/api/groups/list?search=${user.email}&searchType=createdBy`);
         const result = await response.json();
-        console.log("My groups:", result.data);  // 서버에서 받아온 그룹 정보 확인
-        setGroups(result.data || []);  // 데이터가 없으면 빈 배열 설정
+        console.log("My groups:", result.data);  // check froup data
+        setGroups(result.data || []);  // reset array if there is no data
       } catch (error) {
         console.error('Error fetching groups:', error);
-        setGroups([]);  // 에러가 발생하면 빈 배열 설정
+        setGroups([]);  // reset array if there is error
       }
     };
-    fetchGroups(user.id);  // 오브젝트 아이디를 기반으로 그룹 필터링
+    fetchGroups(user.id);  // filter based on obj Id
   }, []);
 
   const handleManageMembers = (groupName) => {
@@ -72,7 +72,7 @@ const ManageGroup = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   {group.status === 'pending' ? (
-                    // 그룹 상태가 "pending"인 경우 "Pending" 버튼만 표시
+                    // if the group status is pending, show pending button instead
                     <button
                       style={{
                         padding: '0.7rem 1.2rem',
@@ -88,7 +88,7 @@ const ManageGroup = () => {
                       Pending
                     </button>
                   ) : (
-                    // 그룹 상태가 "pending"이 아닌 경우 "Manage Members"와 "Manage Posts" 버튼 표시
+                    // if the group status is not pending, display "Manage Members", "Manage Posts" buttons
                     <>
                       <button
                         onClick={() => handleManageMembers(group.groupName)}

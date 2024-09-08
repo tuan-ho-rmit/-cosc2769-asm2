@@ -5,7 +5,7 @@ export default function Friends() {
     return (
         <>
             <NavigationBar/>
-            <Outlet />
+            <Outlet/>
         </>
     )
 }
