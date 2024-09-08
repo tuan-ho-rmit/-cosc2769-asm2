@@ -190,6 +190,12 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       }
   
       await comment.save();
+      await createNoti(
+        'New reaction on your comment',
+        [comment.author._id],
+        'unread',
+        `/post/${comment.postId}`
+    );
       res.status(200).json(comment.reactions);
     } catch (error) {
       console.error('Error adding or updating comment reaction:', error);
