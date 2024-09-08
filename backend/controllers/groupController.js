@@ -286,6 +286,14 @@ export const acceptMember = async (req, res) => {
     // 중복되지 않게 유저 오브젝트 아이디 추가
     if (!group.members.includes(user._id)) {
       group.members.push(user._id);
+
+      createNoti(
+          'You have successfully joined a group',
+          [user._id],
+          'unread',
+          `/api/groups/${groupId}`
+      )
+      
       await group.save();
     } else {
       return res.status(400).json({ message: 'User is already a member of the group' });
