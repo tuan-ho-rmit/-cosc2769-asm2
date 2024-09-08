@@ -7,6 +7,7 @@ import NotificationsProvider from "../right-side-bar/NotificationsContext.jsx";
 import { useAuth } from '../../provider/AuthProvider.jsx';
 
 export default function PrivateLayout() {
+
     const { user, isFetchedUser } = useAuth()
     const navigate = useNavigate()
     useEffect(() => {

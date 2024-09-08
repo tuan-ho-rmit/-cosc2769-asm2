@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {NavLink, useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../provider/AuthProvider';
+import {useAuth} from '../../provider/AuthProvider';
 
+// define navigation items with paths, titles and icons
 const items = [
     {
         path: '/',
@@ -17,8 +18,8 @@ const items = [
                 strokeLinecap="round"
                 strokeLinejoin="round"
             >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
         ),
     },
@@ -55,8 +56,9 @@ const items = [
 export default function LeftSideBar() {
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
-    const { user } = useAuth()
+    const {user} = useAuth() // get user ata from AuthProvider Context
 
+    // check if the user role is admin and update state
     useEffect(() => {
         if (user?.role === 'admin') {
             setIsAdmin(true);
@@ -64,11 +66,10 @@ export default function LeftSideBar() {
     }, [user])
 
 
-
     const handleLogOut = async () => {
         try {
             // Send logout request to the server
-            await axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
+            await axios.post('http://localhost:3000/api/auth/logout', {}, {withCredentials: true});
 
             // Redirect to the login page
             navigate('/login');
@@ -79,14 +80,16 @@ export default function LeftSideBar() {
     };
 
     return (
-        <div className="w-[250px] bg-black relative left-0 text-white h-[100vh-50px] flex flex-col justify-between border-white border-r-1">
+        <div
+            className="w-[250px] bg-black relative left-0 text-white h-[100vh-50px] flex flex-col justify-between border-white border-r-1">
             <nav className="text-white">
                 <ul className="grid grid-cols-1 divide-y divide-white/20">
+                    {/*render navigation items using map*/}
                     {items.map((item, index) => (
                         <li key={index} className="flex h-[40px] items-center">
                             <NavLink
                                 to={item.path}
-                                className={({ isActive }) =>
+                                className={({isActive}) =>
                                     `inline-flex justify-between w-[100%] h-[100%] ${isActive ? 'bg-darkPrimary ' : 'hover:bg-grey-500'} transition-colors duration-300 ease-in-out`
                                 }
                             >
@@ -97,11 +100,12 @@ export default function LeftSideBar() {
                             </NavLink>
                         </li>
                     ))}
+                    {/*conditionally render admin panel if user has admin role*/}
                     {isAdmin && (
                         <li className="flex h-[40px] items-center">
                             <NavLink
                                 to="/admin"
-                                className={({ isActive }) =>
+                                className={({isActive}) =>
                                     `inline-flex justify-between w-[100%] h-[100%] ${isActive ? 'bg-darkPrimary ' : 'hover:bg-grey-500'} transition-colors duration-300 ease-in-out`
                                 }
                             >
@@ -115,8 +119,8 @@ export default function LeftSideBar() {
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                     >
-                                        <path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5" />
-                                        <path d="M16 3a2 2 0 0 1 2 2v4m-7 4l8-8" />
+                                        <path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/>
+                                        <path d="M16 3a2 2 0 0 1 2 2v4m-7 4l8-8"/>
                                     </svg>
                                     <span className="mx-7">Admin</span>
                                 </div>
@@ -128,7 +132,7 @@ export default function LeftSideBar() {
             <button
                 onClick={handleLogOut}
                 className="inline-flex justify-center items-center w-full h-[40px] text-white mb-5 hover:bg-grey-500 transition-colors duration-300 ease-in-out"
-                style={{ padding: '8px 16px', borderRadius: '8px' }}
+                style={{padding: '8px 16px', borderRadius: '8px'}}
             >
                 <div className="inline-flex items-center justify-between">
                     <svg
@@ -142,9 +146,9 @@ export default function LeftSideBar() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >
-                        <path stroke="none" d="M0 0h24v24H0z" />
-                        <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-                        <path d="M7 12h14l-3 -3m0 6l3 -3" />
+                        <path stroke="none" d="M0 0h24v24H0z"/>
+                        <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
+                        <path d="M7 12h14l-3 -3m0 6l3 -3"/>
                     </svg>
                     <span className="mx-7">Log Out</span>
                 </div>

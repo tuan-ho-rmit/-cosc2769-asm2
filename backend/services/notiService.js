@@ -1,5 +1,6 @@
 import Notification from "../models/Notification.js";
 
+// function to create a new notification
 export const createNoti = async (notiTitle, userIds, status, activityUrl) => {
     try {
         const newNoti = new Notification({
@@ -10,6 +11,8 @@ export const createNoti = async (notiTitle, userIds, status, activityUrl) => {
         });
 
         console.log(newNoti)
+
+        // save the new notification to the database
         const savedNoti = await newNoti.save();
         // res.status(201).json(savedNoti);
     } catch (err) {

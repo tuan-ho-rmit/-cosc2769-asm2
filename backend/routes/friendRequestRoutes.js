@@ -8,11 +8,11 @@ import {
 } from "../controllers/friendRequestController.js";
 
 const router = express.Router();
-router.post ('/', createFriendRequest)
-router.get ('/', getAllFriendRequests)
-router.get ('/friendslist/:userId', getUserFriendsList)
-router.patch ('/:requestId/accept', acceptFriendRequest)
-router.patch ('/:requestId/reject', rejectFriendRequest)
+router.post('/', createFriendRequest)
+router.get('/', getAllFriendRequests)
+router.get('/friendslist/:userId', getUserFriendsList)
+router.patch('/:requestId/accept', acceptFriendRequest)
+router.patch('/:requestId/reject', rejectFriendRequest)
 router.get('/single/:firstId/:secondId', findFriendRequest)
 
 
