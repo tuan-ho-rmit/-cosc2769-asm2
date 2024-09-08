@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import UnfriendAction from "../actions/UnfriendAction.jsx";
 import BasePaginationList from "../../../../components/pagination/BasePaginationList.jsx";
 import Button from "../../../../components/button/index.jsx";
-import { NavLink } from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
 export default function FriendList() {
     const [friends, setFriends] = useState([]);
-    const [loading, setLoading] = useState(true)
-    const [currentUser, setCurrentUser] = useState(null)
+    const [loading, setLoading] = useState(true) // loading state
+    const [currentUser, setCurrentUser] = useState(null) // current user ID
     const [friendRequest, setFriendRequest] = useState()
-    const [request, setRequest] = useState(null)
+    const [request, setRequest] = useState(null) // process friend request data
 
+    // fetch friend requests and user data
     const fetchFriendRequest = async () => {
         try {
             // Fetch current user
@@ -23,6 +24,7 @@ export default function FriendList() {
                 throw new Error('Error fetching current user');
             }
 
+            // extract relevant data from current user
             const currentUserData = await currentUserResponse.json();
             console.log('fetched current User Data:', currentUserData)
             // setCurrentUser(currentUserData.user);
@@ -38,8 +40,7 @@ export default function FriendList() {
             const friendList = currentData.friendIds
             console.log('array of friends (currentData.friendIds): ', friendList)
 
-            // fetch friend request
-
+            // fetch all friend request
             const response = await fetch(`http://localhost:3000/api/friendrequest/`, {
                 method: 'GET',
                 headers: {
@@ -47,45 +48,34 @@ export default function FriendList() {
                 },
                 credentials: 'include',
             });
-
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
             }
-
             const allFriendRequests = await response.json();
             console.log('all friend requests:', allFriendRequests)
             // setFriendRequest(resultToUser)
 
+            // filter accepted friend requests based on user involvement (sent or received)
             const acceptedRequests = allFriendRequests.filter(request => ((request.status === 'accepted') && (request.toId === currentUserId)) || ((request.status === 'accepted') && (request.fromId === currentUserId)))
             console.log('accepted rq:', acceptedRequests)
 
-
-            // testing filtering duplicated requests
+            // remove duplicated requests by user pair (fromId and toId)
             const uniqueRequests = [];
             const seenPairs = new Set();
-
-            // Iterate over each request in acceptedRequests
             acceptedRequests.forEach(request => {
-                const { fromId, toId } = request;
-
-                // Create a unique key for the pair
+                const {fromId, toId} = request;
                 const pairKey = fromId < toId ? `${fromId}-${toId}` : `${toId}-${fromId}`;
-
-                // If this pairKey has not been seen before, add it to the Set and push to uniqueRequests
                 if (!seenPairs.has(pairKey)) {
                     seenPairs.add(pairKey);
                     uniqueRequests.push(request);
                 }
             })
-
             console.log('unique requests: ', uniqueRequests)
-
 
             // Fetch user details for each request
             const requestsWithUserDetails = await Promise.all(uniqueRequests.map(async (request) => {
-                const { fromId, toId } = request;
-
+                const {fromId, toId} = request;
                 // Fetch details for fromId
                 const fromUserResponse = await fetch(`http://localhost:3000/api/users/${fromId}`, {
                     method: 'GET',
@@ -94,7 +84,6 @@ export default function FriendList() {
                     },
                     credentials: 'include',
                 });
-
                 if (!fromUserResponse.ok) {
                     const errorText = await fromUserResponse.text();
                     throw new Error(`HTTP error! Status: ${fromUserResponse.status}, Message: ${errorText}`);
@@ -118,6 +107,7 @@ export default function FriendList() {
                 const toUserData = await toUserResponse.json();
                 console.log('toUserData:', toUserData.data.firstName);
 
+                // combining requests details with users' names
                 return {
                     ...request,
                     fromUser: `${fromUserData.data.firstName} ${fromUserData.data.lastName}`,
@@ -142,6 +132,7 @@ export default function FriendList() {
 
     if (loading) return <p>Loading...</p>
 
+    // display message if users have no friends yet
     if (friends.length === 0 && !loading) {
         return <p>You don't have any friends yet.</p>;
     }
@@ -156,34 +147,43 @@ export default function FriendList() {
                     marginTop: "16px"
                 }}
             >
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px", margin: "0px 16px" }}>
+                <div style={{display: "flex", flexDirection: "column", gap: "16px", margin: "0px 16px"}}>
+                    {/*render friend list items if data is available*/}
                     {friends.map(friend => {
-                        const displayName = (friend.fromId === currentUser)
-                            ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
-                            : friend.fromUser;  // Otherwise, display 'fromUser'
+                            const displayName = (friend.fromId === currentUser)
+                                ? friend.toUser  // If the currentUserId is the 'fromId', display 'toUser'
+                                : friend.fromUser;  // Otherwise, display 'fromUser'
 
-                        return (
-                            <div key={friend.id}
-                                className="border p-4 rounded-md shadow-md"
-                                style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start", alignItems: "center", gap: "16px" }}
-                            >
+                            return (
+                                <div key={friend.id}
+                                     className="border p-4 rounded-md shadow-md"
+                                     style={{
+                                         display: "flex",
+                                         flexDirection: "row",
+                                         justifyContent: "flex-start",
+                                         alignItems: "center",
+                                         gap: "16px"
+                                     }}
+                                >
 
-                                <span>{displayName}</span>
-                                <Button
-                                    variant='primary'
-                                    size={'md'}
-                                    ripple={'true'}>
-                                    <NavLink to={`/user/${friend.fromId === currentUser ? friend.toId : friend.fromId}`}>
-                                        View Profile
-                                    </NavLink>
-                                </Button>
-                                <UnfriendAction
-                                    fetchFriendRequest={fetchFriendRequest}
-                                    request={friend}
-                                />
-                            </div>
-                        );
-                    }
+                                    <span>{displayName}</span>
+                                    {/*render buttons to view friend's profile and unfriend*/}
+                                    <Button
+                                        variant='primary'
+                                        size={'md'}
+                                        ripple={'true'}>
+                                        <NavLink
+                                            to={`/user/${friend.fromId === currentUser ? friend.toId : friend.fromId}`}>
+                                            View Profile
+                                        </NavLink>
+                                    </Button>
+                                    <UnfriendAction
+                                        fetchFriendRequest={fetchFriendRequest}
+                                        request={friend}
+                                    />
+                                </div>
+                            );
+                        }
                     )}
                 </div>
             </div>

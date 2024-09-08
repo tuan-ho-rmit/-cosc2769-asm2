@@ -1,7 +1,7 @@
 import {pushError, pushSuccess} from "../../../../components/Toast/index.jsx";
 import Button from "../../../../components/button/index.jsx";
 
-export default function UnfriendAction ({request, fetchFriendRequest}) {
+export default function UnfriendAction({request, fetchFriendRequest}) {
     // unfriend function
     const unfriend = async () => {
         try {
@@ -28,9 +28,9 @@ export default function UnfriendAction ({request, fetchFriendRequest}) {
     };
     return (
         <Button onClick={unfriend}
-        variant='danger'
-        size='md'
-        ripple='true'>
+                variant='danger'
+                size='md'
+                ripple='true'>
             Unfriend
         </Button>
     )
