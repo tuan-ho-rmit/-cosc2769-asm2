@@ -4,7 +4,7 @@ import Groupnav from '../../components/groupnav';
 import { useAuth } from '../../provider/AuthProvider';
 
 const DiscoverGroup = () => {
-  const {user} = useAuth()
+  const {user} = useAuth();
   const [groups, setGroups] = useState([]);
   const [requestedGroups, setRequestedGroups] = useState([]);
   const [joinedGroups, setJoinedGroups] = useState([]); // 빈 배열로 초기화
@@ -14,7 +14,6 @@ const DiscoverGroup = () => {
     // 그룹을 가져오는 함수
     const fetchGroups = async () => {
       try {
-        // 서버에서 'active' 상태인 그룹만 필터링해서 가져옴
         const response = await fetch('http://localhost:3000/api/groups?status=active');
         const result = await response.json();
         setGroups(result);
@@ -70,7 +69,7 @@ const DiscoverGroup = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ groupName }),
-        credentials: 'include', // 세션 쿠키 포함
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -81,18 +80,19 @@ const DiscoverGroup = () => {
 
       const result = await response.json();
       alert('Group join request has been submitted. Please wait for the group leader’s approval.');
-      window.location.reload(); // 페이지 새로고침
+      window.location.reload();
     } catch (error) {
       console.error('Error creating group join request:', error.message);
     }
   };
 
-  const handleView = (group) => {
-    if (group.visibility === 'private') {
+  const handleView = (groupName, visibility) => {
+    if (visibility === 'private') {
       alert('The content of this group is private. To gain access and view its details, please request to join the group.');
       return;
     }
-    navigate(`/groupmain/${group._id}`);
+    // 그룹 이름을 사용하여 네비게이션
+    navigate(`/groupmainvisit/${groupName}`);
   };
 
   return (
@@ -113,7 +113,7 @@ const DiscoverGroup = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button
-                  onClick={() => handleView(group)}
+                  onClick={() => handleView(group.groupName, group.visibility)}  
                   style={{ padding: '0.5rem 1rem', backgroundColor: '#FFD369', color: '#222831', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}
                 >
                   View

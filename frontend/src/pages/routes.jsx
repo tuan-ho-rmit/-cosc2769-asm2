@@ -18,6 +18,7 @@ import AdminPosts from "./admin/components/posts";
 import DiscoverGroup from "./discovergroup";
 import GroupMemberManagement from "./groupmembermanagement";
 import GroupMain from "./groupmain";
+import GroupMainVisit from "./groupmainvisit"
 import Friends from "./friends/index.jsx";
 import FriendList from "./friends/components/friendlist/index.jsx";
 import FriendRequest from "./friends/components/friendrequest/index.jsx";
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
       { path: 'discovergroup', element: <DiscoverGroup /> },
       { path: 'groupmembermanagement/:groupName', element: <GroupMemberManagement /> },
       { path: 'groupmain/:groupId', element: <GroupMain /> },
+      { path: 'groupmainvisit/:groupName', element: <GroupMainVisit /> },
       { path: 'post/:id', element: <PostDetail /> },
       { path: "post/:id/history", element: <PostHistory /> },
       { path: "comment/:commentId/history", element: <CommentHistory /> },
