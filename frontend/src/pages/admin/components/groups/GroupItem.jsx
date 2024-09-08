@@ -99,7 +99,7 @@ export default function GroupItem({
             <hr className="my-4" />
             <div className="flex flex-col md:flex-row">
                 <p className="text-sm text-grey-200 mb-1 md:mb-0">
-                    <strong>Created by: {group.createdBy}</strong>
+                    <strong>Created by: {group.createdBy.email}</strong>
                 </p>
                 <p className="text-sm text-grey-200 mb-1 md:mb-0 ml-0 md:ml-3">
                     <strong>Members: {group.members.length}</strong>

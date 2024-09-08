@@ -16,7 +16,7 @@ const ManageGroup = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/api/groups/list?createdBy=${userId}`);
+        const response = await fetch(`http://localhost:3000/api/groups/list?search=${user.email}&searchType=createdBy`);
         const result = await response.json();
         console.log("My groups:", result.data);  // 서버에서 받아온 그룹 정보 확인
         setGroups(result.data || []);  // 데이터가 없으면 빈 배열 설정
