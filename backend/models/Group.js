@@ -18,7 +18,7 @@ const groupSchema = new mongoose.Schema({
     default: 'pending',
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,  // ObjectId로 정의
+    type: mongoose.Schema.Types.ObjectId,  // ObjectId
     ref: 'User',
     required: true,
   },

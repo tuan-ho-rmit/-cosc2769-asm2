@@ -496,8 +496,8 @@ export const createGroupPost = async (req, res) => {
           author: req.session.user.id,
           images,
           date: new Date(),
-          groupId,  // 그룹 ID 추가
-          isGroupPost: true,  // 그룹 게시물로 설정
+          groupId,  
+          isGroupPost: true,  // set as group post
       });
 
       await newPost.save();
