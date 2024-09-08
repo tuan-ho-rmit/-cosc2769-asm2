@@ -11,22 +11,24 @@ import 'slick-carousel/slick/slick-theme.css';
 import './PostDetail.css';
 import { useAuth } from '../../provider/AuthProvider';
 
+// Main PostDetail component which handles displaying a post's details, comments, and reactions.
 export default function PostDetail() {
-  const {user} = useAuth()
-  const { id: postId } = useParams();
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState("");
-  const [editedImages, setEditedImages] = useState([]);
-  const [reactionCounts, setReactionCounts] = useState({}); // reaction 개수 상태 추가
+  const {user} = useAuth(); // Get the current user from the authentication context
+  const { id: postId } = useParams(); // Retrieve the post ID from the URL parameters
+  const [post, setPost] = useState(null); // State to store post details
+  const [comments, setComments] = useState([]); // State to store comments on the post
+  const [isEditing, setIsEditing] = useState(false); // State to track if the post is being edited
+  const [editedContent, setEditedContent] = useState(""); // State to track the content during editing
+  const [editedImages, setEditedImages] = useState([]); // State to track the images during editing
+  const [reactionCounts, setReactionCounts] = useState({}); // State to store the reaction counts for the post
 
   useEffect(() => {
-    fetchPostDetails(postId);
-    fetchComments(postId);
-    fetchReactionCounts(postId); // 리액션 개수 가져오기
+    fetchPostDetails(postId); // Fetch post details when the component mounts or postId changes
+    fetchComments(postId); // Fetch comments when the component mounts or postId changes
+    fetchReactionCounts(postId); // Fetch reaction counts for the post
   }, [postId]);
 
+  // Function to fetch post details, including handling group information if groupId is a string.
   const fetchPostDetails = async (postId) => {
     try {
         const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
@@ -41,30 +43,29 @@ export default function PostDetail() {
         const data = await response.json();
         console.log("Fetched post details:", data);
 
-        // groupId가 문자열인지 확인
+        // Check if groupId is still a string, and if so, fetch group details
         if (typeof data.groupId === 'string') {
             console.log("Group ID is still a string:", data.groupId);
 
-            // 문자열로 되어 있을 경우, 그룹 정보를 다시 요청
+            // Fetch group information to populate groupId field
             const groupResponse = await fetch(`http://localhost:3000/api/groups/${data.groupId}`, {
                 method: 'GET',
                 credentials: 'include',
             });
 
             const groupData = await groupResponse.json();
-            data.groupId = groupData;  // groupId를 객체로 교체
+            data.groupId = groupData; // Replace groupId string with the actual group object
         }
 
-        setPost(data);
-        setEditedContent(data.content);
-        setEditedImages(data.images);
+        setPost(data); // Update post state
+        setEditedContent(data.content); // Initialize content for editing
+        setEditedImages(data.images); // Initialize images for editing
     } catch (error) {
         console.error('Error fetching the post:', error);
     }
-};
+  };
 
-
-
+  // Function to fetch comments for a given post
   const fetchComments = async (postId) => {
     try {
       const response = await fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
@@ -72,16 +73,18 @@ export default function PostDetail() {
         credentials: 'include',
       });
       const data = await response.json();
-      setComments(data);
+      setComments(data); // Update comments state
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
   };
 
+  // Function to handle adding a new comment
   const handleAddComment = (newCommentText) => {
     const newComment = { content: newCommentText, author: user };
-    setComments([...comments, newComment]);
+    setComments([...comments, newComment]); // Optimistically update comments UI
 
+    // Send new comment to the server
     fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
       method: 'POST',
       headers: {
@@ -92,11 +95,12 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(postId);
+        fetchComments(postId); // Refresh comments after successful addition
       })
       .catch(error => console.error('Error adding comment:', error));
   };
 
+  // Function to handle editing a comment
   const handleEditComment = (postId, commentId, newContent) => {
     fetch(`http://localhost:3000/api/posts/${postId}/comments/${commentId}`, {
       method: 'PUT',
@@ -108,11 +112,12 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        fetchComments(postId);
+        fetchComments(postId); // Refresh comments after editing
       })
       .catch(error => console.error('Error editing comment:', error));
   };
 
+  // Function to handle deleting a comment
   const handleDeleteComment = (postId, commentId) => {
     console.log(`Deleting comment with postId: ${postId} and commentId: ${commentId}`);
 
@@ -121,11 +126,12 @@ export default function PostDetail() {
       credentials: 'include',
     })
       .then(() => {
-        fetchComments(postId);
+        fetchComments(postId); // Refresh comments after deletion
       })
       .catch(error => console.error('Error deleting comment:', error));
   };
 
+  // Function to handle saving an edited post
   const handleSavePost = () => {
     fetch(`http://localhost:3000/api/posts/${postId}`, {
       method: 'PUT',
@@ -137,14 +143,13 @@ export default function PostDetail() {
     })
       .then(response => response.json())
       .then(() => {
-        // 업데이트된 포스트 다시 가져오기
-        fetchPostDetails(postId); // 업데이트 후 다시 데이터 불러오기
-        setIsEditing(false);
+        fetchPostDetails(postId); // Refresh post details after updating
+        setIsEditing(false); // Exit editing mode
       })
       .catch(error => console.error('Error updating post:', error));
   };
-  
 
+  // Function to handle deleting a post
   const handleDeletePost = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       fetch(`http://localhost:3000/api/posts/${postId}`, {
@@ -152,12 +157,13 @@ export default function PostDetail() {
         credentials: 'include',
       })
         .then(() => {
-          window.location.href = '/';
+          window.location.href = '/'; // Redirect after successful deletion
         })
         .catch(error => console.error('Error deleting post:', error));
     }
   };
 
+  // Function to fetch reaction counts for a post
   const fetchReactionCounts = async (postId) => {
     try {
       const response = await fetch(`http://localhost:3000/api/posts/${postId}/reactions/count`, {
@@ -165,18 +171,21 @@ export default function PostDetail() {
         credentials: 'include',
       });
       const data = await response.json();
-      setReactionCounts(data);
+      setReactionCounts(data); // Update reaction counts state
     } catch (error) {
       console.error('Error fetching reaction counts:', error);
     }
   };
 
+  // Function to update reaction counts
   const updateReactionCounts = () => {
     fetchReactionCounts(postId);
   };
 
+  // If post is not yet fetched, show loading state
   if (!post) return <div>Loading...</div>;
 
+  // Slick slider settings for image slider
   const settings = {
     dots: true,
     infinite: false,
@@ -188,21 +197,21 @@ export default function PostDetail() {
 
   return (
     <div className="postDetailContainer">
-        {/* 그룹 포스트인 경우 그룹 정보 렌더링 */}
-  {post.groupId && (
-    <div className="groupInfo">
-      <div className="groupAvatar">
-        <img 
-          src={post.groupId.avatar || 'default-group-avatar-url.jpg'} 
-          alt="Group Avatar" 
-          className="w-10 h-10 rounded-full" 
-        />
-      </div>
-      <div className="groupName">
-        <p>{post.groupId.groupName}</p>
-      </div>
-    </div>
-  )}
+        {/* Render group information if the post is a group post */}
+        {post.groupId && (
+          <div className="groupInfo">
+            <div className="groupAvatar">
+              <img 
+                src={post.groupId.avatar || 'default-group-avatar-url.jpg'} 
+                alt="Group Avatar" 
+                className="w-10 h-10 rounded-full" 
+              />
+            </div>
+            <div className="groupName">
+              <p>{post.groupId.groupName}</p>
+            </div>
+          </div>
+        )}
       <div className="postHeader">
         <div className="imgContainer">
           <div className='mx-4'>
@@ -221,12 +230,13 @@ export default function PostDetail() {
             <p>{new Date(post.date).toLocaleString()}</p>
           </div>
         </div>
-        
+
+        {/* Show edit and delete options for the post's author */}
         {user && user.id === post.author?._id && (
           <div className="dropDown">
             <DropDowns
-              onEdit={() => setIsEditing(true)}
-              onDelete={handleDeletePost}
+              onEdit={() => setIsEditing(true)} // Enter editing mode
+              onDelete={handleDeletePost} // Delete post
             />
           </div>
         )}
@@ -245,6 +255,7 @@ export default function PostDetail() {
         )}
       </div>
       
+      {/* Display reaction counts */}
       <div className="reactionCounts">
         {Object.entries(reactionCounts).map(([type, count]) => (
           <div key={type} className="reactionCount">
@@ -252,6 +263,7 @@ export default function PostDetail() {
           </div>
         ))}
       </div>
+      {/* Image slider for post images */}
       {post.images && post.images.length > 0 && (
         <div className="imageSlider">
           <Slider {...settings}>
@@ -264,7 +276,7 @@ export default function PostDetail() {
         </div>
       )}
 
-      {/* Modified History Button - 작성자에게만 표시 */}
+      {/* Show modified history button for post author */}
       {user && user.id === post.author?._id && post.history && post.history.length > 0 && (
         <div className="modifiedSection">
           <Link to={`/post/${postId}/history`}>
@@ -273,6 +285,7 @@ export default function PostDetail() {
         </div>
       )}
 
+      {/* Editing controls */}
       {isEditing && (
         <div className="editButtons">
           <button onClick={handleSavePost}>Save</button>
@@ -282,6 +295,7 @@ export default function PostDetail() {
 
       <hr className="solidPost"></hr>
       <div className="likeAndComment">
+        {/* Post reactions component */}
         <span className="likeBtn">
           <PostWithReactions postId={postId} onReactionUpdate={updateReactionCounts} />
         </span>
@@ -291,7 +305,7 @@ export default function PostDetail() {
       </div>
       <hr className="solidPost"></hr>
       
-      {/* 댓글 섹션 추가 */}
+      {/* Comments section */}
       <div className="commentsSection">
         <ListOfComments 
           postId={postId} 

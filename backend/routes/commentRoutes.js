@@ -19,7 +19,7 @@ router.delete('/:postId/comments/:commentId', deleteComment);
 // 댓글 수정
 router.put('/posts/:postId/comments/:commentId', updateCommentInPostDetail);
 
-// 댓글 삭제
+// Delete Comment
 router.delete('/:postId/comments/:commentId', deleteCommentInPostDetail);
 
 router.get('/comments/:commentId/history', getCommentHistoryRoute); // 경로 수정

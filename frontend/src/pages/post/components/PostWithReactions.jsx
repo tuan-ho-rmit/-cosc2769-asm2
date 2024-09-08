@@ -16,11 +16,11 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
 
   const currentUserId = user?.id;
 
-  // 이전 상태 저장 변수 추가
+  // Adding Previous State Storage Variables
   const [lastFetchedPostId, setLastFetchedPostId] = useState(null);
 
   useEffect(() => {
-    // 이전에 호출한 postId와 동일한지 확인하여 중복 호출 방지
+    // Prevent duplicate calls by ensuring that they are the same as the previously called postId
     if (lastFetchedPostId !== postId) {
       const fetchReactions = async () => {
         try {
@@ -45,12 +45,12 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
             setSelectedPostReaction(null);
           }
 
-          // 리액션 상태가 업데이트될 때마다 외부 콜백 호출
+          // Calling an external callback each time the reaction status is updated
           if (onReactionUpdate) {
             onReactionUpdate();
           }
 
-          // 상태 업데이트
+          // Update Status
           setLastFetchedPostId(postId);
         } catch (error) {
           console.error('Error fetching post reactions:', error);
@@ -84,7 +84,7 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
         setSelectedPostReaction(null);
         console.log('Reaction removed');
 
-        // 리액션이 삭제되었을 때 외부 콜백 호출
+        // Calling an external callback when a reaction is deleted
         if (onReactionUpdate) {
           onReactionUpdate();
         }
@@ -112,7 +112,7 @@ export function PostWithReactions({ postId, onReactionUpdate }) {
         const data = await response.json();
         console.log('Reaction added or updated:', data);
 
-        // 리액션이 추가되었을 때 외부 콜백 호출
+        // Calling an external callback when a reaction is added
         if (onReactionUpdate) {
           onReactionUpdate();
         }

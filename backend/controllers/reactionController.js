@@ -4,14 +4,14 @@ import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
 import {createNoti} from "../services/notiService.js";
 
-// controllers/reactionController.js
-
+// Get a specific post by its ID and include reactions
 export const getPostById = async (req, res) => {
     try {
       const { postId } = req.params;
+      // Find post by ID and populate author and reactions (with user details)
       const post = await Post.findById(postId)
         .populate('author', 'firstName lastName avatar')
-        .populate('reactions.userId', 'firstName lastName avatar'); // 리액션 작성자의 정보도 포함하여 가져옴
+        .populate('reactions.userId', 'firstName lastName avatar'); // Include the details of users who reacted
   
       if (!post) {
         return res.status(404).json({ message: 'Post not found' });
@@ -22,19 +22,19 @@ export const getPostById = async (req, res) => {
       console.error('Error fetching post:', error);
       res.status(500).json({ message: 'Error fetching post', error: error.message });
     }
-  };
+};
 
-  // 특정 포스트에 대한 사용자의 리액션 가져오기
+// Get the user's specific reaction to a post
 export const getUserReactionForPost = async (req, res) => {
     try {
       const { postId } = req.params;
-      const userId = req.session.user?.id; // 세션에서 사용자 ID 가져오기
+      const userId = req.session.user?.id; // Get user ID from session
   
       if (!userId) {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
-      // 특정 포스트에서 사용자의 리액션 찾기
+      // Find the post and look for the user's reaction in the reactions array
       const post = await Post.findById(postId).select('reactions');
       
       if (!post) {
@@ -50,39 +50,40 @@ export const getUserReactionForPost = async (req, res) => {
       console.error('Error fetching user reaction for post:', error);
       res.status(500).json({ message: 'Error fetching user reaction for post', error: error.message });
     }
-  };
-// 리액션 추가 또는 업데이트
+};
+
+// Add or update the user's reaction to a post
 export const addOrUpdateReaction = async (req, res) => {
     try {
       const { postId } = req.params;
       const { reaction } = req.body;
-      const userId = req.session.user?.id; // 세션에서 사용자 ID 가져오기
+      const userId = req.session.user?.id; // Get user ID from session
   
       if (!userId) {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
+      // Find the post by ID
       const post = await Post.findById(postId);
       if (!post) {
         return res.status(404).json({ message: 'Post not found' });
       }
   
-      // 사용자의 기존 리액션을 찾아서 업데이트
+      // Check if the user already reacted, if so, update the reaction type
       const existingReactionIndex = post.reactions.findIndex(
         (r) => r.userId.toString() === userId
       );
   
       if (existingReactionIndex !== -1) {
-        // 리액션이 이미 존재하면 업데이트
         post.reactions[existingReactionIndex].type = reaction;
       } else {
-        // 리액션이 없다면 새로 추가
+        // If no reaction exists, add a new one
         post.reactions.push({ userId, type: reaction });
       }
   
       await post.save();
 
-      // add Notification
+      // Send a notification to the post author about the new reaction
       const existedPost = await Post.findById(postId).populate('author');
       await createNoti(
           'New comment on your post',
@@ -96,24 +97,25 @@ export const addOrUpdateReaction = async (req, res) => {
       console.error('Error adding or updating reaction:', error);
       res.status(500).json({ message: 'Error adding or updating reaction', error: error.message });
     }
-  };
-  
-// 리액션 삭제
+};
+
+// Remove the user's reaction from a post
 export const removeReaction = async (req, res) => {
     try {
       const { postId } = req.params;
-      const userId = req.session.user?.id; // 세션에서 사용자 ID 가져오기
+      const userId = req.session.user?.id; // Get user ID from session
   
       if (!userId) {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
+      // Find the post by ID
       const post = await Post.findById(postId);
       if (!post) {
         return res.status(404).json({ message: 'Post not found' });
       }
   
-      // 사용자의 리액션을 찾아 삭제
+      // Filter out the user's reaction from the post
       post.reactions = post.reactions.filter(
         (r) => r.userId.toString() !== userId
       );
@@ -124,21 +126,19 @@ export const removeReaction = async (req, res) => {
       console.error('Error removing reaction:', error);
       res.status(500).json({ message: 'Error removing reaction', error: error.message });
     }
-  };
+};
 
-
-// comment reaction
-
+// Get the user's specific reaction to a comment
 export const getUserReactionForComment = async (req, res) => {
     try {
       const { commentId } = req.params;
-      const userId = req.session.user?.id; // 세션에서 사용자 ID 가져오기
+      const userId = req.session.user?.id; // Get user ID from session
   
       if (!userId) {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
-      // 특정 댓글에서 사용자의 리액션 찾기
+      // Find the comment and look for the user's reaction in the reactions array
       const comment = await Comment.findById(commentId).select('reactions');
   
       if (!comment) {
@@ -150,7 +150,7 @@ export const getUserReactionForComment = async (req, res) => {
       );
   
       if (!userReaction) {
-        return res.status(200).json({ reaction: null }); // 사용자가 리액션을 남기지 않은 경우
+        return res.status(200).json({ reaction: null }); // If the user hasn't reacted
       }
   
       res.status(200).json({ reaction: userReaction.type });
@@ -158,9 +158,9 @@ export const getUserReactionForComment = async (req, res) => {
       console.error('Error fetching user reaction for comment:', error);
       res.status(500).json({ message: 'Error fetching user reaction for comment', error: error.message });
     }
-  };
+};
 
-// 댓글에 리액션 추가 또는 업데이트
+// Add or update the user's reaction to a comment
 export const addOrUpdateCommentReaction = async (req, res) => {
     try {
       const { commentId } = req.params;
@@ -171,20 +171,21 @@ export const addOrUpdateCommentReaction = async (req, res) => {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
+      // Find the comment by ID
       const comment = await Comment.findById(commentId);
       if (!comment) {
         return res.status(404).json({ message: 'Comment not found' });
       }
   
+      // Check if the user already reacted, if so, update the reaction type
       const existingReactionIndex = comment.reactions.findIndex(
         (r) => r.userId.toString() === userId
       );
   
       if (existingReactionIndex > -1) {
-        // 리액션이 이미 존재하면 업데이트
         comment.reactions[existingReactionIndex].type = reaction;
       } else {
-        // 리액션이 존재하지 않으면 새로 추가
+        // If no reaction exists, add a new one
         comment.reactions.push({ userId, type: reaction });
       }
   
@@ -194,10 +195,10 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       console.error('Error adding or updating comment reaction:', error);
       res.status(500).json({ message: 'Error adding or updating comment reaction', error: error.message });
     }
-  };
-  
-  // 댓글 리액션 삭제
-  export const removeCommentReaction = async (req, res) => {
+};
+
+// Remove the user's reaction from a comment
+export const removeCommentReaction = async (req, res) => {
     try {
       const { commentId } = req.params;
       const userId = req.session.user?.id;
@@ -206,12 +207,13 @@ export const addOrUpdateCommentReaction = async (req, res) => {
         return res.status(401).json({ message: 'User is not logged in' });
       }
   
+      // Find the comment by ID
       const comment = await Comment.findById(commentId);
       if (!comment) {
         return res.status(404).json({ message: 'Comment not found' });
       }
   
-      // 사용자 리액션 삭제
+      // Filter out the user's reaction from the comment
       comment.reactions = comment.reactions.filter(
         (reaction) => reaction.userId.toString() !== userId
       );
@@ -222,13 +224,14 @@ export const addOrUpdateCommentReaction = async (req, res) => {
       console.error('Error removing comment reaction:', error);
       res.status(500).json({ message: 'Error removing comment reaction', error: error.message });
     }
-  };
+};
 
-// 댓글에 리액션 개수 가져오기
+// Get the count of reactions for a comment
 export const getCommentReactionsCount = async (req, res) => {
   try {
     const { commentId } = req.params;
     
+    // Find the comment and count each reaction type
     const comment = await Comment.findById(commentId).select('reactions');
 
     if (!comment) {
