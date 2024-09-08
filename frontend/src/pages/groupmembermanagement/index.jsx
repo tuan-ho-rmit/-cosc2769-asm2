@@ -7,7 +7,7 @@ const GroupMemberManagement = () => {
   const {user} = useAuth()
   const [requests, setRequests] = useState([]);
   const [members, setMembers] = useState([]);
-  const [suspendedUsers, setSuspendedUsers] = useState([]); // 빈 배열로 초기화
+  const [suspendedUsers, setSuspendedUsers] = useState([]); // reset as empty array
   const { groupName } = useParams();
   const [currentGroupId, setCurrentGroupId] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -25,29 +25,29 @@ const GroupMemberManagement = () => {
           console.error('No user data found in session or User ID is undefined.');
         }
 
-        // 그룹 ID 가져오기
+        // get group Id
         const responseGroupId = await fetch(`http://localhost:3000/api/groups/get-group-id/${groupName}`);
         const groupIdData = await responseGroupId.json();
         setCurrentGroupId(groupIdData._id);
 
-        // 그룹 조인 요청 가져오기
+        // get group join req
         const responseJoinRequests = await fetch(`http://localhost:3000/api/groups/join-requests?groupName=${groupName}`);
         const resultJoinRequests = await responseJoinRequests.json();
         setRequests(resultJoinRequests);
 
-        // 그룹 멤버 가져오기
+        // get group members
         const responseMembers = await fetch(`http://localhost:3000/api/groups/${groupName}/members`);
         const resultMembers = await responseMembers.json();
         setMembers(resultMembers);
 
-        // 서스펜드된 유저 가져오기
+        // get suspended users
         const responseSuspendedUsers = await fetch(`http://localhost:3000/api/groups/suspended-users/${groupIdData._id}`);
         const resultSuspendedUsers = await responseSuspendedUsers.json();
-        // 서스펜드된 유저가 배열인지 확인 후 설정
+        // check for suspended user is array
         if (Array.isArray(resultSuspendedUsers)) {
           setSuspendedUsers(resultSuspendedUsers);
         } else {
-          setSuspendedUsers([]);  // 배열이 아닌 경우 빈 배열로 초기화
+          setSuspendedUsers([]);  // reset as empty array if its not array
         }
       } catch (error) {
         console.error('Error fetching group data:', error);
@@ -57,7 +57,7 @@ const GroupMemberManagement = () => {
     fetchGroupData();
   }, [groupName]);
 
-  // 팝업을 띄우는 함수 (Accept, Reject, Expel, Suspend 등)
+  // popup func (Accept, Reject, Expel, Suspend ...)
   const handleActionClick = (action, id, email = '') => {
     setActionType(action);
     setSelectedId(id);
@@ -65,7 +65,7 @@ const GroupMemberManagement = () => {
     setShowConfirmPopup(true);
   };
 
-  // Accept, Reject 요청 처리
+  // Accept, Reject req
   const handleAcceptReject = async () => {
     const endpoint = actionType === 'Accept' ? 'accept-member' : `join-requests/${selectedId}`;
     const method = actionType === 'Accept' ? 'POST' : 'DELETE';
@@ -90,8 +90,8 @@ const GroupMemberManagement = () => {
         }
         setShowConfirmPopup(false);
 
-        // 페이지를 새로고침하여 업데이트된 멤버 정보 반영
-        window.location.reload();  // 유저 추가 후 페이지 새로고침
+        // rerender page to show updated data
+        window.location.reload();  // rerender
       } else {
         throw new Error(`Failed to ${actionType.toLowerCase()} request`);
       }
@@ -100,7 +100,7 @@ const GroupMemberManagement = () => {
     }
   };
 
-  // 서스펜드 요청 처리
+  // suspend req handle
   const handleSuspend = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/groups/suspend-member', {
@@ -122,7 +122,7 @@ const GroupMemberManagement = () => {
     }
   };
 
-  // 서스펜드 해제 요청 처리
+  // unsuspend req handle
   const handleUnsuspend = async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/groups/unsuspend-member/${currentGroupId}/${selectedId}`, {
@@ -140,7 +140,7 @@ const GroupMemberManagement = () => {
     }
   };
 
-  // 멤버 제거 처리
+  // dekete member handle
   const handleRemoveMember = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/groups/remove-member', {
@@ -155,7 +155,7 @@ const GroupMemberManagement = () => {
         throw new Error('Failed to remove member');
       }
 
-      // 멤버가 삭제된 후 바로 상태 반영
+      
       setMembers(members.filter(member => member._id !== selectedId));
       setShowConfirmPopup(false);
     } catch (error) {
@@ -163,7 +163,7 @@ const GroupMemberManagement = () => {
     }
   };
 
-  // 팝업 닫기 핸들러
+  // close popup handle
   const handleClosePopup = () => {
     setShowConfirmPopup(false);
   };
@@ -232,7 +232,7 @@ const GroupMemberManagement = () => {
                           Expel
                         </button>
 
-                        {/* 서스펜드된 유저인지 확인 */}
+                        {/* check is suspended user */}
                         {/* {suspendedUsers.some(suspended => suspended.userId === member._id) ? (
                           <button
                             onClick={() => handleActionClick('Unsuspend', member._id)}

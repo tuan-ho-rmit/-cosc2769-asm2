@@ -22,7 +22,7 @@ const Groupnav = () => {
             padding: '8px 15px',
             cursor: 'pointer',
             fontSize: '14px',
-            borderRadius: '5px', // 모서리를 둥글게
+            borderRadius: '5px', 
             transition: 'background-color 0.3s ease',
           }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#555')}
@@ -39,7 +39,7 @@ const Groupnav = () => {
             padding: '8px 15px',
             cursor: 'pointer',
             fontSize: '14px',
-            borderRadius: '5px', // 모서리를 둥글게
+            borderRadius: '5px', 
             transition: 'background-color 0.3s ease',
           }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#555')}
@@ -56,7 +56,7 @@ const Groupnav = () => {
             padding: '8px 15px',
             cursor: 'pointer',
             fontSize: '14px',
-            borderRadius: '5px', // 모서리를 둥글게
+            borderRadius: '5px', 
             transition: 'background-color 0.3s ease',
           }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#555')}
@@ -73,7 +73,7 @@ const Groupnav = () => {
             padding: '8px 15px',
             cursor: 'pointer',
             fontSize: '14px',
-            borderRadius: '5px', // 모서리를 둥글게
+            borderRadius: '5px', 
             transition: 'background-color 0.3s ease',
           }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#555')}
