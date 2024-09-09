@@ -16,23 +16,34 @@ Video Demonstration Link: [here](https://rmiteduau-my.sharepoint.com/:v:/g/perso
 
 | Name                 | sID      | Contribution Score | Email                | Github                          |
 |----------------------|----------|--------------------|----------------------|---------------------------------|
-| Cho Jaesuk           | S3914532 |                    | S3914532@rmit.edu.vn | https://github.com/ChoJaesuk    |
-| Cho Jimin            | S3940575 |                    | S3940575@rmit.edu.vn | https://github.com/Jimin76      |
-| Tran Ngoc Hong Doanh | S3927023 |                    | s3927023@rmit.edu.vn | https://github.com/yoantran     |
-| Ho Tuan              | S4019549 |                    | S4019549@rmit.edu.vn | https://github.com/tuan-ho-rmit |
-| Mai Chi Nghi         | S3864219 |                    | S3864219@rmit.edu.vn | https://github.com/chinghi      |
+| Cho Jaesuk           | S3914532 | 7                  | S3914532@rmit.edu.vn | https://github.com/ChoJaesuk    |
+| Cho Jimin            | S3940575 | 7                  | S3940575@rmit.edu.vn | https://github.com/Jimin76      |
+| Tran Ngoc Hong Doanh | S3927023 | 7                  | s3927023@rmit.edu.vn | https://github.com/yoantran     |
+| Ho Tuan              | S4019549 | 7                  | S4019549@rmit.edu.vn | https://github.com/tuan-ho-rmit |
+| Mai Chi Nghi         | S3864219 | 1                  | S3864219@rmit.edu.vn | https://github.com/chinghi      |
 
 ***
 
 ### How to install and run our project:
 
+
+#### Step 1: accessing our MongoDB database for sample data
+- Acessing: [MongodDB](https://account.mongodb.com/account/login)
+
+- email: ```fynkportal@gmail.com```
+
+- password: ```fynkadmin123```
+
+#### Step 2: run the following codes in order:
+1st:
 ```bash
   npm run build
 ```
-
+2nd:
 ```bash
   npm run start
 ```
+
 
 #### Navigating in our project with admin role:
 
