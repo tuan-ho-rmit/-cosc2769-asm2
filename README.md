@@ -16,11 +16,11 @@ Video Demonstration Link: [here](https://rmiteduau-my.sharepoint.com/:v:/g/perso
 
 | Name                 | sID      | Contribution Score | Email                | Github                          |
 |----------------------|----------|--------------------|----------------------|---------------------------------|
-| Cho Jaesuk           | S3914532 | 7                  | S3914532@rmit.edu.vn | https://github.com/ChoJaesuk    |
-| Cho Jimin            | S3940575 | 7                  | S3940575@rmit.edu.vn | https://github.com/Jimin76      |
-| Tran Ngoc Hong Doanh | S3927023 | 7                  | s3927023@rmit.edu.vn | https://github.com/yoantran     |
-| Ho Tuan              | S4019549 | 7                  | S4019549@rmit.edu.vn | https://github.com/tuan-ho-rmit |
-| Mai Chi Nghi         | S3864219 | 1                  | S3864219@rmit.edu.vn | https://github.com/chinghi      |
+| Cho Jaesuk           | S3914532 | 6                  | S3914532@rmit.edu.vn | https://github.com/ChoJaesuk    |
+| Cho Jimin            | S3940575 | 6                  | S3940575@rmit.edu.vn | https://github.com/Jimin76      |
+| Tran Ngoc Hong Doanh | S3927023 | 6                  | s3927023@rmit.edu.vn | https://github.com/yoantran     |
+| Ho Tuan              | S4019549 | 6                  | S4019549@rmit.edu.vn | https://github.com/tuan-ho-rmit |
+| Mai Chi Nghi         | S3864219 | 0                  | S3864219@rmit.edu.vn | https://github.com/chinghi      |
 
 ***
 
