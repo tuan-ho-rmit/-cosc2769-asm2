@@ -25,7 +25,7 @@ const Group = () => {
     // get groups that user is participating
     const fetchGroups = async (userId) => {
       try {
-        const response = await fetch('http://localhost:3000/api/groups');
+        const response = await fetch('http://localhost:3000/api/groups?status=active');
         const result = await response.json();
         const myGroups = result.filter(group => group.members.includes(userId));
         setGroups(myGroups);
