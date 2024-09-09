@@ -8,7 +8,7 @@ Tutor: Bao Ho Nguyen Phu ( bao.honguyenphu@rmit.edu.vn )
 
 GitHub Repo : [here](https://github.com/tuan-ho-rmit/-cosc2769-asm2)
 
-Video Demonstration Link: [here]()
+Video Demonstration Link: [here](https://rmiteduau-my.sharepoint.com/:v:/g/personal/s3940575_rmit_edu_vn/EYJrJiSgAStMqeO0Dqbyxn8BtkJdnhYGfPHuLML8St8-LQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=PkKR4h)
 
 ***
 
@@ -25,6 +25,19 @@ Video Demonstration Link: [here]()
 ***
 
 ### How to install and run our project:
+
+```bash
+  npm install
+```
+```bash
+  cd frontend
+```
+```bash
+  npm install
+```
+```bash
+  cd ../
+```
 
 ```bash
   npm run build
