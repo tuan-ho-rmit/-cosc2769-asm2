@@ -258,7 +258,7 @@ export default function PostDetail() {
       {/* Display reaction counts */}
       <div className="reactionCounts">
         {Object.entries(reactionCounts).map(([type, count]) => (
-          <div key={type} className="reactionCount">
+          <div key={type} className="reactionCount" style={{ color: 'black' }}>
             {type}: {count}
           </div>
         ))}
@@ -287,9 +287,9 @@ export default function PostDetail() {
 
       {/* Editing controls */}
       {isEditing && (
-        <div className="editButtons">
-          <button onClick={handleSavePost}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        <div className="editBtnContainer">
+          <button className="fileSelectButton" onClick={handleSavePost}>Save</button>
+          <button className="saveButton" onClick={() => setIsEditing(false)}>Cancel</button>
         </div>
       )}
 

@@ -16,17 +16,21 @@ export default function ListOfComments({ comments, onEditComment, onDeleteCommen
                         <div className="commentHeader">
                             <div className="imgContainer">
                                 <span className="mx-4">
-                                    <img 
-                                        src={comment.author && comment.author.avatar ? comment.author.avatar : 'default-avatar-url.jpg'} 
-                                        alt="User Avatar"
-                                        className='w-10 h-10 ring-yellow ring-2 rounded-full'
-                                    />
+                                    <Link to={currentUserId === comment.author._id ? '/mydetail' : `/user/${comment.author._id}`}>
+                                        <img 
+                                            src={comment.author && comment.author.avatar ? comment.author.avatar : 'default-avatar-url.jpg'} 
+                                            alt="User Avatar"
+                                            className='w-10 h-10 ring-yellow ring-2 rounded-full'
+                                        />
+                                    </Link>
                                 </span>
                             </div>
                             <div className="commentInfo">
-                                <div className="commentUserName">
-                                    <p>{comment.author && comment.author.firstName} {comment.author && comment.author.lastName}</p>
-                                </div>
+                                <Link to={currentUserId === comment.author._id ? '/mydetail' : `/user/${comment.author._id}`}>
+                                    <div className="commentUserName">
+                                        <p>{comment.author && comment.author.firstName} {comment.author && comment.author.lastName}</p>
+                                    </div>
+                                </Link>
                                 <div className="commentDate">
                                     <p>{new Date(comment.date).toLocaleString()}</p>
                                 </div>

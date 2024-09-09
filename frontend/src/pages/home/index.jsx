@@ -77,35 +77,32 @@ export default function Home() {
   }
 
   // Handle adding a new post
-  function handleAddPost() {
+  function handleAddPost(images) {
     if (!user) {
         alert('You need to log in to post.');
         return;
     }
 
-    // Prepare new post data
     const newPostData = {
         userProfile: user._id,
         userId: user._id,
         author: user._id,
         content: content,
-        images: images,
-        isGroupPost: false, // Flag for group posts, which is false here
-        private: isPrivate // Privacy setting
+        images: images,  // Use the updated image files from the CreatePost component
+        isGroupPost: false,  // Flag for group posts, which is false here
+        private: isPrivate  // Privacy setting
     };
 
-    // Make a POST request to create the post
     fetch('http://localhost:3000/api/posts', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(newPostData), // Send the post data as JSON
+        body: JSON.stringify(newPostData),  // Send the post data including the images
     })
     .then(response => response.json())
     .then(newPost => {
-        // Fetch the newly created post to ensure data consistency
         return fetch(`http://localhost:3000/api/posts/${newPost._id}`, {
             method: 'GET',
             credentials: 'include',
@@ -113,12 +110,12 @@ export default function Home() {
     })
     .then(response => response.json())
     .then(populatedPost => {
-        setPostList([populatedPost, ...posts]); // Add new post to the top of the post list
-        setContent(""); // Clear the content input field
-        setImages([]); // Clear the images input
+        setPostList([populatedPost, ...posts]);  // Add new post to the top of the post list
+        setContent("");  // Clear the content input field
+        setImages([]);  // Clear the images input
     })
     .catch(error => console.error('Error creating post:', error));
-  }
+}
 
   // Handle deleting a post
   function handleDeletePost(id) {

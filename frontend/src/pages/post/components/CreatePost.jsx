@@ -12,7 +12,8 @@ export default function CreatePost({
 }) {
     const fileInputRef = useRef(null);  // Reference to the hidden file input for image uploads
     const [previewImages, setPreviewImages] = useState([]);  // State to store preview images
-    const userAvatar = user?.avatar;  // Retrieves the avatar of the logged-in user
+    const [imageFiles, setImageFiles] = useState([]);  // Store actual image files
+    const userAvatar = user?.avatar; // Retrieves the avatar of the logged-in user
 
     // Trigger the file input when the "Add Image" button is clicked
     const handleImageUploadClick = () => {
@@ -25,13 +26,28 @@ export default function CreatePost({
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);  // Convert the file list into an array
         const imagePreviews = files.map(file => URL.createObjectURL(file));  // Create a preview URL for each file
+
         setPreviewImages([...previewImages, ...imagePreviews]);  // Update preview images state
-        onImageUpload(e);  // Trigger the image upload logic passed as a prop
+        const newFiles = files.map(file => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    resolve(reader.result); // Push base64 encoded image
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Wait for all the images to be processed into base64
+        Promise.all(newFiles).then(encodedImages => {
+            setImageFiles([...imageFiles, ...encodedImages]);  // Store the base64-encoded images
+        });
     };
 
-    // Remove a selected image from the preview
+    // Remove a selected image from the preview and the actual image data
     const handleRemoveImage = (indexToRemove) => {
         setPreviewImages(previewImages.filter((_, index) => index !== indexToRemove));  // Filter out the image by index
+        setImageFiles(imageFiles.filter((_, index) => index !== indexToRemove));  // Filter out the image from actual image data
     };
 
     // Toggle the privacy setting of the post between public and friends-only
@@ -41,10 +57,9 @@ export default function CreatePost({
 
     // Add the post and reset the image previews
     const handleAddPost = () => {
-        onAdd();  // Call the function to add the post
-
-        // Reset image previews after the post is added
-        setPreviewImages([]);
+        onAdd(imageFiles);  // Pass the actual image files (base64 encoded) when adding the post
+        setPreviewImages([]);  // Reset image previews after the post is added
+        setImageFiles([]);  // Reset the actual image data
     };
 
     return (
