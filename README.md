@@ -27,19 +27,6 @@ Video Demonstration Link: [here](https://rmiteduau-my.sharepoint.com/:v:/g/perso
 ### How to install and run our project:
 
 ```bash
-  npm install
-```
-```bash
-  cd frontend
-```
-```bash
-  npm install
-```
-```bash
-  cd ../
-```
-
-```bash
   npm run build
 ```
 
